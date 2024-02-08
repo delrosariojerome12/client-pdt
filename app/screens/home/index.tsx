@@ -1,11 +1,12 @@
-import {View, Text, StyleSheet} from "react-native";
+import {View} from "react-native";
 import React from "react";
 import HomeNavButtons from "../../../src/components/forms/buttons/HomeNavButtons";
 import {homeRoutes} from "../../../src/routes/homeRoutes";
+import {generalStyles} from "../../../src/styles/styles";
 
 const HomeIndex = () => {
   return (
-    <View style={styles.container}>
+    <View style={generalStyles.wideContainer}>
       {homeRoutes.map((item, index) => {
         return (
           <HomeNavButtons
@@ -18,14 +19,5 @@ const HomeIndex = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    gap: 10,
-    padding: 25,
-    justifyContent: "space-evenly",
-    height: "80%",
-  },
-});
 
 export default HomeIndex;
