@@ -5,11 +5,11 @@ import {generalStyles} from "../../../../src/styles/styles";
 import HomeNavButtons from "../../../../src/components/forms/buttons/HomeNavButtons";
 
 const Transport = () => {
-  const {getProperRoutes} = useRouteHooks("TRANSPORT MANAGEMENT SYSTEM");
+  const {getChildRoutes} = useRouteHooks("TRANSPORT MANAGEMENT SYSTEM");
 
   const routes = useMemo(() => {
-    return getProperRoutes();
-  }, [getProperRoutes]);
+    return getChildRoutes();
+  }, [getChildRoutes]);
 
   return (
     <View style={generalStyles.container}>

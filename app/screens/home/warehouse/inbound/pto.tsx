@@ -1,12 +1,12 @@
 import {View, Text} from "react-native";
 import React from "react";
 
-const Outbound = () => {
+const PTO = () => {
   return (
     <View>
-      <Text>Outbound</Text>
+      <Text>PTO</Text>
     </View>
   );
 };
 
-export default Outbound;
+export default PTO;

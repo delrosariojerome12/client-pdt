@@ -9,12 +9,41 @@ const basePath = "screens/home";
 
 export const homeRoutes = [
   {
+    title: "HOME",
+    routePath: `${basePath}`,
+    children: [],
+    isDropdownOpen: false,
+    icon: "home",
+  },
+  {
     title: "WAREHOUSE MANAGEMENT SYSTEM",
     routePath: `${basePath}/warehouse`,
     children: [
       {
         title: "INBOUND",
-        path: "inbound/inbound",
+        path: "inbound",
+        children: [
+          {
+            title: "PURCHASE TRANSFER ORDER",
+            path: "pto",
+          },
+          {
+            title: "PUTAWAY TO - PUR TRANSFER",
+            path: "pur",
+          },
+          {
+            title: "WAREHOUSE TRANSFER ORDER",
+            path: "wto",
+          },
+          {
+            title: "PUTAWAY TO - WHS TRANSFER",
+            path: "whs",
+          },
+          {
+            title: "SALES RETURN TRANSFER ORDER",
+            path: "srto",
+          },
+        ],
         icon: (
           <MaterialCommunityIcons
             name="home-import-outline"
@@ -25,7 +54,21 @@ export const homeRoutes = [
       },
       {
         title: "OUTBOUND",
-        path: "outbound/outbound",
+        path: "outbound",
+        children: [
+          {
+            title: "WAREHOUSE TRANSFER ORDER",
+            path: "wto",
+          },
+          {
+            title: "WAVE PICK LIST",
+            path: "wavepick",
+          },
+          {
+            title: "SINGLE PICK LIST",
+            path: "singlepick",
+          },
+        ],
         icon: (
           <MaterialCommunityIcons
             name="home-export-outline"
@@ -44,7 +87,8 @@ export const homeRoutes = [
     children: [
       {
         title: "TRANSACTION",
-        path: "transaction/transaction",
+        path: "transaction",
+        children: [],
         icon: <FontAwesome5 name="exchange-alt" size={20} color="#808080" />, // Set color to gray
       },
     ],
@@ -57,23 +101,26 @@ export const homeRoutes = [
     children: [
       {
         title: "TRANSACTION",
-        path: "transaction/transaction",
+        path: "transaction",
+        children: [],
         icon: <FontAwesome5 name="exchange-alt" size={20} color="#808080" />, // Set color to gray
       },
       {
         title: "SUBCON",
-        path: "subcon/subcon",
+        path: "subcon",
+        children: [],
         icon: <FontAwesome5 name="exchange-alt" size={20} color="#808080" />, // Set color to gray
       },
       {
         title: "PYHSICAL COUNT",
-        path: "physicalCount/physicalCount",
+        path: "physicalCount",
+        children: [],
         icon: <MaterialIcons name="checklist-rtl" size={20} color="#808080" />, // Set color to gray
       },
       {
         title: "REPLENISHMENT",
-        path: "replenishment/replenishment",
-        // Set color to gray
+        path: "replenishment",
+        children: [],
         icon: (
           <MaterialCommunityIcons
             name="basket-fill"
@@ -92,49 +139,92 @@ export const homeRoutes = [
     children: [
       {
         title: "INQUIRY",
-        path: "inquiry/inquiry",
+        path: "inquiry",
+        children: [],
         icon: <FontAwesome name="search" size={20} color="#808080" />, // Set color to gray
       },
     ],
     isDropdownOpen: false,
-    icon: "shopping-cart",
+    icon: "luggage-cart",
   },
 ];
 
+// hide all the default screens
 export const drawerScreens = [
-  // start warehouse
   {
     name: "index",
     title: "Home",
-    isVisible: true,
+    isVisible: false,
     icon: "home",
   },
+  // start warehouse
   {
     name: "warehouse/index",
-    title: "WMS",
+    title: "Warehouse Management System",
     isVisible: false,
   },
   {
-    name: "warehouse/inbound/inbound",
+    name: "warehouse/inbound/index",
     title: "Inbound",
     isVisible: false,
   },
   {
-    name: "warehouse/outbound/outbound",
-    title: "Outbound",
+    name: "warehouse/inbound/pto",
+    title: "Purchase Transfer Order",
+    isVisible: false,
+  },
+  {
+    name: "warehouse/inbound/pur",
+    title: "Putaway to - PUR Transfer",
     isVisible: false,
   },
 
+  {
+    name: "warehouse/inbound/wto",
+    title: "Warehouse Transfer Order",
+    isVisible: false,
+  },
+  {
+    name: "warehouse/inbound/whs",
+    title: "Putaway to - WHS Transfer",
+    isVisible: false,
+  },
+  {
+    name: "warehouse/inbound/srto",
+    title: "Sales Return Transfer Order",
+    isVisible: false,
+  },
+
+  {
+    name: "warehouse/outbound/index",
+    title: "Outbound",
+    isVisible: false,
+  },
+  {
+    name: "warehouse/outbound/wto",
+    title: "Warehouse Transfer Order",
+    isVisible: false,
+  },
+  {
+    name: "warehouse/outbound/wavepick",
+    title: "Wave Pick List",
+    isVisible: false,
+  },
+  {
+    name: "warehouse/outbound/singlepick",
+    title: "Single Pick List",
+    isVisible: false,
+  },
   // end warehouse
 
   // start transport
   {
     name: "transport/index",
-    title: "TMS",
+    title: "Transport Management System",
     isVisible: false,
   },
   {
-    name: "transport/transaction/transaction",
+    name: "transport/transaction/index",
     title: "Transaction",
     isVisible: false,
   },
@@ -143,26 +233,26 @@ export const drawerScreens = [
   // start ims
   {
     name: "inventoryManagement/index",
-    title: "IMS",
+    title: "Inventory Management System",
     isVisible: false,
   },
   {
-    name: "inventoryManagement/transaction/transaction",
-    title: "Transcation",
+    name: "inventoryManagement/transaction/index",
+    title: "Transaction",
     isVisible: false,
   },
   {
-    name: "inventoryManagement/subcon/subcon",
+    name: "inventoryManagement/subcon/index",
     title: "SUBCON",
     isVisible: false,
   },
   {
-    name: "inventoryManagement/physicalCount/physicalCount",
+    name: "inventoryManagement/physicalCount/index",
     title: "Physical Count",
     isVisible: false,
   },
   {
-    name: "inventoryManagement/replenishment/replenishment",
+    name: "inventoryManagement/replenishment/index",
     title: "Replenishment",
     isVisible: false,
   },
@@ -175,7 +265,7 @@ export const drawerScreens = [
     isVisible: false,
   },
   {
-    name: "inventory/inquiry/inquiry",
+    name: "inventory/inquiry/index",
     title: "Inquiry",
     isVisible: false,
   },

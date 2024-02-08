@@ -5,11 +5,11 @@ import {generalStyles} from "../../../../src/styles/styles";
 import HomeNavButtons from "../../../../src/components/forms/buttons/HomeNavButtons";
 
 const Inventory = () => {
-  const {getProperRoutes} = useRouteHooks("INVENTORY");
+  const {getChildRoutes} = useRouteHooks("INVENTORY");
 
   const routes = useMemo(() => {
-    return getProperRoutes();
-  }, [getProperRoutes]);
+    return getChildRoutes();
+  }, [getChildRoutes]);
 
   return (
     <View style={generalStyles.container}>

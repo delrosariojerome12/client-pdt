@@ -1,14 +1,13 @@
-import {View, SafeAreaView, Text, Animated} from "react-native";
+import {View, SafeAreaView} from "react-native";
 import React, {useState, useEffect} from "react";
 import {Drawer} from "expo-router/drawer";
-import {FontAwesome5, FontAwesome} from "@expo/vector-icons";
+import {FontAwesome} from "@expo/vector-icons";
 import {
   DrawerContentScrollView,
   DrawerItemList,
   DrawerItem,
 } from "@react-navigation/drawer";
 import {useAuthHooks} from "../../../src/hooks/authHooks";
-import {useRouter} from "expo-router";
 import {useDrawerHooks} from "../../../src/hooks/drawerHooks";
 
 const CustomDrawers = (props: any) => {

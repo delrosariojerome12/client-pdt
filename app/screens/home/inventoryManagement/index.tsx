@@ -5,11 +5,11 @@ import {generalStyles} from "../../../../src/styles/styles";
 import HomeNavButtons from "../../../../src/components/forms/buttons/HomeNavButtons";
 
 const InventoryManagement = () => {
-  const {getProperRoutes} = useRouteHooks("INVENTORY MANAGEMENT SYSTEM");
+  const {getChildRoutes} = useRouteHooks("INVENTORY MANAGEMENT SYSTEM");
 
   const routes = useMemo(() => {
-    return getProperRoutes();
-  }, [getProperRoutes]);
+    return getChildRoutes();
+  }, [getChildRoutes]);
 
   return (
     <View style={generalStyles.wideContainer}>

@@ -5,11 +5,11 @@ import {useRouteHooks} from "../../../../src/hooks/routeHooks";
 import {generalStyles} from "../../../../src/styles/styles";
 
 const Warehouse = () => {
-  const {getProperRoutes} = useRouteHooks("WAREHOUSE MANAGEMENT SYSTEM");
+  const {getChildRoutes} = useRouteHooks("WAREHOUSE MANAGEMENT SYSTEM");
 
   const routes = useMemo(() => {
-    return getProperRoutes();
-  }, [getProperRoutes]);
+    return getChildRoutes();
+  }, [getChildRoutes]);
 
   return (
     <View style={generalStyles.container}>

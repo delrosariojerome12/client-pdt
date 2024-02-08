@@ -1,12 +1,12 @@
 import {View, Text} from "react-native";
 import React from "react";
 
-const Inbound = () => {
+const WTO = () => {
   return (
     <View>
-      <Text>Inbound</Text>
+      <Text>WTO</Text>
     </View>
   );
 };
 
-export default Inbound;
+export default WTO;

@@ -5,7 +5,7 @@ export const generalStyles = StyleSheet.create({
     gap: 10,
     padding: 25,
     justifyContent: "space-evenly",
-    height: "80%",
+    height: "100%",
   },
   container: {
     flex: 1,
