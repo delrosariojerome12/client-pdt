@@ -2,12 +2,12 @@ import {createSlice} from "@reduxjs/toolkit";
 
 interface Document {
   selectedDocument: any | null;
-  scanFields: string;
+  // scanFields: string;
 }
 
 const initialState: Document = {
   selectedDocument: null,
-  scanFields: "",
+  // scanFields: "",
 };
 
 const documentReducer = createSlice({
@@ -18,7 +18,7 @@ const documentReducer = createSlice({
       state.selectedDocument = action.payload;
     },
     handleSetScanFields: (state, action) => {
-      state.scanFields = action.payload;
+      // state.scanFields = action.payload;
     },
   },
   extraReducers(builder) {},

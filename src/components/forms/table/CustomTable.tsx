@@ -81,7 +81,7 @@ const CustomTable = (props: TableProps) => {
 
 const styles = StyleSheet.create({
   head: {height: 40, backgroundColor: "#f1f8ff"},
-  headText: {margin: 6, fontWeight: "bold"},
+  headText: {margin: 6, fontWeight: "bold", fontSize: 14},
   row: {height: 80, flex: 1, backgroundColor: "#ccc"},
   rows: {height: 120, flex: 1, backgroundColor: "#fff"},
 

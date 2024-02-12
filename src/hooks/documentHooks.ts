@@ -4,16 +4,26 @@ import {
   handleToggleSelectModal,
 } from "../reducers/modalReducer";
 
+import {
+  handleSetDocument,
+  handleSetScanFields,
+} from "../reducers/documentReducer";
+
 export const useDocumentHooks = () => {
   const {isScanModal, isSelectModal} = useAppSelector((state) => state.modal);
   const dispatch = useAppDispatch();
 
-  const handleSelectModal = () => {
+  const handleSelectModal = (item: any) => {
+    dispatch(handleSetDocument(item));
     dispatch(handleToggleSelectModal());
   };
   const handleScanModal = () => {
     dispatch(handleToggleScanModal());
   };
 
-  return {handleScanModal, handleSelectModal};
+  const closeSelectModal = () => {
+    dispatch(handleToggleSelectModal());
+  };
+
+  return {handleScanModal, handleSelectModal, closeSelectModal};
 };

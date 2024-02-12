@@ -5,10 +5,11 @@ interface CustomButtonProps {
   onPress: () => void | Promise<void>;
   title: string;
   type: "regular" | "delete" | "edit" | "save";
+  isWidthNotFull?: boolean;
 }
 
 const CustomButton = (props: CustomButtonProps) => {
-  const {onPress, title, type} = props;
+  const {onPress, title, type, isWidthNotFull} = props;
 
   const getButtonStyle = () => {
     switch (type) {
@@ -25,6 +26,32 @@ const CustomButton = (props: CustomButtonProps) => {
     }
   };
 
+  const styles = StyleSheet.create({
+    button: {
+      borderRadius: 5,
+      width: `${isWidthNotFull ? "auto" : "100%"}`,
+      padding: 12,
+    },
+    regular: {
+      backgroundColor: "#007bff",
+    },
+    save: {
+      backgroundColor: "#28a745",
+    },
+    delete: {
+      backgroundColor: "#dc3545",
+    },
+    edit: {
+      backgroundColor: "#ffc107",
+    },
+    buttonText: {
+      color: "#fff",
+      fontSize: 16,
+      fontWeight: "bold",
+      textAlign: "center",
+    },
+  });
+
   return (
     <TouchableOpacity
       style={[styles.button, getButtonStyle()]}
@@ -36,29 +63,3 @@ const CustomButton = (props: CustomButtonProps) => {
 };
 
 export default CustomButton;
-
-const styles = StyleSheet.create({
-  button: {
-    borderRadius: 5,
-    width: "100%",
-    padding: 12,
-  },
-  regular: {
-    backgroundColor: "#007bff",
-  },
-  save: {
-    backgroundColor: "#28a745",
-  },
-  delete: {
-    backgroundColor: "#dc3545",
-  },
-  edit: {
-    backgroundColor: "#ffc107",
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-});
