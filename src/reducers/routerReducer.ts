@@ -14,7 +14,6 @@ export const routerReducer = createSlice({
   initialState,
   reducers: {
     handlePreviousRoute: (state, action) => {
-      //   state.previousRoutes = [...state.previousRoutes, action.payload];
       const isDuplicate = state.previousRoutes.includes(action.payload);
 
       if (!isDuplicate) {

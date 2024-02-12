@@ -105,7 +105,7 @@ export const useDrawerHooks = () => {
                   }}
                   onPress={() => {
                     if (previousRoutes.length !== 0) {
-                      console.log(previousRoutes);
+                      console.log("previous routes", previousRoutes);
                       dispatch(
                         handleRemovePreviousRoute(
                           previousRoutes[previousRoutes.length - 1]
@@ -194,6 +194,9 @@ export const useDrawerHooks = () => {
                         completeRoute.lastIndexOf("/")
                       );
 
+                      console.log(parentPath);
+
+                      dispatch(handlePreviousRoute("screens/home"));
                       dispatch(handlePreviousRoute(parentPath));
 
                       setFocusedItem(drawerItemChild.title);

@@ -1,6 +1,7 @@
 import {StyleSheet} from "react-native";
 
 export const generalStyles = StyleSheet.create({
+  // containers
   wideContainer: {
     gap: 10,
     padding: 25,
@@ -12,6 +13,13 @@ export const generalStyles = StyleSheet.create({
     gap: 25,
     padding: 25,
   },
+  innerContainer: {
+    padding: 7,
+    paddingTop: 20,
+    flex: 1,
+    gap: 20,
+  },
+
   boldText: {
     fontSize: 16,
     fontWeight: "bold",
