@@ -9,6 +9,7 @@ import {useAppSelector, useAppDispatch} from "../store/store";
 import {
   handleRemovePreviousRoute,
   handlePreviousRoute,
+  handleClearRoutes,
 } from "../reducers/routerReducer";
 
 interface customDrawers {
@@ -163,6 +164,12 @@ export const useDrawerHooks = () => {
               );
               router.push(drawerItem.routePath);
               setFocusedItem(drawerItem.title);
+
+              if (drawerItem.title === "HOME") {
+                dispatch(handleClearRoutes());
+                console.log(drawerItem.title);
+                return;
+              }
               dispatch(handlePreviousRoute(parentPath));
             }}
             icon={({size, color}) => (

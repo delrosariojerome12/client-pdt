@@ -26,10 +26,16 @@ export const routerReducer = createSlice({
         (item) => item !== action.payload
       );
     },
+    handleClearRoutes: (state) => {
+      state.previousRoutes = [];
+    },
   },
 });
 
-export const {handlePreviousRoute, handleRemovePreviousRoute} =
-  routerReducer.actions;
+export const {
+  handlePreviousRoute,
+  handleRemovePreviousRoute,
+  handleClearRoutes,
+} = routerReducer.actions;
 
 export default routerReducer.reducer;
