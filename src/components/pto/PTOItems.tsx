@@ -15,8 +15,6 @@ const PTOItems = (props: Items) => {
   const {handleItemScanModal, closeItemScanModal} = useDocumentHooks();
   const {item} = props;
 
-  console.log("xxx", item);
-
   return (
     <>
       <View style={[styles.container, bgColors.mediumGrayishBG]}>
@@ -71,6 +69,7 @@ const styles = StyleSheet.create({
   },
   leftContainer: {
     gap: 5,
+    // borderWidth: 1,
   },
   remove: {
     flexDirection: "row",
@@ -81,6 +80,7 @@ const styles = StyleSheet.create({
     gap: 5,
     alignItems: "flex-end",
     width: "60%",
+    // borderWidth: 1,
   },
   datesContainer: {
     // alignItems: "flex-start",

@@ -13,7 +13,7 @@ const PTO = () => {
   const {isScanModal, isSelectModal} = useAppSelector((state) => state.modal);
   const {selectedDocument} = useAppSelector((state) => state.document);
 
-  const {handleScanModal, handleSelectModal, closeSelectModal} =
+  const {handleScanModal, handleSelectModal, closeSelectModal, handlePost} =
     useDocumentHooks();
 
   const tableHeaders = ["Date", "Document No.", "Intransit No.", ""];
@@ -101,6 +101,7 @@ const PTO = () => {
         tableData={tableData}
         visibleProperties={tableVisibleProps}
         onSelect={handleSelectModal}
+        onPost={handlePost}
       />
       <ScanModal visible={isScanModal} onClose={handleScanModal} />
       <SelectModal

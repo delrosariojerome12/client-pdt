@@ -2,15 +2,17 @@ import React, {useState} from "react";
 import {Modal, View, Text, Button, StyleSheet} from "react-native";
 import CustomInputs from "../forms/inputs/CustomInputs";
 import CustomButton from "../forms/buttons/CustomButton";
-
+import {useDocumentHooks} from "../../hooks/documentHooks";
 interface ScanModalProps {
   visible: boolean;
   onClose: () => void;
 }
 
 const ScanModal = (props: ScanModalProps) => {
-  const [scanfield, setScanfield] = useState<string>("");
+  const {handleScan} = useDocumentHooks();
+
   const {visible, onClose} = props;
+  const [scanfield, setScanfield] = useState<string>("");
 
   const handleOnChange = (key: string, value: string | number) => {
     setScanfield(String(value));
@@ -30,7 +32,7 @@ const ScanModal = (props: ScanModalProps) => {
           />
           <View style={styles.buttonContainer}>
             <CustomButton
-              onPress={onClose}
+              onPress={handleScan}
               title="Continue"
               type="regular"
               isWidthNotFull={true}

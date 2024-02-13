@@ -7,10 +7,12 @@ interface CustomInputsProps {
   inputValue: number | string;
   placeHolder: string;
   inputKey: string;
+  customWidth?: number;
 }
 
 const CustomInputs = (props: CustomInputsProps) => {
-  const {onInputChange, type, inputValue, placeHolder, inputKey} = props;
+  const {onInputChange, type, inputValue, placeHolder, inputKey, customWidth} =
+    props;
 
   const handleChange = (value: string) => {
     if (type === "numeric") {
@@ -26,7 +28,12 @@ const CustomInputs = (props: CustomInputsProps) => {
   };
 
   return (
-    <View>
+    <View
+      style={{
+        height: 50,
+        width: customWidth ? customWidth : "auto",
+      }}
+    >
       <TextInput
         style={styles.input}
         placeholder={placeHolder}
@@ -41,7 +48,7 @@ const CustomInputs = (props: CustomInputsProps) => {
 const styles = StyleSheet.create({
   input: {
     width: "100%",
-    height: 50,
+    height: "100%",
     borderColor: "gray",
     borderWidth: 1,
     marginBottom: 16,

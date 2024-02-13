@@ -1,3 +1,4 @@
+import {Alert} from "react-native";
 import {useAppSelector, useAppDispatch} from "../store/store";
 import {
   handleToggleScanModal,
@@ -35,11 +36,22 @@ export const useDocumentHooks = () => {
     dispatch(handleToggleItemScanModal());
   };
 
+  const handlePost = (item: any) => {
+    Alert.alert("Transaction Posting", `Do you want to post '${item.docnum}'`, [
+      {text: "OK", onPress: () => alert("No api yet.")},
+    ]);
+  };
+  const handleScan = () => {
+    alert("No api yet");
+  };
+
   return {
     handleScanModal,
     handleSelectModal,
     closeSelectModal,
     handleItemScanModal,
     closeItemScanModal,
+    handlePost,
+    handleScan,
   };
 };
