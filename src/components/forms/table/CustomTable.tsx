@@ -40,7 +40,7 @@ const CustomTable = (props: TableProps) => {
 
         {!isPostDisable && (
           <TouchableOpacity
-            style={styles.buttons}
+            style={styles.postbutton}
             onPress={() => onPost && onPost(rowData)}
           >
             <Text style={styles.buttonText}>POST</Text>
@@ -92,6 +92,11 @@ const styles = StyleSheet.create({
   },
   buttons: {
     backgroundColor: "#007bff",
+    borderRadius: 5,
+    padding: 10,
+  },
+  postbutton: {
+    backgroundColor: "#28a745",
     borderRadius: 5,
     padding: 10,
   },

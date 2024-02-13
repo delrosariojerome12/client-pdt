@@ -88,7 +88,12 @@ export const homeRoutes = [
       {
         title: "TRANSACTION",
         path: "transaction",
-        children: [],
+        children: [
+          {
+            title: "SHIPMENT DOCUMENT",
+            path: "shipmentDocument",
+          },
+        ],
         icon: <FontAwesome5 name="exchange-alt" size={20} color="#808080" />, // Set color to gray
       },
     ],
@@ -102,25 +107,53 @@ export const homeRoutes = [
       {
         title: "TRANSACTION",
         path: "transaction",
-        children: [],
+        children: [
+          {
+            title: "CYCLE COUNT",
+            path: "cycleCount",
+          },
+          {
+            title: "S.LOC TO S.LOC",
+            path: "slocToSloc",
+          },
+          {
+            title: "STOCK TRANSFER (BIN TO BIN)",
+            path: "stockTransfer",
+          },
+        ],
         icon: <FontAwesome5 name="exchange-alt" size={20} color="#808080" />, // Set color to gray
       },
       {
         title: "SUBCON",
         path: "subcon",
-        children: [],
+        children: [
+          {
+            title: "DELIVERY TO SUPPLIER",
+            path: "deliveryToSupplier",
+          },
+        ],
         icon: <FontAwesome5 name="exchange-alt" size={20} color="#808080" />, // Set color to gray
       },
       {
-        title: "PYHSICAL COUNT",
+        title: "PHYSICAL COUNT",
         path: "physicalCount",
-        children: [],
+        children: [
+          {
+            title: "PHYSICAL INVENTORY RECORD",
+            path: "physicalInventory",
+          },
+        ],
         icon: <MaterialIcons name="checklist-rtl" size={20} color="#808080" />, // Set color to gray
       },
       {
         title: "REPLENISHMENT",
         path: "replenishment",
-        children: [],
+        children: [
+          {
+            title: "STOCK REPLENISHMENT TO",
+            path: "stockReplenish",
+          },
+        ],
         icon: (
           <MaterialCommunityIcons
             name="basket-fill"
@@ -140,7 +173,12 @@ export const homeRoutes = [
       {
         title: "INQUIRY",
         path: "inquiry",
-        children: [],
+        children: [
+          {
+            title: "BATCH NO.AND BIN LOCATION INQUIRY",
+            path: "batchNOandLOC",
+          },
+        ],
         icon: <FontAwesome name="search" size={20} color="#808080" />, // Set color to gray
       },
     ],
@@ -228,6 +266,11 @@ export const drawerScreens = [
     title: "Transaction",
     isVisible: false,
   },
+  {
+    name: "transport/transaction/shipmentDocument",
+    title: "Shipment Document",
+    isVisible: false,
+  },
   // end transport
 
   // start ims
@@ -242,8 +285,28 @@ export const drawerScreens = [
     isVisible: false,
   },
   {
+    name: "inventoryManagement/transaction/cycleCount",
+    title: "Cycle Count",
+    isVisible: false,
+  },
+  {
+    name: "inventoryManagement/transaction/slocToSloc",
+    title: "S.LOC to S.LOC",
+    isVisible: false,
+  },
+  {
+    name: "inventoryManagement/transaction/stockTransfer",
+    title: "Stock Transfer (Bin to Bin)",
+    isVisible: false,
+  },
+  {
     name: "inventoryManagement/subcon/index",
     title: "SUBCON",
+    isVisible: false,
+  },
+  {
+    name: "inventoryManagement/subcon/deliveryToSupplier",
+    title: "Delivery to Supplier",
     isVisible: false,
   },
   {
@@ -252,8 +315,18 @@ export const drawerScreens = [
     isVisible: false,
   },
   {
+    name: "inventoryManagement/physicalCount/physicalInventory",
+    title: "Physical Inventory Record",
+    isVisible: false,
+  },
+  {
     name: "inventoryManagement/replenishment/index",
     title: "Replenishment",
+    isVisible: false,
+  },
+  {
+    name: "inventoryManagement/replenishment/stockReplenish",
+    title: "Stock Replenishment To",
     isVisible: false,
   },
   // end ims
@@ -267,6 +340,11 @@ export const drawerScreens = [
   {
     name: "inventory/inquiry/index",
     title: "Inquiry",
+    isVisible: false,
+  },
+  {
+    name: "inventory/inquiry/batchNOandLOC",
+    title: "Batch NO. and Bin Location Inquiry",
     isVisible: false,
   },
 
