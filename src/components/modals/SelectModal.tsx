@@ -1,31 +1,64 @@
 import React, {useState} from "react";
-import {Modal, View, Text, Button, StyleSheet} from "react-native";
-import CustomInputs from "../forms/inputs/CustomInputs";
-import CustomButton from "../forms/buttons/CustomButton";
-import PTOItems from "../pto/ptoItems";
+import {
+  Modal,
+  View,
+  Text,
+  Button,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
+import {FontAwesome5} from "@expo/vector-icons";
+import {shadows} from "../../styles/styles";
 
 interface SelectModalProps {
   visible: boolean;
   onClose: () => void;
   selectedItem: any;
+  title: string;
+  propertiesToShow: {name: string; label: string}[];
+  customContent: JSX.Element;
 }
 
 const SelectModal = (props: SelectModalProps) => {
-  const {visible, onClose, selectedItem} = props;
+  const {
+    visible,
+    onClose,
+    selectedItem,
+    title,
+    propertiesToShow,
+    customContent,
+  } = props;
 
-  return (
-    <Modal visible={visible} onRequestClose={onClose} transparent>
-      <View style={styles.centeredView}>
-        <View style={styles.modalView}>
-          <Text style={styles.headerText}>Purchase Transfer Order Details</Text>
-          <View>
-            <Text>{selectedItem.docnum}</Text>
-            <Text>{selectedItem.inrnum}</Text>
+  if (selectedItem) {
+    return (
+      <Modal visible={visible} onRequestClose={onClose} transparent>
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <View style={styles.headerContainer}>
+              <TouchableOpacity onPress={onClose}>
+                <FontAwesome5 name="arrow-left" size={24} color="black" />
+              </TouchableOpacity>
+              <Text style={styles.headerText}>{title}</Text>
+            </View>
+
+            <View style={[shadows.boxShadow, styles.propertiesContainer]}>
+              {propertiesToShow.map((propertyObj) => (
+                <View key={propertyObj.name} style={styles.properties}>
+                  <Text style={styles.label}>{propertyObj.label}: </Text>
+                  <Text>{selectedItem[propertyObj.name]}</Text>
+                </View>
+              ))}
+            </View>
+
+            <ScrollView style={styles.customContainer}>
+              {customContent}
+            </ScrollView>
           </View>
         </View>
-      </View>
-    </Modal>
-  );
+      </Modal>
+    );
+  }
 };
 
 const styles = StyleSheet.create({
@@ -39,9 +72,9 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     padding: 20,
     borderRadius: 10,
-    height: "80%",
-    gap: 10,
-    width: "90%",
+    height: "95%",
+    width: "95%",
+    gap: 20,
   },
   topContainer: {
     gap: 10,
@@ -58,9 +91,27 @@ const styles = StyleSheet.create({
   closeBtn: {
     width: "40%",
   },
+  headerContainer: {
+    flexDirection: "row",
+    gap: 20,
+  },
+  propertiesContainer: {
+    padding: 20,
+  },
+  customContainer: {
+    // borderWidth: 1,
+    width: "100%",
+  },
+  properties: {
+    flexDirection: "row",
+    gap: 10,
+  },
   headerText: {
     fontWeight: "bold",
     fontSize: 20,
+  },
+  label: {
+    fontWeight: "bold",
   },
 });
 

@@ -34,3 +34,37 @@ export const generalStyles = StyleSheet.create({
     color: "#000",
   },
 });
+
+export const shadows = StyleSheet.create({
+  boxShadow: {
+    borderRadius: 50 / 10,
+    shadowColor: "#474C5C", // Shadow color
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 1.84,
+    elevation: 5, // For Android shadow
+  },
+
+  boxShadowBottom: {
+    shadowColor: "#474C5C", // Shadow color
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5, // For Android shadow
+  },
+});
+
+export const bgColors = StyleSheet.create({
+  grayishBG: {
+    backgroundColor: "#474C5C",
+  },
+  mediumGrayishBG: {
+    backgroundColor: "#E9EBF8",
+  },
+});
