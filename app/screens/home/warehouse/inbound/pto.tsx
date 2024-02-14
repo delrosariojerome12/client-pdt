@@ -99,43 +99,37 @@ const PTO = () => {
     console.log("api call");
   }, []);
 
-  if (isFocused) {
-    console.log("PTO");
+  console.log("PTO");
 
-    return (
-      <View style={generalStyles.innerContainer}>
-        <CustomButton
-          title="SCAN WRR"
-          onPress={handleScanModal}
-          type="regular"
-        />
-        <CustomTable
-          tableHeaders={tableHeaders}
-          tableData={tableData}
-          visibleProperties={tableVisibleProps}
-          onSelect={handleSelectModal}
-          onPost={handlePost}
-        />
-        <ScanModal
-          visible={isScanModal}
-          onClose={handleScanModal}
-          placeholder="Waiting to Scan WRR Barcode"
-        />
+  return (
+    <View style={generalStyles.innerContainer}>
+      <CustomButton title="SCAN WRR" onPress={handleScanModal} type="regular" />
+      <CustomTable
+        tableHeaders={tableHeaders}
+        tableData={tableData}
+        visibleProperties={tableVisibleProps}
+        onSelect={handleSelectModal}
+        onPost={handlePost}
+      />
+      <ScanModal
+        visible={isScanModal}
+        onClose={handleScanModal}
+        placeholder="Waiting to Scan WRR Barcode"
+      />
 
-        <SelectModal
-          visible={isSelectModal}
-          onClose={closeSelectModal}
-          selectedItem={selectedDocument}
-          title="Purchase Transfer Order Details"
-          propertiesToShow={[
-            {name: "docnum", label: "Document Number"},
-            {name: "inrnum", label: "Other Number"},
-          ]}
-          customContent={<PTOItemsList />}
-        />
-      </View>
-    );
-  }
+      <SelectModal
+        visible={isSelectModal}
+        onClose={closeSelectModal}
+        selectedItem={selectedDocument}
+        title="Purchase Transfer Order Details"
+        propertiesToShow={[
+          {name: "docnum", label: "Document Number"},
+          {name: "inrnum", label: "Other Number"},
+        ]}
+        customContent={<PTOItemsList />}
+      />
+    </View>
+  );
 };
 
 export default PTO;

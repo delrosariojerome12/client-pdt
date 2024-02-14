@@ -93,38 +93,34 @@ const PUR = () => {
     console.log("api call");
   }, []);
 
-  console.log("wtf");
+  console.log("PUR");
+  return (
+    <View style={generalStyles.innerContainer}>
+      <CustomButton
+        title="SCAN LPN NO."
+        onPress={handleScanModal}
+        type="regular"
+        // onPress={() => setIsScanModalVisible(!isScanModalVisible)}
+      />
+      <CustomTable
+        tableHeaders={tableHeaders}
+        tableData={tableData}
+        visibleProperties={tableVisibleProps}
+        onPost={handlePost}
+        // onSelect={handleSelectModal}
+        isSelectDisable={true}
+      />
 
-  if (isFocused) {
-    console.log("PUR");
-    return (
-      <View style={generalStyles.innerContainer}>
-        <CustomButton
-          title="SCAN LPN NO."
-          // onPress={() => setIsScanModalVisible(!isScanModalVisible)}
-          onPress={handleScanModal}
-          type="regular"
-        />
-        <CustomTable
-          tableHeaders={tableHeaders}
-          tableData={tableData}
-          visibleProperties={tableVisibleProps}
-          onPost={handlePost}
-          // onSelect={handleSelectModal}
-          isSelectDisable={true}
-        />
-
-        <ScanModal
-          visible={isScanModal}
-          onClose={handleScanModal}
-          // visible={isScanModalVisible}
-          // onClose={() => setIsScanModalVisible(!isScanModalVisible)}
-          placeholder="Waiting to Scan LPN No."
-          isNextBtn={true}
-        />
-      </View>
-    );
-  }
+      <ScanModal
+        visible={isScanModal}
+        onClose={handleScanModal}
+        // visible={isScanModalVisible}
+        // onClose={() => setIsScanModalVisible(!isScanModalVisible)}
+        placeholder="Waiting to Scan LPN No."
+        isNextBtn={true}
+      />
+    </View>
+  );
 };
 
 export default PUR;
