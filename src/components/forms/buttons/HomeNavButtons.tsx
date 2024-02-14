@@ -18,12 +18,9 @@ const HomeNavButtons = (props: HomeNav) => {
     <TouchableOpacity
       style={styles.navButton}
       onPress={() => {
-        router.navigate(routePath);
+        router.push(routePath);
         const parentPath = routePath.substring(0, routePath.lastIndexOf("/"));
         dispatch(handlePreviousRoute(parentPath));
-
-        console.log(previousRoutes);
-        console.log(parentPath);
       }}
     >
       <Text style={{textAlign: "center", color: "#FFF", fontWeight: "600"}}>

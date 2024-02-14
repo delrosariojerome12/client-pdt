@@ -13,8 +13,9 @@ interface TableProps {
   tableHeaders: string[];
   tableData: any[];
   visibleProperties: string[];
+  isSelectDisable?: boolean;
   isPostDisable?: boolean;
-  onSelect: (selectedItem: any) => void;
+  onSelect?: (selectedItem: any) => void;
   onPost?: (selectedItem: any) => void;
 }
 
@@ -23,6 +24,7 @@ const CustomTable = (props: TableProps) => {
     tableHeaders,
     tableData,
     visibleProperties,
+    isSelectDisable,
     isPostDisable,
     onSelect,
     onPost,
@@ -31,12 +33,14 @@ const CustomTable = (props: TableProps) => {
   const renderButtons = (rowData: any) => {
     return (
       <View style={{gap: 10}}>
-        <TouchableOpacity
-          style={styles.buttons}
-          onPress={() => onSelect(rowData)}
-        >
-          <Text style={styles.buttonText}>SELECT</Text>
-        </TouchableOpacity>
+        {!isSelectDisable && (
+          <TouchableOpacity
+            style={styles.buttons}
+            onPress={() => onSelect && onSelect(rowData)}
+          >
+            <Text style={styles.buttonText}>SELECT</Text>
+          </TouchableOpacity>
+        )}
 
         {!isPostDisable && (
           <TouchableOpacity

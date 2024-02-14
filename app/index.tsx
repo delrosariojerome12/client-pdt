@@ -19,6 +19,7 @@ const Index = () => {
     const url = "https://your-license-agreement-url.com"; // Replace with your actual URL
     Linking.openURL(url);
   };
+  console.log("login");
 
   return (
     <View style={styles.container}>

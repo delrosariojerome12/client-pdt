@@ -35,8 +35,6 @@ const ItemScanModal = (props: ScanModalProps) => {
     setQuantityField(parseInt(value as any));
   };
 
-  console.log("eyy", item);
-
   if (item) {
     return (
       <Modal visible={visible} onRequestClose={onClose} transparent>

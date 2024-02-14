@@ -1,5 +1,5 @@
 import {View, Text} from "react-native";
-import React from "react";
+import React, {useEffect} from "react";
 import {useAppSelector} from "../../../../../src/store/store";
 import CustomButton from "../../../../../src/components/forms/buttons/CustomButton";
 import CustomTable from "../../../../../src/components/forms/table/CustomTable";
@@ -8,6 +8,7 @@ import SelectModal from "../../../../../src/components/modals/SelectModal";
 import {useDocumentHooks} from "../../../../../src/hooks/documentHooks";
 import {generalStyles} from "../../../../../src/styles/styles";
 import PTOItemsList from "../../../../../src/components/pto/PTOItemsList";
+import {useIsFocused} from "@react-navigation/native";
 
 const PTO = () => {
   const {isScanModal, isSelectModal} = useAppSelector((state) => state.modal);
@@ -92,31 +93,49 @@ const PTO = () => {
   ];
 
   const tableVisibleProps = ["trndte", "docnum", "inrnum"];
+  const isFocused = useIsFocused();
 
-  return (
-    <View style={generalStyles.innerContainer}>
-      <CustomButton title="SCAN WRR" onPress={handleScanModal} type="regular" />
-      <CustomTable
-        tableHeaders={tableHeaders}
-        tableData={tableData}
-        visibleProperties={tableVisibleProps}
-        onSelect={handleSelectModal}
-        onPost={handlePost}
-      />
-      <ScanModal visible={isScanModal} onClose={handleScanModal} />
-      <SelectModal
-        visible={isSelectModal}
-        onClose={closeSelectModal}
-        selectedItem={selectedDocument}
-        title="Purchase Transfer Order Details"
-        propertiesToShow={[
-          {name: "docnum", label: "Document Number"},
-          {name: "inrnum", label: "Other Number"},
-        ]}
-        customContent={<PTOItemsList />}
-      />
-    </View>
-  );
+  useEffect(() => {
+    console.log("api call");
+  }, []);
+
+  if (isFocused) {
+    console.log("PTO");
+
+    return (
+      <View style={generalStyles.innerContainer}>
+        <CustomButton
+          title="SCAN WRR"
+          onPress={handleScanModal}
+          type="regular"
+        />
+        <CustomTable
+          tableHeaders={tableHeaders}
+          tableData={tableData}
+          visibleProperties={tableVisibleProps}
+          onSelect={handleSelectModal}
+          onPost={handlePost}
+        />
+        <ScanModal
+          visible={isScanModal}
+          onClose={handleScanModal}
+          placeholder="Waiting to Scan WRR Barcode"
+        />
+
+        <SelectModal
+          visible={isSelectModal}
+          onClose={closeSelectModal}
+          selectedItem={selectedDocument}
+          title="Purchase Transfer Order Details"
+          propertiesToShow={[
+            {name: "docnum", label: "Document Number"},
+            {name: "inrnum", label: "Other Number"},
+          ]}
+          customContent={<PTOItemsList />}
+        />
+      </View>
+    );
+  }
 };
 
 export default PTO;

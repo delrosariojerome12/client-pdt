@@ -5,6 +5,8 @@ import {homeRoutes} from "../../../src/routes/homeRoutes";
 import {generalStyles} from "../../../src/styles/styles";
 
 const HomeIndex = () => {
+  console.log("home");
+
   return (
     <View style={generalStyles.wideContainer}>
       {/* <StatusBar hidden /> */}
