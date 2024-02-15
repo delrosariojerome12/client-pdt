@@ -5,7 +5,7 @@ import {
   MaterialIcons,
 } from "@expo/vector-icons";
 
-const basePath = "screens/home";
+const basePath = "screens";
 
 export const homeRoutes = [
   {
@@ -190,7 +190,7 @@ export const homeRoutes = [
 // hide all the default screens
 export const drawerScreens = [
   {
-    name: "index",
+    name: "home/index",
     title: "Home",
     isVisible: false,
     icon: "home",

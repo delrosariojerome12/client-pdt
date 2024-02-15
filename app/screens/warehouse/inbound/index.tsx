@@ -1,8 +1,8 @@
 import {View, Text} from "react-native";
 import React, {useMemo} from "react";
-import {useRouteHooks} from "../../../../../src/hooks/routeHooks";
-import HomeNavButtons from "../../../../../src/components/forms/buttons/HomeNavButtons";
-import {generalStyles} from "../../../../../src/styles/styles";
+import {useRouteHooks} from "../../../../src/hooks/routeHooks";
+import HomeNavButtons from "../../../../src/components/forms/buttons/HomeNavButtons";
+import {generalStyles} from "../../../../src/styles/styles";
 
 const Inbound = () => {
   const {getGrandchildRoutes, getBasePath} = useRouteHooks(

@@ -1,17 +1,22 @@
 import {View, Text} from "react-native";
-import React, {useEffect, useState} from "react";
-import CustomButton from "../../../../../src/components/forms/buttons/CustomButton";
-import CustomTable from "../../../../../src/components/forms/table/CustomTable";
-import ScanModal from "../../../../../src/components/modals/ScanModal";
-import {useDocumentHooks} from "../../../../../src/hooks/documentHooks";
-import {useAppSelector} from "../../../../../src/store/store";
-import {generalStyles} from "../../../../../src/styles/styles";
+import React, {useEffect} from "react";
+import {useAppSelector} from "../../../../src/store/store";
+import CustomButton from "../../../../src/components/forms/buttons/CustomButton";
+import CustomTable from "../../../../src/components/forms/table/CustomTable";
+import ScanModal from "../../../../src/components/modals/ScanModal";
+import SelectModal from "../../../../src/components/modals/SelectModal";
+import {useDocumentHooks} from "../../../../src/hooks/documentHooks";
+import {generalStyles} from "../../../../src/styles/styles";
+import PTOItemsList from "../../../../src/components/pto/PTOItemsList";
 import {useIsFocused} from "@react-navigation/native";
 
-const PUR = () => {
-  const {isScanModal} = useAppSelector((state) => state.modal);
+const PTO = () => {
+  const {isScanModal, isSelectModal} = useAppSelector((state) => state.modal);
+  const {selectedDocument} = useAppSelector((state) => state.document);
 
-  const {handleScanModal, handlePost} = useDocumentHooks();
+  const {handleScanModal, handleSelectModal, closeSelectModal, handlePost} =
+    useDocumentHooks();
+
   const tableHeaders = ["Date", "Document No.", "Intransit No.", ""];
   const tableData = [
     {
@@ -86,6 +91,7 @@ const PUR = () => {
       ],
     },
   ];
+
   const tableVisibleProps = ["trndte", "docnum", "inrnum"];
   const isFocused = useIsFocused();
 
@@ -93,34 +99,37 @@ const PUR = () => {
     console.log("api call");
   }, []);
 
-  console.log("PUR");
+  console.log("PTO");
+
   return (
     <View style={generalStyles.innerContainer}>
-      <CustomButton
-        title="SCAN LPN NO."
-        onPress={handleScanModal}
-        type="regular"
-        // onPress={() => setIsScanModalVisible(!isScanModalVisible)}
-      />
+      <CustomButton title="SCAN WRR" onPress={handleScanModal} type="regular" />
       <CustomTable
         tableHeaders={tableHeaders}
         tableData={tableData}
         visibleProperties={tableVisibleProps}
+        onSelect={handleSelectModal}
         onPost={handlePost}
-        // onSelect={handleSelectModal}
-        isSelectDisable={true}
       />
-
       <ScanModal
         visible={isScanModal}
         onClose={handleScanModal}
-        // visible={isScanModalVisible}
-        // onClose={() => setIsScanModalVisible(!isScanModalVisible)}
-        placeholder="Waiting to Scan LPN No."
-        isNextBtn={true}
+        placeholder="Waiting to Scan WRR Barcode"
+      />
+
+      <SelectModal
+        visible={isSelectModal}
+        onClose={closeSelectModal}
+        selectedItem={selectedDocument}
+        title="Purchase Transfer Order Details"
+        propertiesToShow={[
+          {name: "docnum", label: "Document Number"},
+          {name: "inrnum", label: "Other Number"},
+        ]}
+        customContent={<PTOItemsList />}
       />
     </View>
   );
 };
 
-export default PUR;
+export default PTO;

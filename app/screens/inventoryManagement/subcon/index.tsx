@@ -1,13 +1,13 @@
 import {View, Text} from "react-native";
 import React, {useMemo} from "react";
-import {useRouteHooks} from "../../../../../src/hooks/routeHooks";
-import HomeNavButtons from "../../../../../src/components/forms/buttons/HomeNavButtons";
-import {generalStyles} from "../../../../../src/styles/styles";
+import {useRouteHooks} from "../../../../src/hooks/routeHooks";
+import HomeNavButtons from "../../../../src/components/forms/buttons/HomeNavButtons";
+import {generalStyles} from "../../../../src/styles/styles";
 
-const PhysicalCount = () => {
+const Subcon = () => {
   const {getGrandchildRoutes, getBasePath} = useRouteHooks(
     "INVENTORY MANAGEMENT SYSTEM",
-    "PHYSICAL COUNT"
+    "SUBCON"
   );
 
   const routes = useMemo(() => {
@@ -33,4 +33,4 @@ const PhysicalCount = () => {
   );
 };
 
-export default PhysicalCount;
+export default Subcon;

@@ -1,13 +1,13 @@
 import {View, Text} from "react-native";
 import React, {useMemo} from "react";
-import {useRouteHooks} from "../../../../../src/hooks/routeHooks";
-import HomeNavButtons from "../../../../../src/components/forms/buttons/HomeNavButtons";
-import {generalStyles} from "../../../../../src/styles/styles";
+import {useRouteHooks} from "../../../../src/hooks/routeHooks";
+import HomeNavButtons from "../../../../src/components/forms/buttons/HomeNavButtons";
+import {generalStyles} from "../../../../src/styles/styles";
 
-const Transaction = () => {
+const Inquiry = () => {
   const {getGrandchildRoutes, getBasePath} = useRouteHooks(
-    "TRANSPORT MANAGEMENT SYSTEM",
-    "TRANSACTION"
+    "INVENTORY",
+    "INQUIRY"
   );
 
   const routes = useMemo(() => {
@@ -17,7 +17,6 @@ const Transaction = () => {
   const basePath = useMemo(() => {
     return getBasePath();
   }, [getBasePath]);
-
   return (
     <View style={generalStyles.container}>
       {routes?.children?.map((item, index) => {
@@ -33,4 +32,4 @@ const Transaction = () => {
   );
 };
 
-export default Transaction;
+export default Inquiry;

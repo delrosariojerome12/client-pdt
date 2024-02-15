@@ -1,8 +1,8 @@
 import {View} from "react-native";
 import React, {useMemo} from "react";
-import {useRouteHooks} from "../../../../src/hooks/routeHooks";
-import {generalStyles} from "../../../../src/styles/styles";
-import HomeNavButtons from "../../../../src/components/forms/buttons/HomeNavButtons";
+import {useRouteHooks} from "../../../src/hooks/routeHooks";
+import {generalStyles} from "../../../src/styles/styles";
+import HomeNavButtons from "../../../src/components/forms/buttons/HomeNavButtons";
 
 const InventoryManagement = () => {
   const {getChildRoutes} = useRouteHooks("INVENTORY MANAGEMENT SYSTEM");

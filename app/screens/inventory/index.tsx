@@ -1,11 +1,11 @@
 import {View} from "react-native";
 import React, {useMemo} from "react";
-import {useRouteHooks} from "../../../../src/hooks/routeHooks";
-import {generalStyles} from "../../../../src/styles/styles";
-import HomeNavButtons from "../../../../src/components/forms/buttons/HomeNavButtons";
+import {useRouteHooks} from "../../../src/hooks/routeHooks";
+import {generalStyles} from "../../../src/styles/styles";
+import HomeNavButtons from "../../../src/components/forms/buttons/HomeNavButtons";
 
-const Transport = () => {
-  const {getChildRoutes} = useRouteHooks("TRANSPORT MANAGEMENT SYSTEM");
+const Inventory = () => {
+  const {getChildRoutes} = useRouteHooks("INVENTORY");
 
   const routes = useMemo(() => {
     return getChildRoutes();
@@ -26,4 +26,4 @@ const Transport = () => {
   );
 };
 
-export default Transport;
+export default Inventory;

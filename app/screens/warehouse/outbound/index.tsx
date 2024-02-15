@@ -1,13 +1,13 @@
 import {View, Text} from "react-native";
 import React, {useMemo} from "react";
-import {useRouteHooks} from "../../../../../src/hooks/routeHooks";
-import HomeNavButtons from "../../../../../src/components/forms/buttons/HomeNavButtons";
-import {generalStyles} from "../../../../../src/styles/styles";
+import {useRouteHooks} from "../../../../src/hooks/routeHooks";
+import HomeNavButtons from "../../../../src/components/forms/buttons/HomeNavButtons";
+import {generalStyles} from "../../../../src/styles/styles";
 
-const Transaction = () => {
+const Outbound = () => {
   const {getGrandchildRoutes, getBasePath} = useRouteHooks(
-    "INVENTORY MANAGEMENT SYSTEM",
-    "TRANSACTION"
+    "WAREHOUSE MANAGEMENT SYSTEM",
+    "OUTBOUND"
   );
 
   const routes = useMemo(() => {
@@ -33,4 +33,4 @@ const Transaction = () => {
   );
 };
 
-export default Transaction;
+export default Outbound;

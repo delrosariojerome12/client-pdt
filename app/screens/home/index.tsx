@@ -1,9 +1,8 @@
 import {View, StatusBar} from "react-native";
-import React from "react";
+import React, {useEffect} from "react";
 import HomeNavButtons from "../../../src/components/forms/buttons/HomeNavButtons";
 import {homeRoutes} from "../../../src/routes/homeRoutes";
 import {generalStyles} from "../../../src/styles/styles";
-
 const HomeIndex = () => {
   console.log("home");
 

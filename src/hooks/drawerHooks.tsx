@@ -105,15 +105,28 @@ export const useDrawerHooks = () => {
                     borderRadius: 50 / 3,
                   }}
                   onPress={() => {
-                    if (previousRoutes.length !== 0) {
+                    // router.back();
+                    console.log(previousRoutes);
+                    console.log(previousRoutes.length);
+
+                    if (previousRoutes.length === 1) {
                       dispatch(
                         handleRemovePreviousRoute(
                           previousRoutes[previousRoutes.length - 1]
                         )
                       );
-                      router.navigate(
-                        previousRoutes[previousRoutes.length - 1]
-                      );
+                      router.back();
+                    } else {
+                      if (previousRoutes.length !== 0) {
+                        dispatch(
+                          handleRemovePreviousRoute(
+                            previousRoutes[previousRoutes.length - 1]
+                          )
+                        );
+                        router.navigate(
+                          previousRoutes[previousRoutes.length - 1]
+                        );
+                      }
                     }
                   }}
                 >
