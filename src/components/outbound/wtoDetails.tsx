@@ -10,21 +10,28 @@ import {useAppSelector} from "../../store/store";
 interface Items {
   item: any;
 }
-const PTOItems = (props: Items) => {
+const WTODetails = (props: Items) => {
   const {isScanItemModal} = useAppSelector((state) => state.modal);
-  const {handleItemScanModal, closeItemScanModal} = useDocumentHooks();
+  const {handleItemScanModal, closeItemScanModal, removeScannedQuantity} =
+    useDocumentHooks();
   const {item} = props;
 
   return (
     <>
       <View style={[styles.container, bgColors.mediumGrayishBG]}>
         <View style={styles.leftContainer}>
-          <Text>{item.itemName}</Text>
+          <Text>{`Line No: 1`}</Text>
           <Text>{item.itemCode}</Text>
-          <Text>{`${item.pieces} PCS`}</Text>
+          <Text>{item.itemName}</Text>
+          <Text>{`UOM: PCS`}</Text>
+          <Text>{`Qty: ${item.pieces}`}</Text>
           <View style={styles.remove}>
-            <Text>{`Receieved Qty: ${item.receiveQty}`}</Text>
-            <TouchableOpacity onPress={() => {}}>
+            <Text>{`Scanned Qty: ${item.receiveQty}`}</Text>
+            <TouchableOpacity
+              onPress={() => {
+                removeScannedQuantity(item);
+              }}
+            >
               <FontAwesome name="remove" size={24} color="black" />
             </TouchableOpacity>
           </View>
@@ -93,4 +100,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 });
-export default PTOItems;
+
+export default WTODetails;

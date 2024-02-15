@@ -8,11 +8,9 @@ import {useAppSelector} from "../../../../src/store/store";
 import {generalStyles} from "../../../../src/styles/styles";
 
 const WHS = () => {
-  const {isScanModal, isSelectModal} = useAppSelector((state) => state.modal);
-  const {selectedDocument} = useAppSelector((state) => state.document);
+  const {isScanModal} = useAppSelector((state) => state.modal);
 
-  const {handleScanModal, handleSelectModal, closeSelectModal, handlePost} =
-    useDocumentHooks();
+  const {handleScanModal, handlePost} = useDocumentHooks();
 
   const tableHeaders = ["Date", "Document No.", "Intransit No.", ""];
   const tableData = [
@@ -94,7 +92,7 @@ const WHS = () => {
     console.log("api call");
   }, []);
 
-  console.log("WTS");
+  console.log("WHS");
 
   return (
     <View style={generalStyles.innerContainer}>

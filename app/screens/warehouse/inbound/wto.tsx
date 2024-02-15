@@ -7,7 +7,7 @@ import SelectModal from "../../../../src/components/modals/SelectModal";
 import ScanModal from "../../../../src/components/modals/ScanModal";
 import {useDocumentHooks} from "../../../../src/hooks/documentHooks";
 import {generalStyles} from "../../../../src/styles/styles";
-import PTOItemsList from "../../../../src/components/pto/PTOItemsList";
+import PTOItemsList from "../../../../src/components/list-holder/PTOItemsList";
 
 const WTO = () => {
   const {isScanModal, isSelectModal} = useAppSelector((state) => state.modal);
@@ -124,7 +124,7 @@ const WTO = () => {
           {name: "docnum", label: "Document Number"},
           {name: "inrnum", label: "Other Number"},
         ]}
-        customContent={<PTOItemsList />}
+        customContent={<PTOItemsList uses="inbound" />}
       />
     </View>
   );

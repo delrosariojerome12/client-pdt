@@ -7,7 +7,7 @@ import {useDocumentHooks} from "../../../../src/hooks/documentHooks";
 import {useAppSelector} from "../../../../src/store/store";
 import {generalStyles} from "../../../../src/styles/styles";
 import SelectModal from "../../../../src/components/modals/SelectModal";
-import PTOItemsList from "../../../../src/components/pto/PTOItemsList";
+import PTOItemsList from "../../../../src/components/list-holder/PTOItemsList";
 
 const SRTO = () => {
   const {isScanModal, isSelectModal} = useAppSelector((state) => state.modal);
@@ -110,19 +110,19 @@ const SRTO = () => {
       <ScanModal
         visible={isScanModal}
         onClose={handleScanModal}
-        placeholder="Waiting to Scan LPN No."
+        placeholder="Waiting to Scan SRT Barcode..."
       />
 
       <SelectModal
         visible={isSelectModal}
         onClose={closeSelectModal}
         selectedItem={selectedDocument}
-        title="Warehouse Transfer Order Details"
+        title="Sales Return Transfer Order Details"
         propertiesToShow={[
           {name: "docnum", label: "Document Number"},
           {name: "inrnum", label: "Other Number"},
         ]}
-        customContent={<PTOItemsList />}
+        customContent={<PTOItemsList uses="inbound" />}
       />
     </View>
   );

@@ -30,7 +30,7 @@ const CustomInputs = (props: CustomInputsProps) => {
   return (
     <View
       style={{
-        height: 50,
+        height: 60,
         width: customWidth ? customWidth : "auto",
       }}
     >
@@ -52,7 +52,8 @@ const styles = StyleSheet.create({
     borderColor: "gray",
     borderWidth: 1,
     marginBottom: 16,
-    padding: 15,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
     borderRadius: 100 / 30,
   },
 });

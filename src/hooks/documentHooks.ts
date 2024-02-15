@@ -14,9 +14,12 @@ import {
 
 export const useDocumentHooks = () => {
   // const {isScanModal, isSelectModal} = useAppSelector((state) => state.modal);
+  const {selectedDocument} = useAppSelector((state) => state.document);
   const dispatch = useAppDispatch();
 
   const handleSelectModal = (item: any) => {
+    console.log("xxx");
+
     dispatch(handleSetDocument(item));
     dispatch(handleToggleSelectModal());
   };
@@ -38,7 +41,8 @@ export const useDocumentHooks = () => {
 
   const handlePost = (item: any) => {
     Alert.alert("Transaction Posting", `Do you want to post '${item.docnum}'`, [
-      {text: "OK", onPress: () => alert("No api yet.")},
+      {text: "Yes", onPress: () => alert("No api yet."), style: "destructive"},
+      {text: "No", onPress: () => alert("No api yet."), style: "cancel"},
     ]);
   };
   const handleScan = () => {
@@ -46,6 +50,24 @@ export const useDocumentHooks = () => {
   };
   const validateBin = () => {
     alert("No api yet");
+  };
+
+  const removeScannedQuantity = (item: any) => {
+    // clear scanned items
+    Alert.alert(
+      "Remove Scanned Items",
+      `Are you sure you want to remove the scanned quantity of item line no. 1`,
+      [
+        {
+          text: "Yes",
+          onPress: () => alert("No api yet."),
+          style: "destructive",
+        },
+        {text: "No", onPress: () => alert("No api yet."), style: "cancel"},
+      ]
+    );
+    console.log("remove", item);
+    console.log("parent", selectedDocument);
   };
 
   return {
@@ -57,5 +79,6 @@ export const useDocumentHooks = () => {
     handlePost,
     handleScan,
     validateBin,
+    removeScannedQuantity,
   };
 };
