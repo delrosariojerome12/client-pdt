@@ -44,6 +44,9 @@ export const useDocumentHooks = () => {
   const handleScan = () => {
     alert("No api yet");
   };
+  const validateBin = () => {
+    alert("No api yet");
+  };
 
   return {
     handleScanModal,
@@ -53,5 +56,6 @@ export const useDocumentHooks = () => {
     closeItemScanModal,
     handlePost,
     handleScan,
+    validateBin,
   };
 };

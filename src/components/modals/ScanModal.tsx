@@ -20,13 +20,30 @@ interface ScanModalProps {
 }
 
 const ScanModal = React.memo((props: ScanModalProps) => {
-  const {handleScan} = useDocumentHooks();
+  const {handleScan, validateBin} = useDocumentHooks();
 
   const {visible, onClose, placeholder, isNextBtn} = props;
   const [scanfield, setScanfield] = useState<string>("");
+  const [binfield, setBinfield] = useState<string>("");
+  const [itemDetails, setItemDetails] = useState<any | null>(null);
+
+  // const [itemDetails, setItemDetails] = useState<any | null>({
+  //   itemCode: "ABC123",
+  //   itemName: "Item 1",
+  //   pieces: 5,
+  //   receiveQty: 5,
+  //   LPNNumber: "LPN123",
+  //   batchNumber: "BATCH001",
+  //   mfgDate: "2023-01-01",
+  //   expDate: "2024-12-31",
+  // });
 
   const handleOnChange = (key: string, value: string | number) => {
     setScanfield(String(value));
+  };
+
+  const handleBinChange = (key: string, value: string | number) => {
+    setBinfield(String(value));
   };
 
   return (
@@ -73,6 +90,36 @@ const ScanModal = React.memo((props: ScanModalProps) => {
               />
             </View>
           )}
+
+          {itemDetails && (
+            <>
+              <View style={styles.itemContainer}>
+                <Text style={styles.floatingText}>Item Details</Text>
+                <Text>{`Item No: ${itemDetails.itemCode}`}</Text>
+                <Text>{`Item No: ${itemDetails.itemCode}`}</Text>
+                <Text>{`Item name: ${itemDetails.itemName}`}</Text>
+                <Text>{`PCS: ${itemDetails.pieces}`}</Text>
+                <Text>{`Batch No.: ${itemDetails.batchNumber}`}</Text>
+                <Text>{`Mfg. Date: ${itemDetails.expDate}`}</Text>
+                <Text>{`Exp. Date: ${itemDetails.mfgDate}`}</Text>
+              </View>
+
+              <CustomInputs
+                onInputChange={handleBinChange}
+                inputValue={binfield}
+                type="text"
+                placeHolder={"Scan Bin No."}
+                inputKey="bin"
+              />
+
+              <CustomButton
+                onPress={validateBin}
+                title="VALIDATE"
+                type="save"
+                isWidthNotFull={true}
+              />
+            </>
+          )}
         </View>
       </View>
     </Modal>
@@ -89,11 +136,9 @@ const styles = StyleSheet.create({
   modalView: {
     backgroundColor: "white",
     padding: 20,
-    // borderRadius: 10,
     height: "100%",
-    gap: 10,
+    gap: 20,
     width: "100%",
-    // justifyContent: "space-evenly",
   },
   headerContainer: {
     flexDirection: "row",
@@ -105,6 +150,12 @@ const styles = StyleSheet.create({
     gap: 10,
     justifyContent: "space-evenly",
   },
+  itemContainer: {
+    borderWidth: 1,
+    padding: 15,
+    borderRadius: 50 / 10,
+    gap: 10,
+  },
   continueBtn: {
     width: "60%",
   },
@@ -114,6 +165,12 @@ const styles = StyleSheet.create({
   headerText: {
     fontWeight: "bold",
     fontSize: 20,
+  },
+  floatingText: {
+    position: "absolute",
+    top: -10,
+    left: 10,
+    backgroundColor: "#fff",
   },
 });
 

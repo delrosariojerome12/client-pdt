@@ -6,7 +6,6 @@ import ScanModal from "../../../../src/components/modals/ScanModal";
 import {useDocumentHooks} from "../../../../src/hooks/documentHooks";
 import {useAppSelector} from "../../../../src/store/store";
 import {generalStyles} from "../../../../src/styles/styles";
-import {useIsFocused} from "@react-navigation/native";
 
 const PUR = () => {
   const {isScanModal} = useAppSelector((state) => state.modal);
@@ -87,35 +86,31 @@ const PUR = () => {
     },
   ];
   const tableVisibleProps = ["trndte", "docnum", "inrnum"];
-  const isFocused = useIsFocused();
 
   useEffect(() => {
     console.log("api call");
   }, []);
 
   console.log("PUR");
+
   return (
     <View style={generalStyles.innerContainer}>
       <CustomButton
         title="SCAN LPN NO."
         onPress={handleScanModal}
         type="regular"
-        // onPress={() => setIsScanModalVisible(!isScanModalVisible)}
       />
       <CustomTable
         tableHeaders={tableHeaders}
         tableData={tableData}
         visibleProperties={tableVisibleProps}
         onPost={handlePost}
-        // onSelect={handleSelectModal}
         isSelectDisable={true}
       />
 
       <ScanModal
         visible={isScanModal}
         onClose={handleScanModal}
-        // visible={isScanModalVisible}
-        // onClose={() => setIsScanModalVisible(!isScanModalVisible)}
         placeholder="Waiting to Scan LPN No."
         isNextBtn={true}
       />

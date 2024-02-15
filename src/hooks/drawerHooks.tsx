@@ -66,29 +66,6 @@ export const useDrawerHooks = () => {
 
   const renderDrawerScreens = () => {
     return drawerScreens.map((drawer, index) => {
-      // if (drawer.icon) {
-      //   return (
-      //     <Drawer.Screen
-      //       key={index}
-      //       name={drawer.name}
-      //       listeners={{
-      //         focus: () => {
-      //           setFocusedItem("HOME");
-      //           // Custom logic to execute when the screen is focused
-      //         },
-      //       }}
-      //       options={{
-      //         headerTitle: drawer.title,
-      //         drawerLabel: "Home",
-      //         drawerItemStyle: {display: drawer.isVisible ? "flex" : "none"},
-      //         drawerIcon: ({size, color}) => (
-      //           <FontAwesome5 name={drawer.icon} color={color} size={size} />
-      //         ),
-      //         drawerLabelStyle: {fontSize: 18},
-      //       }}
-      //     />
-      //   );
-      // }
       return (
         <Drawer.Screen
           key={index}

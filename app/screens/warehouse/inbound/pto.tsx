@@ -8,7 +8,6 @@ import SelectModal from "../../../../src/components/modals/SelectModal";
 import {useDocumentHooks} from "../../../../src/hooks/documentHooks";
 import {generalStyles} from "../../../../src/styles/styles";
 import PTOItemsList from "../../../../src/components/pto/PTOItemsList";
-import {useIsFocused} from "@react-navigation/native";
 
 const PTO = () => {
   const {isScanModal, isSelectModal} = useAppSelector((state) => state.modal);
@@ -93,7 +92,6 @@ const PTO = () => {
   ];
 
   const tableVisibleProps = ["trndte", "docnum", "inrnum"];
-  const isFocused = useIsFocused();
 
   useEffect(() => {
     console.log("api call");

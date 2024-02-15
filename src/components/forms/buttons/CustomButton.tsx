@@ -6,10 +6,11 @@ interface CustomButtonProps {
   title: string;
   type: "regular" | "delete" | "edit" | "save";
   isWidthNotFull?: boolean;
+  isDisable?: boolean;
 }
 
 const CustomButton = (props: CustomButtonProps) => {
-  const {onPress, title, type, isWidthNotFull} = props;
+  const {onPress, title, type, isWidthNotFull, isDisable} = props;
 
   const getButtonStyle = () => {
     switch (type) {
@@ -54,6 +55,7 @@ const CustomButton = (props: CustomButtonProps) => {
 
   return (
     <TouchableOpacity
+      disabled={isDisable}
       style={[styles.button, getButtonStyle()]}
       onPress={onPress}
     >
