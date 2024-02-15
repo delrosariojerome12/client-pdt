@@ -13,13 +13,10 @@ import {
 } from "../reducers/documentReducer";
 
 export const useDocumentHooks = () => {
-  // const {isScanModal, isSelectModal} = useAppSelector((state) => state.modal);
   const {selectedDocument} = useAppSelector((state) => state.document);
   const dispatch = useAppDispatch();
 
   const handleSelectModal = (item: any) => {
-    console.log("xxx");
-
     dispatch(handleSetDocument(item));
     dispatch(handleToggleSelectModal());
   };
