@@ -69,16 +69,29 @@ const CustomTable = (props: TableProps) => {
     );
   };
 
+  const renderTable = () => {
+    if (tableData.length > 0) {
+      return (
+        <Table borderStyle={{borderWidth: 1, borderColor: "#C1C0B9"}}>
+          <Row
+            data={tableHeaders}
+            style={styles.row}
+            textStyle={styles.headText}
+          />
+          {renderDataRows()}
+        </Table>
+      );
+    }
+    return (
+      <View style={styles.placeholderContainer}>
+        <Text style={styles.placeholderText}>No data available</Text>
+      </View>
+    );
+  };
+
   return (
     <ScrollView style={generalStyles.innerContainer}>
-      <Table borderStyle={{borderWidth: 1, borderColor: "#C1C0B9"}}>
-        <Row
-          data={tableHeaders}
-          style={styles.row}
-          textStyle={styles.headText}
-        />
-        {renderDataRows()}
-      </Table>
+      {renderTable()}
     </ScrollView>
   );
 };
@@ -109,6 +122,15 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "bold",
     textAlign: "center",
+  },
+  placeholderContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  placeholderText: {
+    fontSize: 16,
+    fontStyle: "italic",
   },
 });
 

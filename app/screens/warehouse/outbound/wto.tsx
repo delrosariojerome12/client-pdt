@@ -7,7 +7,7 @@ import {useDocumentHooks} from "../../../../src/hooks/documentHooks";
 import {useAppSelector} from "../../../../src/store/store";
 import {generalStyles} from "../../../../src/styles/styles";
 import SelectModal from "../../../../src/components/modals/SelectModal";
-import PTOItemsList from "../../../../src/components/list-holder/PTOItemsList";
+import ItemsList from "../../../../src/components/list-holder/ItemsList";
 import SwitchButton from "../../../../src/components/forms/buttons/SwitchButton";
 
 const WTO = () => {
@@ -99,6 +99,8 @@ const WTO = () => {
     setActiveIndex(index); // Update the active index
   };
 
+  console.log("WTO outbound");
+
   return (
     <View style={generalStyles.innerContainer}>
       <CustomButton
@@ -145,7 +147,7 @@ const WTO = () => {
           {name: "docnum", label: "TO Number"},
           {name: "inrnum", label: "STR Number"},
         ]}
-        customContent={<PTOItemsList uses="outbound" />}
+        customContent={<ItemsList uses="outbound" />}
       />
     </View>
   );

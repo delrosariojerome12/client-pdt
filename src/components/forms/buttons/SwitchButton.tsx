@@ -26,6 +26,7 @@ const SwitchButton: React.FC<SwitchButtonProps> = ({
             styles.button,
             index === activeIndex && styles.activeButton,
             index === 0 && styles.firstButton,
+            index === options.length - 1 && styles.lastButton,
           ]}
         >
           <Text
@@ -33,6 +34,7 @@ const SwitchButton: React.FC<SwitchButtonProps> = ({
               styles.buttonText,
               index === activeIndex && styles.activeText,
             ]}
+            ellipsizeMode="tail" // Truncate with an ellipsis at the end
           >
             {option}
           </Text>
@@ -49,6 +51,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     borderColor: "#ccc",
+    // justifyContent: "space-evenly",
   },
   button: {
     flex: 1,
@@ -56,10 +59,16 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
+
+    // borderRadius: 10,
   },
   firstButton: {
     borderTopLeftRadius: 10,
     borderBottomLeftRadius: 10,
+  },
+  lastButton: {
+    borderBottomRightRadius: 10,
+    borderTopRightRadius: 10,
   },
   activeButton: {
     backgroundColor: "#007bff",
@@ -68,6 +77,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#333",
     fontWeight: "bold",
+    maxWidth: 100,
   },
   activeText: {
     color: "#fff",

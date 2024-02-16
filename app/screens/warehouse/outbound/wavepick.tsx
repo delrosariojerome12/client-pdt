@@ -7,7 +7,7 @@ import {useDocumentHooks} from "../../../../src/hooks/documentHooks";
 import {useAppSelector} from "../../../../src/store/store";
 import {generalStyles} from "../../../../src/styles/styles";
 import SelectModal from "../../../../src/components/modals/SelectModal";
-import PTOItemsList from "../../../../src/components/list-holder/PTOItemsList";
+import ItemsList from "../../../../src/components/list-holder/ItemsList";
 import SwitchButton from "../../../../src/components/forms/buttons/SwitchButton";
 
 const WavePick = () => {
@@ -135,7 +135,7 @@ const WavePick = () => {
       <ScanModal
         visible={isScanModal}
         onClose={handleScanModal}
-        placeholder="Waiting to Scan SRT No. Barcode..."
+        placeholder="Waiting to Scan Wave Pick Barcode..."
       />
 
       <SelectModal
@@ -147,7 +147,7 @@ const WavePick = () => {
           {name: "docnum", label: "TO Number"},
           {name: "inrnum", label: "STR Number"},
         ]}
-        customContent={<PTOItemsList uses="outbound" />}
+        customContent={<ItemsList uses="outbound" />}
       />
     </View>
   );

@@ -39,7 +39,7 @@ export const useDocumentHooks = () => {
   const handlePost = (item: any) => {
     Alert.alert("Transaction Posting", `Do you want to post '${item.docnum}'`, [
       {text: "Yes", onPress: () => alert("No api yet."), style: "destructive"},
-      {text: "No", onPress: () => alert("No api yet."), style: "cancel"},
+      {text: "No", style: "cancel"}, // Just close the alert without any action
     ]);
   };
   const handleScan = () => {
@@ -60,7 +60,7 @@ export const useDocumentHooks = () => {
           onPress: () => alert("No api yet."),
           style: "destructive",
         },
-        {text: "No", onPress: () => alert("No api yet."), style: "cancel"},
+        {text: "No", style: "cancel"},
       ]
     );
     console.log("remove", item);
