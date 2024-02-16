@@ -67,6 +67,10 @@ export const useDocumentHooks = () => {
     console.log("parent", selectedDocument);
   };
 
+  const validateCycleCount = () => {
+    alert("No api yet");
+  };
+
   return {
     handleScanModal,
     handleSelectModal,
@@ -77,5 +81,6 @@ export const useDocumentHooks = () => {
     handleScan,
     validateBin,
     removeScannedQuantity,
+    validateCycleCount,
   };
 };
