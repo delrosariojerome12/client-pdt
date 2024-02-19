@@ -38,6 +38,13 @@ const CycleCount = () => {
       ccrNo: "CCR003",
       sLoc: "good",
     },
+    {
+      warehouse: "Warehouse D",
+      whsNo: "WH003",
+      date: "2024-02-17",
+      ccrNo: "CCR003",
+      sLoc: "good",
+    },
   ];
 
   console.log("cycle count");

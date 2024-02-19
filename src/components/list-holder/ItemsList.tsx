@@ -3,9 +3,11 @@ import React from "react";
 import {useAppSelector} from "../../store/store";
 import PTOItems from "../inbound/PTODetails";
 import WTODetails from "../outbound/wtoDetails";
+import SubConBinDetails from "../inventory-management/subConBinDetails";
+import StockTransferDetails from "../stockTransfer/stockTransferDetails";
 
 interface Props {
-  uses: "inbound" | "outbound";
+  uses: "inbound" | "outbound" | "subcon" | "stockTransfer";
 }
 
 const ItemsList = (props: Props) => {
@@ -18,6 +20,10 @@ const ItemsList = (props: Props) => {
         return <PTOItems item={item} key={index} />;
       case "outbound":
         return <WTODetails item={item} key={index} />;
+      case "subcon":
+        return <SubConBinDetails item={item} key={index} />;
+      case "stockTransfer":
+        return <StockTransferDetails item={item} key={index} />;
       default:
         break;
     }

@@ -306,7 +306,7 @@ export const drawerScreens = [
   },
   {
     name: "inventoryManagement/subcon/deliveryToSupplier",
-    title: "Delivery to Supplier",
+    title: "Delivery to Supplier TO",
     isVisible: false,
   },
   {

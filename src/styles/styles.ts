@@ -15,9 +15,9 @@ export const generalStyles = StyleSheet.create({
   },
   innerContainer: {
     padding: 7,
-    paddingTop: 20,
+    paddingTop: 10,
     flex: 1,
-    gap: 20,
+    gap: 15,
   },
 
   boldText: {
@@ -67,4 +67,13 @@ export const bgColors = StyleSheet.create({
   mediumGrayishBG: {
     backgroundColor: "#E9EBF8",
   },
+});
+
+export const format = StyleSheet.create({
+  twoRowText: {
+    flexDirection: "row",
+    gap: 10,
+    flexWrap: "wrap",
+  },
+  wrapText: {},
 });

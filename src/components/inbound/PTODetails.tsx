@@ -6,6 +6,7 @@ import {bgColors} from "../../styles/styles";
 import {useDocumentHooks} from "../../hooks/documentHooks";
 import ItemScanModal from "../modals/ItemScanModal";
 import {useAppSelector} from "../../store/store";
+import {format} from "../../styles/styles";
 
 interface Items {
   item: any;
@@ -35,15 +36,26 @@ const PTOItems = (props: Items) => {
           </View>
         </View>
         <View style={styles.rightContainer}>
+          {/* if validated */}
+          {/* <Text style={{fontWeight: "bold"}}>**VALIDATED**</Text> */}
           <View style={{flexDirection: "row", gap: 5}}>
             <Text style={{fontWeight: "bold"}}>LPN: </Text>
             <Text>{`${item.LPNNumber}`}</Text>
           </View>
           <View style={styles.datesContainer}>
             <View>
-              <Text>{`Batch No.: ${item.batchNumber}`}</Text>
-              <Text>{`Mfg. Date: ${item.expDate}`}</Text>
-              <Text>{`Exp. Date: ${item.mfgDate}`}</Text>
+              <View style={format.twoRowText}>
+                <Text style={{fontWeight: "bold"}}>Batch No.:</Text>
+                <Text>{` ${item.batchNumber}`}</Text>
+              </View>
+              <View style={format.twoRowText}>
+                <Text style={{fontWeight: "bold"}}>Mfg. Date:</Text>
+                <Text>{` ${item.expDate}`}</Text>
+              </View>
+              <View style={format.twoRowText}>
+                <Text style={{fontWeight: "bold"}}>Exp. Date:</Text>
+                <Text>{` ${item.mfgDate}`}</Text>
+              </View>
             </View>
             <TouchableOpacity onPress={() => {}}>
               <FontAwesome name="edit" size={24} color="black" />
@@ -67,13 +79,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    // borderWidth: 1,
-    height: 200,
-    padding: 10,
+    padding: 20,
     borderRadius: 100 / 10,
   },
   leftContainer: {
     gap: 5,
+    width: "45%",
     // borderWidth: 1,
   },
   remove: {
@@ -84,7 +95,7 @@ const styles = StyleSheet.create({
   rightContainer: {
     gap: 5,
     alignItems: "flex-end",
-    width: "60%",
+    width: "55%",
     // borderWidth: 1,
   },
   datesContainer: {

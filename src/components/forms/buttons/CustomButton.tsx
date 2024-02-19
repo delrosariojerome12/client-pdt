@@ -7,10 +7,11 @@ interface CustomButtonProps {
   type: "regular" | "delete" | "edit" | "save";
   isWidthNotFull?: boolean;
   isDisable?: boolean;
+  fontSize?: number;
 }
 
 const CustomButton = (props: CustomButtonProps) => {
-  const {onPress, title, type, isWidthNotFull, isDisable} = props;
+  const {onPress, title, type, isWidthNotFull, isDisable, fontSize} = props;
 
   const getButtonStyle = () => {
     switch (type) {
@@ -47,7 +48,7 @@ const CustomButton = (props: CustomButtonProps) => {
     },
     buttonText: {
       color: "#fff",
-      fontSize: 16,
+      fontSize: fontSize || 16,
       fontWeight: "bold",
       textAlign: "center",
     },
