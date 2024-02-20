@@ -1,9 +1,8 @@
-import React, {useState} from "react";
+import React from "react";
 import {
   Modal,
   View,
   Text,
-  Button,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
@@ -14,17 +13,35 @@ import CustomButton from "../forms/buttons/CustomButton";
 import {useDocumentHooks} from "../../hooks/documentHooks";
 import ScanModal from "./ScanModal";
 import {useAppSelector} from "../../store/store";
+import CustomCheckBox from "../forms/inputs/CustomCheckBox";
+import ScanBinAndItemModal from "./ScanBinAndItemModal";
 
-interface SelectModalProps {
+interface SelectScanModalProps {
   visible: boolean;
   onClose: () => void;
   selectedItem: any;
   title: string;
   propertiesToShow: {name: string; label: string}[];
   customContent: JSX.Element;
+  scanOptions?: {
+    scanModal: boolean;
+    showPending: boolean;
+    scanCounted: boolean;
+    scanModalDetails?: {title: string; placeholder: string};
+  };
+  checkBoxOptions: {
+    pending: {
+      showPending: boolean;
+      togglePending: () => void;
+    };
+    counted: {
+      showCounted: boolean;
+      toggleCounted: () => void;
+    };
+  };
 }
 
-const SelectModal = React.memo((props: SelectModalProps) => {
+const SelectandScanModal = React.memo((props: SelectScanModalProps) => {
   const {
     visible,
     onClose,
@@ -32,8 +49,9 @@ const SelectModal = React.memo((props: SelectModalProps) => {
     title,
     propertiesToShow,
     customContent,
+    scanOptions,
+    checkBoxOptions,
   } = props;
-
   const {isScanModal} = useAppSelector((state) => state.modal);
   const {handleScanModal} = useDocumentHooks();
 
@@ -49,6 +67,22 @@ const SelectModal = React.memo((props: SelectModalProps) => {
               <Text style={styles.headerText}>{title}</Text>
             </View>
 
+            {scanOptions?.scanModal && (
+              <>
+                <CustomButton
+                  title={scanOptions.scanModalDetails?.title || ""}
+                  onPress={handleScanModal}
+                  type="regular"
+                />
+
+                <ScanBinAndItemModal
+                  visible={isScanModal}
+                  onClose={handleScanModal}
+                  placeholder={scanOptions.scanModalDetails?.placeholder || ""}
+                />
+              </>
+            )}
+
             <View style={[shadows.boxShadow, styles.propertiesContainer]}>
               {propertiesToShow.map((propertyObj) => (
                 <View key={propertyObj.name} style={styles.properties}>
@@ -56,6 +90,37 @@ const SelectModal = React.memo((props: SelectModalProps) => {
                   <Text>{selectedItem[propertyObj.name]}</Text>
                 </View>
               ))}
+
+              {checkBoxOptions.counted.showCounted && (
+                <View style={styles.properties}>
+                  <Text style={styles.label}>Scanned/Counted: </Text>
+                  <Text>{`0/0`}</Text>
+                </View>
+              )}
+            </View>
+
+            {/* change the values based on the item */}
+            <View
+              style={[
+                {
+                  flexDirection: "row",
+                  borderBlockColor: "#ccc",
+                  alignItems: "center",
+                  height: 80,
+                },
+                shadows.boxShadow,
+              ]}
+            >
+              <CustomCheckBox
+                label="Show Pending"
+                isChecked={checkBoxOptions.pending.showPending}
+                onToggle={checkBoxOptions.pending.togglePending}
+              />
+              <CustomCheckBox
+                label="Show Scanned/Counted"
+                isChecked={checkBoxOptions.counted.showCounted}
+                onToggle={checkBoxOptions?.counted.toggleCounted}
+              />
             </View>
 
             <ScrollView style={styles.customContainer}>
@@ -81,7 +146,7 @@ const styles = StyleSheet.create({
     // borderRadius: 10,
     height: "100%",
     width: "100%",
-    gap: 15,
+    gap: 10,
   },
   topContainer: {
     gap: 10,
@@ -122,4 +187,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SelectModal;
+export default SelectandScanModal;

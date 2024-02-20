@@ -168,12 +168,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: "center",
   },
-  scanContainer: {
-    width: "100%",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 20,
-  },
+
   quantityContainer: {
     flexDirection: "row",
     alignItems: "center",

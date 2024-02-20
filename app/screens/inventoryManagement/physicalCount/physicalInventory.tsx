@@ -6,12 +6,15 @@ import {useDocumentHooks} from "../../../../src/hooks/documentHooks";
 import {useAppSelector} from "../../../../src/store/store";
 import {generalStyles} from "../../../../src/styles/styles";
 import VerticalList from "../../../../src/components/list/verticalList";
-import SelectModal from "../../../../src/components/modals/SelectModal";
 import ItemsList from "../../../../src/components/list-holder/ItemsList";
+import SelectandScanModal from "../../../../src/components/modals/SelectandScanModal";
 
 const PhysicalInventory = () => {
   const {isScanModal, isSelectModal} = useAppSelector((state) => state.modal);
   const {selectedDocument} = useAppSelector((state) => state.document);
+
+  const [isShowPending, setIsShowPending] = useState<boolean>(false);
+  const [isShowCounted, setIsShowCounted] = useState<boolean>(false);
 
   const {
     handleScanModal,
@@ -150,8 +153,8 @@ const PhysicalInventory = () => {
           {name: "sLoc", label: "Storage Location"},
         ]}
       />
-      {/* may error dito on click */}
-      <SelectModal
+
+      <SelectandScanModal
         visible={isSelectModal}
         onClose={closeSelectModal}
         selectedItem={selectedDocument}
@@ -160,7 +163,6 @@ const PhysicalInventory = () => {
           {name: "pirNo", label: "PIR No. "},
           {name: "warehouse", label: "Warehouse"},
           {name: "whsNo", label: "WHS No. "},
-          {name: "ccrNo", label: "Scanned/Counted "},
           {name: "sLoc", label: "Storage Location"},
         ]}
         customContent={<ItemsList uses="physicalInventory" />}
@@ -171,6 +173,16 @@ const PhysicalInventory = () => {
           scanModalDetails: {
             placeholder: "Waiting to Scan Bin No. Barcode...",
             title: "SCAN BIN NO. / ITEM",
+          },
+        }}
+        checkBoxOptions={{
+          counted: {
+            showCounted: isShowCounted,
+            toggleCounted: () => setIsShowCounted(!isShowCounted),
+          },
+          pending: {
+            showPending: isShowPending,
+            togglePending: () => setIsShowPending(!isShowPending),
           },
         }}
       />
