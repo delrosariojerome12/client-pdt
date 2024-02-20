@@ -19,17 +19,25 @@ const documentReducer = createSlice({
     handleSetDocument: (state, action) => {
       state.selectedDocument = action.payload;
     },
-    handleSetScanFields: (state, action) => {
-      // state.scanFields = action.payload;
+    handleClearDocument: (state) => {
+      state.selectedDocument = null;
     },
+
     handleSetItem: (state, action) => {
       state.selectedItem = action.payload;
+    },
+    handleSetScanFields: (state, action) => {
+      // state.scanFields = action.payload;
     },
   },
   extraReducers(builder) {},
 });
 
-export const {handleSetDocument, handleSetScanFields, handleSetItem} =
-  documentReducer.actions;
+export const {
+  handleSetDocument,
+  handleClearDocument,
+  handleSetScanFields,
+  handleSetItem,
+} = documentReducer.actions;
 
 export default documentReducer.reducer;

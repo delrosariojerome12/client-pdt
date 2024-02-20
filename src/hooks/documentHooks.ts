@@ -67,7 +67,12 @@ export const useDocumentHooks = () => {
     console.log("parent", selectedDocument);
   };
 
-  const validateCycleCount = () => {
+  const validateCycleCount = (item: any) => {
+    alert("No api yet");
+  };
+
+  const validatePhysicalRecord = (item: any) => {
+    console.log(selectedDocument);
     alert("No api yet");
   };
 
@@ -82,5 +87,6 @@ export const useDocumentHooks = () => {
     validateBin,
     removeScannedQuantity,
     validateCycleCount,
+    validatePhysicalRecord,
   };
 };

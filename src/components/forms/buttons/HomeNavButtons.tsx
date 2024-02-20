@@ -3,6 +3,7 @@ import React from "react";
 import {useRouter} from "expo-router";
 import {useAppSelector, useAppDispatch} from "../../../store/store";
 import {handlePreviousRoute} from "../../../reducers/routerReducer";
+import {handleClearDocument} from "../../../reducers/documentReducer";
 interface HomeNav {
   title: string;
   routePath: string;
@@ -21,6 +22,7 @@ const HomeNavButtons = (props: HomeNav) => {
         router.push(routePath);
         const parentPath = routePath.substring(0, routePath.lastIndexOf("/"));
         dispatch(handlePreviousRoute(parentPath));
+        dispatch(handleClearDocument());
       }}
     >
       <Text style={{textAlign: "center", color: "#FFF", fontWeight: "600"}}>

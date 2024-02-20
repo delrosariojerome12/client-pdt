@@ -5,9 +5,15 @@ import PTOItems from "../inbound/PTODetails";
 import WTODetails from "../outbound/wtoDetails";
 import SubConBinDetails from "../inventory-management/subConBinDetails";
 import StockTransferDetails from "../stockTransfer/stockTransferDetails";
+import PhysicalInventoryDetails from "../physical-inventory/physicalInventoryDetails";
 
 interface Props {
-  uses: "inbound" | "outbound" | "subcon" | "stockTransfer";
+  uses:
+    | "inbound"
+    | "outbound"
+    | "subcon"
+    | "stockTransfer"
+    | "physicalInventory";
 }
 
 const ItemsList = (props: Props) => {
@@ -24,6 +30,8 @@ const ItemsList = (props: Props) => {
         return <SubConBinDetails item={item} key={index} />;
       case "stockTransfer":
         return <StockTransferDetails item={item} key={index} />;
+      case "physicalInventory":
+        return <PhysicalInventoryDetails item={item} key={index} />;
       default:
         break;
     }

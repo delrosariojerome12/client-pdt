@@ -1,5 +1,6 @@
 import {View, Text, TouchableOpacity, StyleSheet} from "react-native";
 import React from "react";
+import CustomButton from "../../forms/buttons/CustomButton";
 
 interface VerticalItemProps {
   item: any;
@@ -25,15 +26,29 @@ const VerticalItem: React.FC<VerticalItemProps> = ({
         ))}
       </View>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={onValidate}>
-          <Text style={styles.buttonText}>Validate</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
+        <CustomButton
+          title="SELECT"
+          onPress={onSelect}
+          type="regular"
+          fontSize={12}
+        />
+        {/* <TouchableOpacity
           style={[styles.button, {backgroundColor: "#28a745"}]}
           onPress={onSelect}
         >
           <Text style={styles.buttonText}>Select</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
+
+        <CustomButton
+          title="VALIDATE"
+          onPress={onValidate}
+          type="save"
+          fontSize={12}
+        />
+
+        {/* <TouchableOpacity style={styles.button} onPress={onValidate}>
+          <Text style={styles.buttonText}>Validate</Text>
+        </TouchableOpacity> */}
       </View>
     </View>
   );
@@ -41,7 +56,7 @@ const VerticalItem: React.FC<VerticalItemProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    padding: 15,
+    padding: 20,
     borderWidth: 1,
     borderColor: "#bbb",
     flexDirection: "row",
@@ -59,6 +74,7 @@ const styles = StyleSheet.create({
   buttonContainer: {
     alignItems: "center",
     justifyContent: "center",
+    gap: 10,
   },
   button: {
     backgroundColor: "#007bff",

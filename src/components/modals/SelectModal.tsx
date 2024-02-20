@@ -10,6 +10,11 @@ import {
 } from "react-native";
 import {FontAwesome5} from "@expo/vector-icons";
 import {shadows} from "../../styles/styles";
+import CustomButton from "../forms/buttons/CustomButton";
+import {useDocumentHooks} from "../../hooks/documentHooks";
+import ScanModal from "./ScanModal";
+import {useAppSelector} from "../../store/store";
+import CustomCheckBox from "../forms/inputs/CustomCheckBox";
 
 interface SelectModalProps {
   visible: boolean;
@@ -18,9 +23,15 @@ interface SelectModalProps {
   title: string;
   propertiesToShow: {name: string; label: string}[];
   customContent: JSX.Element;
+  scanOptions?: {
+    scanModal: boolean;
+    showPending: boolean;
+    scanCounted: boolean;
+    scanModalDetails?: {title: string; placeholder: string};
+  };
 }
 
-const SelectModal = (props: SelectModalProps) => {
+const SelectModal = React.memo((props: SelectModalProps) => {
   const {
     visible,
     onClose,
@@ -28,9 +39,15 @@ const SelectModal = (props: SelectModalProps) => {
     title,
     propertiesToShow,
     customContent,
+    scanOptions,
   } = props;
 
+  const {isScanModal} = useAppSelector((state) => state.modal);
+  const {handleScanModal} = useDocumentHooks();
+
   if (selectedItem) {
+    console.log("xxx");
+
     return (
       <Modal visible={visible} onRequestClose={onClose} transparent>
         <View style={styles.centeredView}>
@@ -40,6 +57,27 @@ const SelectModal = (props: SelectModalProps) => {
                 <FontAwesome5 name="arrow-left" size={24} color="black" />
               </TouchableOpacity>
               <Text style={styles.headerText}>{title}</Text>
+            </View>
+
+            <View>
+              {scanOptions?.scanModal && (
+                <>
+                  <CustomButton
+                    title={scanOptions.scanModalDetails?.title || ""}
+                    onPress={handleScanModal}
+                    type="regular"
+                  />
+                  <CustomCheckBox label="Show Pending" value={true} />
+
+                  <ScanModal
+                    visible={isScanModal}
+                    onClose={handleScanModal}
+                    placeholder={
+                      scanOptions.scanModalDetails?.placeholder || ""
+                    }
+                  />
+                </>
+              )}
             </View>
 
             <View style={[shadows.boxShadow, styles.propertiesContainer]}>
@@ -59,7 +97,7 @@ const SelectModal = (props: SelectModalProps) => {
       </Modal>
     );
   }
-};
+});
 
 const styles = StyleSheet.create({
   centeredView: {

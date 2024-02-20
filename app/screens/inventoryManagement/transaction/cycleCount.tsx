@@ -13,8 +13,13 @@ const CycleCount = () => {
   const {isScanModal, isSelectModal} = useAppSelector((state) => state.modal);
   const {selectedDocument} = useAppSelector((state) => state.document);
 
-  const {handleScanModal, handleSelectModal, closeSelectModal, handlePost} =
-    useDocumentHooks();
+  const {
+    handleScanModal,
+    handleSelectModal,
+    closeSelectModal,
+    handlePost,
+    validateCycleCount,
+  } = useDocumentHooks();
 
   const data = [
     {
@@ -63,6 +68,8 @@ const CycleCount = () => {
       />
 
       <VerticalList
+        onValidate={validateCycleCount}
+        onSelect={handleSelectModal}
         data={data}
         propertiesToShow={[
           {name: "warehouse", label: "Warehouse"},
