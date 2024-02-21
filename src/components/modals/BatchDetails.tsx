@@ -26,22 +26,24 @@ const BatchDetails = (props: BatchDetailsProps) => {
   const [batchNo, setBatchNo] = useState(item.batchNumber); //change this to batch number name
   const [isBatchSearch, setIsBatchSearch] = useState(item.batchNumber); //change this to batch number name
 
-  console.log("batch details");
-
-  console.log(item);
-
   const handleOnChange = (key: string, value: string | number) => {
     setBatchNo(String(value));
   };
 
   const handleToggleBatch = () => {
-    setIsBatchSearch(isBatchSearch);
+    setIsBatchSearch(!isBatchSearch);
   };
 
   const clearValues = () => {
     setBatchNo("");
     setIsBatchSearch(false);
   };
+
+  const handleSetSearchBatch = (batchnum: string) => {
+    setBatchNo(batchnum);
+  };
+
+  console.log("batch details");
 
   return (
     <>
@@ -106,8 +108,13 @@ const BatchDetails = (props: BatchDetailsProps) => {
           </ScrollView>
         </View>
       </Modal>
-
-      {isBatchSearch && <BatchSearch />}
+      {isBatchSearch && (
+        <BatchSearch
+          visible={isBatchSearch}
+          onClose={handleToggleBatch}
+          onSaveBatch={handleSetSearchBatch}
+        />
+      )}
     </>
   );
 };

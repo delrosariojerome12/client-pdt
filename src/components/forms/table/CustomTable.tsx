@@ -60,6 +60,8 @@ const CustomTable = (props: TableProps) => {
       renderButtons(rowData),
     ]);
 
+    console.log(tableData[0]);
+
     return (
       <Rows
         data={rowDataArray}
