@@ -19,7 +19,6 @@ const StockReplenish = () => {
   const [activeIndex, setActiveIndex] = useState(0); // State to track the active index
 
   const tableHeaders = ["Date", "Document No.", ""];
-  // const tableData: any = [];
   const tableData = [
     {
       trndte: "01-26-2024",
@@ -100,6 +99,31 @@ const StockReplenish = () => {
     setActiveIndex(index); // Update the active index
   };
 
+  const renderTables = () => {
+    switch (activeIndex) {
+      case 0:
+        return (
+          <CustomTable
+            tableHeaders={tableHeaders}
+            tableData={tableData}
+            visibleProperties={tableVisibleProps}
+            isPostDisable={true}
+            onSelect={handleSelectModal}
+          />
+        );
+      case 1:
+        return (
+          <CustomTable
+            tableHeaders={tableHeaders}
+            tableData={tableData}
+            visibleProperties={tableVisibleProps}
+            isSelectDisable={true}
+            onPost={handlePost}
+          />
+        );
+    }
+  };
+
   console.log("stock replenish");
 
   return (
@@ -115,23 +139,7 @@ const StockReplenish = () => {
         onChange={handleChange}
       />
 
-      {activeIndex === 0 ? (
-        <CustomTable
-          tableHeaders={tableHeaders}
-          tableData={tableData}
-          visibleProperties={tableVisibleProps}
-          isPostDisable={true}
-          onSelect={handleSelectModal}
-        />
-      ) : (
-        <CustomTable
-          tableHeaders={tableHeaders}
-          tableData={tableData}
-          visibleProperties={tableVisibleProps}
-          isSelectDisable={true}
-          onPost={handlePost}
-        />
-      )}
+      {renderTables()}
 
       <ScanModal
         visible={isScanModal}
