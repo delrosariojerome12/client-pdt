@@ -8,11 +8,19 @@ interface CustomInputsProps {
   placeHolder: string;
   inputKey: string;
   customWidth?: number;
+  useFlex?: boolean; // for row automatic width
 }
 
 const CustomInputs = (props: CustomInputsProps) => {
-  const {onInputChange, type, inputValue, placeHolder, inputKey, customWidth} =
-    props;
+  const {
+    onInputChange,
+    type,
+    inputValue,
+    placeHolder,
+    inputKey,
+    customWidth,
+    useFlex,
+  } = props;
 
   const handleChange = (value: string) => {
     if (type === "numeric") {
@@ -32,6 +40,7 @@ const CustomInputs = (props: CustomInputsProps) => {
       style={{
         height: 60,
         width: customWidth ? customWidth : "auto",
+        flex: useFlex ? 1 : 0,
       }}
     >
       <TextInput

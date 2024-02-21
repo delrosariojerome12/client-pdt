@@ -8,10 +8,12 @@ interface CustomButtonProps {
   isWidthNotFull?: boolean;
   isDisable?: boolean;
   fontSize?: number;
+  useFlex?: boolean;
 }
 
 const CustomButton = (props: CustomButtonProps) => {
-  const {onPress, title, type, isWidthNotFull, isDisable, fontSize} = props;
+  const {onPress, title, type, isWidthNotFull, isDisable, fontSize, useFlex} =
+    props;
 
   const getButtonStyle = () => {
     switch (type) {
@@ -33,6 +35,7 @@ const CustomButton = (props: CustomButtonProps) => {
       borderRadius: 5,
       width: `${isWidthNotFull ? "auto" : "100%"}`,
       padding: 12,
+      flex: useFlex ? 1 : 0,
     },
     regular: {
       backgroundColor: "#007bff",

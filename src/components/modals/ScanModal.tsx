@@ -26,18 +26,18 @@ const ScanModal = React.memo((props: ScanModalProps) => {
   const {visible, onClose, placeholder, isNextBtn} = props;
   const [scanfield, setScanfield] = useState<string>("");
   const [binfield, setBinfield] = useState<string>("");
-  // const [itemDetails, setItemDetails] = useState<any | null>(null);
+  const [itemDetails, setItemDetails] = useState<any | null>(null);
 
-  const [itemDetails, setItemDetails] = useState<any | null>({
-    itemCode: "ABC123",
-    itemName: "Item 1",
-    pieces: 5,
-    receiveQty: 5,
-    LPNNumber: "LPN123",
-    batchNumber: "BATCH001",
-    mfgDate: "2023-01-01",
-    expDate: "2024-12-31",
-  });
+  // const [itemDetails, setItemDetails] = useState<any | null>({
+  //   itemCode: "ABC123",
+  //   itemName: "Item 1",
+  //   pieces: 5,
+  //   receiveQty: 5,
+  //   LPNNumber: "LPN123",
+  //   batchNumber: "BATCH001",
+  //   mfgDate: "2023-01-01",
+  //   expDate: "2024-12-31",
+  // });
 
   const handleOnChange = (key: string, value: string | number) => {
     setScanfield(String(value));
@@ -45,6 +45,37 @@ const ScanModal = React.memo((props: ScanModalProps) => {
 
   const handleBinChange = (key: string, value: string | number) => {
     setBinfield(String(value));
+  };
+
+  const renderButtons = () => {
+    if (!itemDetails) {
+      if (isNextBtn) {
+        return (
+          <CustomButton
+            onPress={handleScan}
+            title="Next"
+            type="regular"
+            isWidthNotFull={true}
+          />
+        );
+      }
+      return (
+        <View style={styles.buttonContainer}>
+          <CustomButton
+            onPress={handleScan}
+            title="Continue"
+            type="regular"
+            isWidthNotFull={true}
+          />
+          <CustomButton
+            onPress={onClose}
+            title="Close"
+            type="delete"
+            isWidthNotFull={true}
+          />
+        </View>
+      );
+    }
   };
 
   return (
@@ -69,7 +100,7 @@ const ScanModal = React.memo((props: ScanModalProps) => {
               />
             </View>
 
-            {isNextBtn ? (
+            {/* {isNextBtn ? (
               <CustomButton
                 onPress={handleScan}
                 title="Next"
@@ -91,7 +122,9 @@ const ScanModal = React.memo((props: ScanModalProps) => {
                   isWidthNotFull={true}
                 />
               </View>
-            )}
+            )} */}
+
+            {renderButtons()}
 
             {itemDetails && (
               <>

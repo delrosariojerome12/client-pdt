@@ -12,7 +12,7 @@ import CustomButton from "../forms/buttons/CustomButton";
 import {useDocumentHooks} from "../../hooks/documentHooks";
 import {FontAwesome5} from "@expo/vector-icons";
 import {format} from "../../styles/styles";
-
+import BatchDetails from "./BatchDetails";
 interface ScanModalProps {
   visible: boolean;
   onClose: () => void;
@@ -20,26 +20,14 @@ interface ScanModalProps {
 }
 
 const ScanBinAndItemModal = React.memo((props: ScanModalProps) => {
-  const {handleScan, validateBin} = useDocumentHooks();
+  const {handleScan} = useDocumentHooks();
   const {visible, onClose, placeholder} = props;
   // barcodes
-  const [scanfield, setScanfield] = useState<string>("");
-  const [binfield, setBinfield] = useState<string>("");
+  const [binNo, setBinNo] = useState<string>("");
+  const [itemBarcode, setItemBarcode] = useState<string>("");
 
   // item from the barcodes
-  const [binItemDetails, setBinItemDetails] = useState<any | null>(
-    // {
-    // itemCode: "ABC123",
-    // itemName: "Item 1",
-    // pieces: 5,
-    // receiveQty: 5,
-    // LPNNumber: "LPN123",
-    // batchNumber: "BATCH001",
-    // mfgDate: "2023-01-01",
-    // expDate: "2024-12-31",
-    // }
-    null
-  );
+  const [binItemDetails, setBinItemDetails] = useState<any | null>(null);
   const [scanItemDetails, setScanItemDetails] = useState<any | null>(null);
   const [quantityField, setQuantityField] = useState<number>(1);
   const [isBatchDetailsOpen, setBatchDetailsOpen] = useState(false);
@@ -55,12 +43,12 @@ const ScanBinAndItemModal = React.memo((props: ScanModalProps) => {
   // expDate: "2024-12-31",
   // }
 
-  const handleOnChange = (key: string, value: string | number) => {
-    setScanfield(String(value));
+  const handleItemBarcodeChange = (key: string, value: string | number) => {
+    setItemBarcode(String(value));
   };
 
-  const handleBinChange = (key: string, value: string | number) => {
-    setBinfield(String(value));
+  const handleBinNoChange = (key: string, value: string | number) => {
+    setBinNo(String(value));
   };
 
   const handleQuantityChange = (key: string, value: string | number) => {
@@ -71,8 +59,15 @@ const ScanBinAndItemModal = React.memo((props: ScanModalProps) => {
     setQuantityField(1);
     setBinItemDetails(null);
     setScanItemDetails(null);
-    setScanfield("");
-    setBinfield("");
+    setBinNo("");
+    setItemBarcode("");
+    setBatchDetailsOpen(false);
+  };
+
+  const handleSetBatchNum = (batchnum: string, item: any) => {
+    setBatchDetailsOpen(false);
+    setItemBarcode(batchnum);
+    setScanItemDetails(item);
   };
 
   return (
@@ -88,16 +83,15 @@ const ScanBinAndItemModal = React.memo((props: ScanModalProps) => {
                 <Text style={styles.headerText}>Scan Barcode</Text>
               </View>
 
-              <View>
-                <CustomInputs
-                  onInputChange={handleOnChange}
-                  inputValue={scanfield}
-                  type="text"
-                  placeHolder={placeholder}
-                  inputKey="scan"
-                />
-              </View>
+              <CustomInputs
+                onInputChange={handleBinNoChange}
+                inputValue={binNo}
+                type="text"
+                placeHolder={placeholder}
+                inputKey="binNo"
+              />
 
+              {/* buttons */}
               {!binItemDetails && (
                 <View style={styles.buttonContainer}>
                   <CustomButton
@@ -117,16 +111,19 @@ const ScanBinAndItemModal = React.memo((props: ScanModalProps) => {
                     title="Next"
                     type="save"
                     isWidthNotFull={true}
+                    useFlex={true}
                   />
                   <CustomButton
                     onPress={onClose}
                     title="Close"
                     type="delete"
                     isWidthNotFull={true}
+                    useFlex={true}
                   />
                 </View>
               )}
 
+              {/* bin details */}
               {binItemDetails && (
                 <>
                   <View style={styles.itemContainer}>
@@ -172,45 +169,40 @@ const ScanBinAndItemModal = React.memo((props: ScanModalProps) => {
                   </View>
 
                   <CustomInputs
-                    onInputChange={handleBinChange}
-                    inputValue={binfield}
+                    onInputChange={handleItemBarcodeChange}
+                    inputValue={itemBarcode}
                     type="text"
                     placeHolder={"Waiting to Scan Item Barcode..."}
                     inputKey="bin"
                   />
 
+                  {/* buttons */}
                   {!scanItemDetails && (
                     <View style={styles.buttonContainer}>
                       <CustomButton
-                        // onPress={handleScan}
-                        onPress={
-                          () => setBatchDetailsOpen(!isBatchDetailsOpen)
-                          // setScanItemDetails({
-                          //   itemCode: "ABC123",
-                          //   itemName: "Item 1",
-                          //   pieces: 5,
-                          //   receiveQty: 5,
-                          //   LPNNumber: "LPN123",
-                          //   batchNumber: "BATCH001",
-                          //   mfgDate: "2023-01-01",
-                          //   expDate: "2024-12-31",
-                          // })
-                        }
+                        onPress={() => setBatchDetailsOpen(!isBatchDetailsOpen)}
                         title="Next"
                         type="save"
                         isWidthNotFull={true}
+                        useFlex={true}
                       />
                       <CustomButton
-                        onPress={onClose}
+                        // onPress={onClose}
+                        onPress={() => {
+                          onClose();
+                          clearValues();
+                        }}
                         title="Close"
                         type="delete"
                         isWidthNotFull={true}
+                        useFlex={true}
                       />
                     </View>
                   )}
                 </>
               )}
 
+              {/* scan item details */}
               {scanItemDetails && (
                 <>
                   <View style={styles.itemContainer}>
@@ -262,6 +254,7 @@ const ScanBinAndItemModal = React.memo((props: ScanModalProps) => {
                       title="Continue"
                       type="save"
                       isWidthNotFull={true}
+                      useFlex={true}
                     />
                     <CustomButton
                       onPress={() => {
@@ -271,6 +264,7 @@ const ScanBinAndItemModal = React.memo((props: ScanModalProps) => {
                       title="Close"
                       type="delete"
                       isWidthNotFull={true}
+                      useFlex={true}
                     />
                   </View>
                 </>
@@ -279,6 +273,16 @@ const ScanBinAndItemModal = React.memo((props: ScanModalProps) => {
           </ScrollView>
         </View>
       </Modal>
+
+      {/* batch modals */}
+      {isBatchDetailsOpen && (
+        <BatchDetails
+          visible={isBatchDetailsOpen}
+          item={binItemDetails}
+          onClose={() => setBatchDetailsOpen(false)}
+          onSave={handleSetBatchNum}
+        />
+      )}
     </>
   );
 });

@@ -6,11 +6,7 @@ import {
   handleToggleItemScanModal,
 } from "../reducers/modalReducer";
 
-import {
-  handleSetDocument,
-  handleSetScanFields,
-  handleSetItem,
-} from "../reducers/documentReducer";
+import {handleSetDocument, handleSetItem} from "../reducers/documentReducer";
 
 export const useDocumentHooks = () => {
   const {selectedDocument} = useAppSelector((state) => state.document);
@@ -72,8 +68,14 @@ export const useDocumentHooks = () => {
   };
 
   const validatePhysicalRecord = (item: any) => {
-    console.log(selectedDocument);
-    alert("No api yet");
+    Alert.alert("Validation", `Do you want to validate '${item.pirNo}'`, [
+      {
+        text: "Yes",
+        onPress: () => alert("No api yet."),
+        style: "destructive",
+      },
+      {text: "No", style: "cancel"}, // Just close the alert without any action
+    ]);
   };
 
   return {

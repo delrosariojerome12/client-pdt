@@ -75,5 +75,17 @@ export const format = StyleSheet.create({
     gap: 10,
     flexWrap: "wrap",
   },
-  wrapText: {},
+  twoRowTextBetween: {
+    flexDirection: "row",
+    gap: 10,
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    padding: 15,
+  },
+  twoItemsRow: {
+    flexDirection: "row",
+    gap: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
 });

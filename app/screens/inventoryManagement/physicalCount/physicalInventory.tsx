@@ -20,7 +20,6 @@ const PhysicalInventory = () => {
     handleScanModal,
     handleSelectModal,
     closeSelectModal,
-    handlePost,
     validatePhysicalRecord,
   } = useDocumentHooks();
 
