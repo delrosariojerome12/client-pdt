@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@react-native-picker/picker": "2.6.1",
-    "@react-navigation/drawer": "^6.6.6",
+    "@react-navigation/drawer": "^6.6.7",
     "@reduxjs/toolkit": "^2.1.0",
     "@rneui/base": "^0.0.0-edge.2",
     "@rneui/themed": "^0.0.0-edge.2",

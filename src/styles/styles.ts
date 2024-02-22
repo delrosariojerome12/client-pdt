@@ -37,7 +37,7 @@ export const generalStyles = StyleSheet.create({
 
 export const shadows = StyleSheet.create({
   boxShadow: {
-    borderRadius: 50 / 10,
+    borderRadius: 10,
     shadowColor: "#474C5C", // Shadow color
     shadowOffset: {
       width: 0,
