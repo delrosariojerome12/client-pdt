@@ -5,6 +5,7 @@ interface Modal {
   isSelectModal: boolean;
   isScanItemModal: boolean;
   isSearchModal: boolean;
+  searchModalContent: "warehouse" | "bin" | "item" | null;
 }
 
 const initialState: Modal = {
@@ -12,6 +13,7 @@ const initialState: Modal = {
   isSelectModal: false,
   isScanItemModal: false,
   isSearchModal: false,
+  searchModalContent: null,
 };
 
 const modalReducer = createSlice({
@@ -31,6 +33,9 @@ const modalReducer = createSlice({
     handleToggleSearchModal: (state) => {
       state.isSearchModal = !state.isSearchModal;
     },
+    handleSetSearchModalContent: (state, action) => {
+      state.searchModalContent = action.payload;
+    },
     handleCloseModal: (state, action) => {},
   },
   extraReducers(builder) {},
@@ -42,6 +47,7 @@ export const {
   handleCloseModal,
   handleToggleItemScanModal,
   handleToggleSearchModal,
+  handleSetSearchModalContent,
 } = modalReducer.actions;
 
 export default modalReducer.reducer;

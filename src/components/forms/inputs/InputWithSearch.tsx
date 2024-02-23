@@ -7,16 +7,17 @@ import {
 } from "react-native";
 import React, {useState} from "react";
 import {FontAwesome} from "@expo/vector-icons";
-import {format} from "../../../styles/styles";
 
 interface InputProps {
   label: string;
   onShow: () => void;
+  text: string;
+  onTextChange?: (value: string) => void;
+  disable?: boolean;
 }
 
 const InputWithSearch = (props: InputProps) => {
-  const {label, onShow} = props;
-  const [text, setText] = useState<string>("");
+  const {label, onShow, text, onTextChange, disable} = props;
 
   return (
     <View style={style.inputWithSearchContainer}>
@@ -27,10 +28,11 @@ const InputWithSearch = (props: InputProps) => {
       )}
       <View style={style.inputFieldWrapper}>
         <TextInput
+          readOnly={disable}
           style={style.inputField} // Apply your styles for the input field
           placeholder="" // No need for placeholder when using conditional rendering
           value={text}
-          onChangeText={(newText) => setText(newText)}
+          onChangeText={(newText) => onTextChange && onTextChange(newText)}
         />
         <TouchableOpacity onPress={onShow}>
           <FontAwesome name="search" size={20} color="#808080" />

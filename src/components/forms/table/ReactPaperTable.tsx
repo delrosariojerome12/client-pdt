@@ -14,10 +14,12 @@ interface TableProps {
   tableHeaders: string[];
   tableData: any[];
   visibleProperties: string[];
+  disableActions?: boolean;
   isSelectDisable?: boolean;
   isPostDisable?: boolean;
   onSelect?: (selectedItem: any) => void;
   onPost?: (selectedItem: any) => void;
+  onSelectRow?: (selectedItem: any) => void; //not using action just the row
 }
 
 const ReactPaperTable = (props: TableProps) => {
@@ -29,6 +31,8 @@ const ReactPaperTable = (props: TableProps) => {
     isPostDisable,
     onSelect,
     onPost,
+    disableActions,
+    onSelectRow,
   } = props;
 
   const [page, setPage] = useState<number>(0);
@@ -43,19 +47,9 @@ const ReactPaperTable = (props: TableProps) => {
     setPage(0);
   }, [numberOfItemsPerPage]);
 
-  const tableheader = (header: string, index: number) => (
-    <DataTable.Title
-      style={{width: 100, backgroundColor: "#ccc"}}
-      textStyle={{fontWeight: "bold", fontSize: 14}}
-      key={index}
-    >
-      {header}
-    </DataTable.Title>
-  );
-
   const renderButtons = (rowData: any) => {
     return (
-      <View style={{flexDirection: "row", gap: 10}}>
+      <View style={{gap: 5, flexDirection: "row"}}>
         {!isSelectDisable && (
           <TouchableOpacity
             style={styles.buttons}
@@ -77,22 +71,35 @@ const ReactPaperTable = (props: TableProps) => {
     );
   };
 
+  const tableheader = (header: string, index: number) => (
+    <DataTable.Title
+      style={{width: 100, backgroundColor: "#ccc"}}
+      textStyle={{fontWeight: "bold", fontSize: 14, textAlign: "center"}}
+      key={index}
+    >
+      {header}
+    </DataTable.Title>
+  );
+
   const tableRow = (item: any, index: number) => (
     <DataTable.Row key={index} style={{}}>
       {visibleProperties.map((prop, propIndex) => (
         <DataTable.Cell
           style={{
             width: 100,
-            justifyContent: "center",
           }}
           key={propIndex}
+          onPress={() => onSelectRow && onSelectRow(item)}
         >
           {item[prop]}
         </DataTable.Cell>
       ))}
-      <DataTable.Cell style={{width: 150, justifyContent: "center"}}>
-        {renderButtons(item)}
-      </DataTable.Cell>
+
+      {!disableActions && (
+        <DataTable.Cell style={{width: 100, justifyContent: "center"}}>
+          {renderButtons(item)}
+        </DataTable.Cell>
+      )}
     </DataTable.Row>
   );
 
@@ -105,48 +112,62 @@ const ReactPaperTable = (props: TableProps) => {
             horizontal={tableData.length === 0 ? false : true}
             contentContainerStyle={{flexDirection: "column"}}
           >
-            {tableData.length === 0 ? (
-              <View style={styles.placeholderContainer}>
-                <FontAwesome name="file-o" size={50} color="#000" />
-                <Text style={styles.placeholderText}>No records found</Text>
-              </View>
-            ) : (
-              <DataTable style={styles.table}>
-                <ScrollView
-                  showsHorizontalScrollIndicator
-                  horizontal
-                  contentContainerStyle={{flexDirection: "column"}}
-                >
-                  <DataTable.Header style={{}}>
-                    {tableHeaders.map((header, index) =>
-                      tableheader(header, index)
-                    )}
-                  </DataTable.Header>
+            <DataTable style={styles.table}>
+              <ScrollView
+                showsHorizontalScrollIndicator
+                horizontal={tableData.length === 0 ? false : true}
+                contentContainerStyle={{flexDirection: "column"}}
+              >
+                <DataTable.Header style={{}}>
+                  {tableHeaders.map((header, index) =>
+                    tableheader(header, index)
+                  )}
+                  {!disableActions && (
+                    <DataTable.Title
+                      style={{width: 100, backgroundColor: "#ccc"}}
+                      textStyle={{
+                        fontWeight: "bold",
+                        fontSize: 14,
+                        textAlign: "center",
+                      }}
+                    >
+                      Actions
+                    </DataTable.Title>
+                  )}
+                </DataTable.Header>
 
-                  {tableData
-                    .slice(
-                      page * numberOfItemsPerPage,
-                      page * numberOfItemsPerPage + numberOfItemsPerPage
-                    )
-                    .map((row, index) => tableRow(row, index))}
+                {tableData.length === 0 ? (
+                  <View style={styles.placeholderContainer}>
+                    <FontAwesome name="file-o" size={50} color="#000" />
+                    <Text style={styles.placeholderText}>No records found</Text>
+                  </View>
+                ) : (
+                  <>
+                    {tableData
+                      .slice(
+                        page * numberOfItemsPerPage,
+                        page * numberOfItemsPerPage + numberOfItemsPerPage
+                      )
+                      .map((row, index) => tableRow(row, index))}
 
-                  <DataTable.Pagination
-                    page={page}
-                    numberOfPages={Math.ceil(
-                      tableData.length / numberOfItemsPerPage
-                    )}
-                    onPageChange={(page) => setPage(page)}
-                    label={`${from + 1}-${to} of ${tableData.length}`}
-                    showFastPaginationControls
-                    numberOfItemsPerPage={numberOfItemsPerPage}
-                    numberOfItemsPerPageList={[5, 10, 15]}
-                    onItemsPerPageChange={onItemsPerPageChange}
-                    selectPageDropdownLabel={"Rows per page"}
-                    style={{alignSelf: "center"}}
-                  />
-                </ScrollView>
-              </DataTable>
-            )}
+                    <DataTable.Pagination
+                      page={page}
+                      numberOfPages={Math.ceil(
+                        tableData.length / numberOfItemsPerPage
+                      )}
+                      onPageChange={(page) => setPage(page)}
+                      label={`${from + 1}-${to} of ${tableData.length}`}
+                      showFastPaginationControls
+                      numberOfItemsPerPage={numberOfItemsPerPage}
+                      numberOfItemsPerPageList={[5, 10, 15]}
+                      onItemsPerPageChange={onItemsPerPageChange}
+                      selectPageDropdownLabel={"Rows per page"}
+                      style={{alignSelf: "center"}}
+                    />
+                  </>
+                )}
+              </ScrollView>
+            </DataTable>
           </ScrollView>
         </DataTable>
       </ScrollView>

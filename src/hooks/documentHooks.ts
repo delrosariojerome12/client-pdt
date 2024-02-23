@@ -4,9 +4,15 @@ import {
   handleToggleScanModal,
   handleToggleSelectModal,
   handleToggleItemScanModal,
+  handleToggleSearchModal,
+  handleSetSearchModalContent,
 } from "../reducers/modalReducer";
 
 import {handleSetDocument, handleSetItem} from "../reducers/documentReducer";
+
+interface SearchContent {
+  content: "warehouse" | "bin" | "item";
+}
 
 export const useDocumentHooks = () => {
   const {selectedDocument} = useAppSelector((state) => state.document);
@@ -27,6 +33,11 @@ export const useDocumentHooks = () => {
   const handleItemScanModal = (item: any) => {
     dispatch(handleToggleItemScanModal());
     dispatch(handleSetItem(item));
+  };
+
+  const handleSearchModal = (content: SearchContent) => {
+    dispatch(handleToggleSearchModal());
+    dispatch(handleSetSearchModalContent(content.content));
   };
   const closeItemScanModal = () => {
     dispatch(handleToggleItemScanModal());
@@ -81,6 +92,7 @@ export const useDocumentHooks = () => {
   return {
     handleScanModal,
     handleSelectModal,
+    handleSearchModal,
     closeSelectModal,
     handleItemScanModal,
     closeItemScanModal,

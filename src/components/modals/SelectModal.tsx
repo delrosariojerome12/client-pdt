@@ -10,10 +10,10 @@ import {
 } from "react-native";
 import {FontAwesome5} from "@expo/vector-icons";
 import {shadows} from "../../styles/styles";
-import CustomButton from "../forms/buttons/CustomButton";
-import {useDocumentHooks} from "../../hooks/documentHooks";
-import ScanModal from "./ScanModal";
-import {useAppSelector} from "../../store/store";
+// import CustomButton from "../forms/buttons/CustomButton";
+// import {useDocumentHooks} from "../../hooks/documentHooks";
+// import ScanModal from "./ScanModal";
+// import {useAppSelector} from "../../store/store";
 
 interface SelectModalProps {
   visible: boolean;
@@ -34,8 +34,8 @@ const SelectModal = React.memo((props: SelectModalProps) => {
     customContent,
   } = props;
 
-  const {isScanModal} = useAppSelector((state) => state.modal);
-  const {handleScanModal} = useDocumentHooks();
+  // const {isScanModal} = useAppSelector((state) => state.modal);
+  // const {handleScanModal} = useDocumentHooks();
 
   if (selectedItem) {
     return (

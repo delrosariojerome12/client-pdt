@@ -80,7 +80,7 @@ const BatchSearch = React.memo((props: BatchSearchProps) => {
                 onInputChange={handleOnChange}
                 inputValue={searchBatchNo}
                 type="text"
-                placeHolder={"Batch No."}
+                placeHolder={"Search"}
                 inputKey="scan"
                 useFlex={true}
               />
