@@ -217,17 +217,20 @@ const SearchModal = (props: SearchModalProps) => {
         <View style={styles.modalView}>
           <View style={styles.headerContainer}>
             <TouchableOpacity onPress={handleCloseModal}>
-              <FontAwesome5 name="arrow-left" size={24} colr="lback" />
+              <FontAwesome5 name="arrow-left" size={24} colr="black" />
             </TouchableOpacity>
-            <CustomInputs
-              placeHolder="Search"
-              inputKey="search"
-              inputValue={searchText}
-              onInputChange={handleOnChange}
-              type="text"
-              useFlex={true}
-            />
+            <Text style={styles.headerText}>
+              {searchModalContent &&
+                `Search:${searchModalContent.toUpperCase()}`}
+            </Text>
           </View>
+          <CustomInputs
+            placeHolder="Search"
+            inputKey="search"
+            inputValue={searchText}
+            onInputChange={handleOnChange}
+            type="text"
+          />
           {renderTable()}
         </View>
       </View>
@@ -242,6 +245,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
+
   modalView: {
     backgroundColor: "white",
     padding: 20,
@@ -257,6 +261,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 10,
     justifyContent: "space-evenly",
+  },
+  headerText: {
+    fontWeight: "bold",
+    fontSize: 20,
   },
   continueBtn: {
     width: "60%",
@@ -275,10 +283,6 @@ const styles = StyleSheet.create({
   properties: {
     flexDirection: "row",
     gap: 10,
-  },
-  headerText: {
-    fontWeight: "bold",
-    fontSize: 20,
   },
   label: {
     fontWeight: "bold",

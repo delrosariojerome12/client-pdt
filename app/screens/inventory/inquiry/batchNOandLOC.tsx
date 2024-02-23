@@ -75,7 +75,12 @@ const BatchNOandLOC = () => {
     toggleBtn: {
       position: "absolute",
       bottom: 0,
-      left: "50%",
+      left: 0,
+      zIndex: 10,
+      justifyContent: "center",
+      alignItems: "center",
+      width: "106%",
+      backgroundColor: "#ccc",
     },
   });
 
@@ -117,7 +122,7 @@ const BatchNOandLOC = () => {
           onShow={() => handleSearchModal({content: "item"})}
           disable={true}
         />
-        <View style={{flexDirection: "row"}}>
+        <View style={{flexDirection: "row", marginBottom: 20}}>
           <CustomButton
             onPress={() => handleFilterItems("PASS params here")}
             title="Filter"
