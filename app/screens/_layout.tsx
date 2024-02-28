@@ -10,16 +10,15 @@ import {
 } from "@react-navigation/drawer";
 import {useAuthHooks} from "../../src/hooks/authHooks";
 import {View, SafeAreaView} from "react-native";
-
-// const ScreenLayout = () => {
-//   return (
-//     <Stack>
-//       <Stack.Screen name="home" options={{headerShown: false}} />
-//     </Stack>
-//   );
-// };
+import {Text} from "react-native";
+import {useAppSelector} from "../../src/store/store";
+import {format, textFormat} from "../../src/styles/styles";
+import {FontAwesome5} from "@expo/vector-icons";
 
 const CustomDrawers = (props: any) => {
+  const {
+    user: {userDetails},
+  } = useAppSelector((state) => state.auth);
   const {renderCustomDrawers} = useDrawerHooks();
 
   const {handleLogout} = useAuthHooks();
@@ -27,6 +26,11 @@ const CustomDrawers = (props: any) => {
   return (
     <SafeAreaView style={{flex: 1}}>
       <DrawerContentScrollView {...props}>
+        <View style={format.rowBoxType}>
+          <FontAwesome name="user" size={24} color="gray" />
+          <Text style={textFormat.boldBigText}>User:</Text>
+          <Text style={textFormat.boldBigText}>{userDetails?.usrname}</Text>
+        </View>
         <DrawerItemList {...props} />
         {renderCustomDrawers()}
       </DrawerContentScrollView>

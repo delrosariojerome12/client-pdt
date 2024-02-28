@@ -12,7 +12,7 @@ import {Link} from "expo-router";
 import {useAuthHooks} from "../src/hooks/authHooks";
 
 const Index = () => {
-  const {handleLogin, userID, setUserID, password, setPassword} =
+  const {handleLogin, userID, setUserID, password, setPassword, status} =
     useAuthHooks();
 
   const handleLinkPress = () => {
@@ -25,8 +25,9 @@ const Index = () => {
     <View style={styles.container}>
       <Text style={styles.title}>User Login</Text>
       {/* {status === "not-found" && (
-        <Text style={styles.error}>{errorMessage}</Text>
-      )} */}
+          <Text style={styles.error}>{errorMessage}</Text>
+        )} */}
+
       <TextInput
         style={styles.input}
         placeholder="USER ID"
@@ -43,7 +44,14 @@ const Index = () => {
       />
 
       <View style={styles.customButton}>
-        <CustomButton onPress={handleLogin} title="Login" type="regular" />
+        <CustomButton
+          onPress={handleLogin}
+          title={status === "loading" ? "Logging in..." : "Login"}
+          type="regular"
+          isDisable={
+            status === "loading" || status === "success" ? true : false
+          }
+        />
       </View>
 
       <Link href={"server"} style={styles.serverLink} asChild>

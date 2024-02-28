@@ -49,6 +49,9 @@ const CustomButton = (props: CustomButtonProps) => {
     edit: {
       backgroundColor: "#ffc107",
     },
+    disabled: {
+      backgroundColor: "#cdcdcd", // Grayed out color
+    },
     buttonText: {
       color: "#fff",
       fontSize: fontSize || 16,
@@ -60,7 +63,11 @@ const CustomButton = (props: CustomButtonProps) => {
   return (
     <TouchableOpacity
       disabled={isDisable}
-      style={[styles.button, getButtonStyle()]}
+      style={[
+        styles.button,
+        getButtonStyle(),
+        isDisable ? styles.disabled : null,
+      ]}
       onPress={onPress}
     >
       <Text style={styles.buttonText}>{title}</Text>

@@ -109,11 +109,14 @@ const PTO = () => {
         onSelect={handleSelectModal}
         onPost={handlePost}
       />
-      <ScanModal
-        visible={isScanModal}
-        onClose={handleScanModal}
-        placeholder="Waiting to Scan WRR Barcode"
-      />
+
+      {isScanModal && (
+        <ScanModal
+          visible={isScanModal}
+          onClose={handleScanModal}
+          placeholder="Waiting to Scan WRR Barcode"
+        />
+      )}
 
       <SelectModal
         visible={isSelectModal}

@@ -22,6 +22,9 @@ interface customDrawers {
 
 export const useDrawerHooks = () => {
   const {previousRoutes} = useAppSelector((state) => state.router);
+
+  // console.log(userDetails);
+
   const dispatch = useAppDispatch();
 
   const [customDrawers, setCustomDrawers] =

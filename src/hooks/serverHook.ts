@@ -1,15 +1,18 @@
-import {useAppDispatch} from "../store/store";
+import {useAppDispatch, useAppSelector} from "../store/store";
 import {useState} from "react";
 import {handleUpdateProtocol} from "../reducers/authReducer";
 import {ToastMessage} from "../helper/Toast";
 
 export const useServerHooks = () => {
+  const {
+    server: {ipAddress, port, protocol},
+  } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
 
   const [serverConfig, setServerConfig] = useState({
-    protocol: "http",
-    ipAddress: "192.168.100.4",
-    port: 8080,
+    protocol: protocol,
+    ipAddress: ipAddress,
+    port: port,
   });
 
   const handleInputChange = (key: string, value: string | number) => {
@@ -18,7 +21,6 @@ export const useServerHooks = () => {
 
   const updateServer = () => {
     ToastMessage("Updating...", 1000);
-
     try {
       dispatch(handleUpdateProtocol(serverConfig));
       ToastMessage("Server Protocols Updated.", 1000);

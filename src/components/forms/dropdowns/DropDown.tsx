@@ -35,7 +35,7 @@ const DropDown = (props: DropDown) => {
 
 const styles = StyleSheet.create({
   dropdownContainer: {
-    marginBottom: 16,
+    // marginBottom: 16,
   },
   label: {
     fontSize: 16,

@@ -88,4 +88,18 @@ export const format = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  rowBoxType: {
+    flexDirection: "row",
+    gap: 10,
+    padding: 20,
+    justifyContent: "space-evenly",
+    alignItems: "center",
+  },
+});
+
+export const textFormat = StyleSheet.create({
+  boldBigText: {
+    fontSize: 20,
+    fontWeight: "bold",
+  },
 });

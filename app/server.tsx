@@ -8,16 +8,6 @@ import {useServerHooks} from "../src/hooks/serverHook";
 const Server = () => {
   const {updateServer, serverConfig, handleInputChange} = useServerHooks();
 
-  // const [serverConfig, setServerConfig] = useState({
-  //   protocol: "http",
-  //   ipAddress: "192.168.100.4",
-  //   port: 8080,
-  // });
-
-  // const handleInputChange = (key: string, value: string | number) => {
-  //   setServerConfig({...serverConfig, [key]: value});
-  // };
-
   return (
     <View style={styles.container}>
       <DropDown
@@ -47,9 +37,7 @@ const Server = () => {
         type="numeric"
       />
 
-      <View style={{marginTop: 20}}>
-        <CustomButton onPress={updateServer} title="Save" type="save" />
-      </View>
+      <CustomButton onPress={updateServer} title="Save" type="save" />
     </View>
   );
 };
@@ -59,6 +47,7 @@ const styles = StyleSheet.create({
     padding: 30,
     flex: 1,
     backgroundColor: "#f8f8f8",
+    gap: 20,
   },
   input: {
     height: 40,
