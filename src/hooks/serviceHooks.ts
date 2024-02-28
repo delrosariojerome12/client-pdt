@@ -55,6 +55,7 @@ export const useServiceHooks = () => {
     onSuccess?: (data: any) => void // Callback function for success
   ) => {
     const completeUrl = `${baseURl}/api/${url}`;
+    // const completeUrl = `http://10.0.2.2:5901/api/${url}`;
 
     setStatus("loading");
     ToastMessage(toastMessage?.loading || "Loading...", 500);

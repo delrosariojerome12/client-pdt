@@ -90,10 +90,10 @@ export const format = StyleSheet.create({
   },
   rowBoxType: {
     flexDirection: "row",
-    gap: 10,
+    gap: 20,
     padding: 20,
-    justifyContent: "space-evenly",
     alignItems: "center",
+    flexWrap: "wrap",
   },
 });
 

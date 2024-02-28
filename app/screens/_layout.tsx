@@ -28,7 +28,7 @@ const CustomDrawers = (props: any) => {
       <DrawerContentScrollView {...props}>
         <View style={format.rowBoxType}>
           <FontAwesome name="user" size={24} color="gray" />
-          <Text style={textFormat.boldBigText}>User:</Text>
+          {/* <Text style={textFormat.boldBigText}>USER: JEROOOOME POOOGIIIII</Text> */}
           <Text style={textFormat.boldBigText}>{userDetails?.usrname}</Text>
         </View>
         <DrawerItemList {...props} />

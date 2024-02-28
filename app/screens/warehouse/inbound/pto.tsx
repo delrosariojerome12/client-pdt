@@ -1,6 +1,6 @@
 import {View, Text} from "react-native";
 import React, {useEffect} from "react";
-import {useAppSelector} from "../../../../src/store/store";
+import {useAppSelector, useAppDispatch} from "../../../../src/store/store";
 import CustomButton from "../../../../src/components/forms/buttons/CustomButton";
 import CustomTable from "../../../../src/components/forms/table/CustomTable";
 import ScanModal from "../../../../src/components/modals/ScanModal";
@@ -8,10 +8,14 @@ import SelectModal from "../../../../src/components/modals/SelectModal";
 import {useDocumentHooks} from "../../../../src/hooks/documentHooks";
 import {generalStyles} from "../../../../src/styles/styles";
 import ItemsList from "../../../../src/components/list-holder/ItemsList";
+import {getPTO} from "../../../../src/store/actions/warehouse/warehouseActions";
 
 const PTO = () => {
   const {isScanModal, isSelectModal} = useAppSelector((state) => state.modal);
   const {selectedDocument} = useAppSelector((state) => state.document);
+  const {ptoData} = useAppSelector((state) => state.inbound);
+
+  const dispatch = useAppDispatch();
 
   const {handleScanModal, handleSelectModal, closeSelectModal, handlePost} =
     useDocumentHooks();
@@ -94,7 +98,7 @@ const PTO = () => {
   const tableVisibleProps = ["trndte", "docnum", "inrnum"];
 
   useEffect(() => {
-    console.log("api call");
+    dispatch(getPTO({limit: 10, offset: 0}));
   }, []);
 
   console.log("PTO");
