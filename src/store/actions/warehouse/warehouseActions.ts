@@ -5,6 +5,7 @@ import {RootState} from "../../store";
 interface FetchPTOPayload {
   limit: number;
   offset: number;
+  paginating?: boolean;
 }
 interface FetchDocnumDetails {
   docnum: string;
@@ -12,7 +13,10 @@ interface FetchDocnumDetails {
 
 export const getPTO = createAsyncThunk(
   "pto/getPTO",
-  async ({limit, offset}: FetchPTOPayload, {rejectWithValue, getState}) => {
+  async (
+    {limit, offset, paginating}: FetchPTOPayload,
+    {rejectWithValue, getState}
+  ) => {
     try {
       const state = getState() as RootState;
       const {ipAddress, port, protocol} = state.auth.server;
@@ -21,9 +25,10 @@ export const getPTO = createAsyncThunk(
 
       const response = await axios.get(url);
 
-      console.log(response.data);
-
-      return response.data;
+      return {
+        data: response.data,
+        paginating: paginating,
+      };
     } catch (error: any) {
       return rejectWithValue(error.message);
     }

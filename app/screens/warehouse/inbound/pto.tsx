@@ -8,10 +8,7 @@ import SelectModal from "../../../../src/components/modals/SelectModal";
 import {useDocumentHooks} from "../../../../src/hooks/documentHooks";
 import {generalStyles} from "../../../../src/styles/styles";
 import ItemsList from "../../../../src/components/list-holder/ItemsList";
-import {
-  getPTO,
-  paginatePTO,
-} from "../../../../src/store/actions/warehouse/warehouseActions";
+import {getPTO} from "../../../../src/store/actions/warehouse/warehouseActions";
 import LoadingSpinner from "../../../../src/components/load-spinner/LoadingSpinner";
 import {ToastMessage} from "../../../../src/helper/Toast";
 
@@ -45,7 +42,6 @@ const PTO = () => {
     console.log(contentOffset);
     console.log(bottomOffset);
 
-    // Check if scrolled to the very bottom within the threshold
     if (currentOffset >= bottomOffset - threshold && !isPaginating) {
       fetchData();
     }
@@ -53,20 +49,24 @@ const PTO = () => {
 
   const fetchData = () => {
     setPaginating(true);
-    const newOffset = pto.data.length + 10;
-    dispatch(paginatePTO({limit: 10, offset: newOffset})).then(() => {
-      ToastMessage("Table updated.", 1000);
-      setPaginating(false);
-    });
+    const newOffset = pto.data.length + 10; // Calculate new offset by adding the current length of data array with the limit
+    dispatch(getPTO({limit: 10, offset: newOffset, paginating: true})).then(
+      () => {
+        ToastMessage("Table updated.", 1000);
+        setPaginating(false);
+      }
+    );
   };
 
   const onRefresh = () => {
+    setRefreshing(true);
     dispatch(getPTO({limit: 10, offset: 0})).then(() => {
+      setRefreshing(false);
       ToastMessage("Refresh Success", 1000);
     });
   };
 
-  if (pto.status === "loading") {
+  if (pto.status === "loading" && !refreshing && !isPaginating) {
     return <LoadingSpinner />;
   }
 
@@ -75,12 +75,11 @@ const PTO = () => {
       style={generalStyles.innerContainer}
       contentContainerStyle={{flexGrow: 1}}
       refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        <RefreshControl refreshing={false} onRefresh={onRefresh} />
       }
       onScroll={handleScroll}
       // scrollEventThrottle={400}
     >
-      {/* <View style={generalStyles.innerContainer}> */}
       <CustomButton title="SCAN WRR" onPress={handleScanModal} type="regular" />
       <CustomTable
         tableHeaders={tableHeaders}
@@ -110,7 +109,6 @@ const PTO = () => {
         ]}
         customContent={<ItemsList uses="inbound" />}
       />
-      {/* </View> */}
     </ScrollView>
   );
 };

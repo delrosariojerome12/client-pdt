@@ -36,6 +36,12 @@ interface FetchDocnumDetails {
     | "tms_SO_item";
 }
 
+interface PutawaDetails {
+  limit: number;
+  offset: number;
+  category: "PUR" | "WHS" | "SRTO";
+}
+
 export const getDocument = createAsyncThunk(
   "general/getDocument",
   async (
@@ -47,6 +53,27 @@ export const getDocument = createAsyncThunk(
       const {ipAddress, port, protocol} = state.auth.server;
 
       const url = `${protocol}://${ipAddress}:${port}/api/getPTODetails/?docnum=${docnum}`;
+
+      const response = await axios.get(url);
+
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const getPutaway = createAsyncThunk(
+  "general/getPutaway",
+  async (
+    {category, limit, offset}: PutawaDetails,
+    {rejectWithValue, getState}
+  ) => {
+    try {
+      const state = getState() as RootState;
+      const {ipAddress, port, protocol} = state.auth.server;
+
+      const url = `${protocol}://${ipAddress}:${port}/api/getPutawayTO/?category=${category}&limit=${limit}&offset=${offset}}`;
 
       const response = await axios.get(url);
 

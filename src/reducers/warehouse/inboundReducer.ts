@@ -39,8 +39,16 @@ const inboundReducer = createSlice({
         state.pto.status = "loading";
       })
       .addCase(getPTO.fulfilled, (state, action) => {
-        console.log("eto nga", action.payload.data.length);
-        state.pto.data = action.payload.data;
+        const {data, paginating} = action.payload;
+        if (paginating) {
+          console.log("paginating");
+
+          state.pto.data = [...state.pto.data, ...data.data];
+        } else {
+          console.log("normal fetch");
+
+          state.pto.data = data.data;
+        }
         state.pto.status = "success";
       })
       .addCase(getPTO.rejected, (state, action) => {
