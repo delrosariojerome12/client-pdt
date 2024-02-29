@@ -35,26 +35,6 @@ export const getPTO = createAsyncThunk(
   }
 );
 
-export const paginatePTO = createAsyncThunk(
-  "pto/refetchPTO",
-  async ({limit, offset}: FetchPTOPayload, {rejectWithValue, getState}) => {
-    try {
-      const state = getState() as RootState;
-      const {ipAddress, port, protocol} = state.auth.server;
-
-      const url = `${protocol}://${ipAddress}:${port}/api/getAllPTO?limit=${limit}&offset=${offset}`;
-
-      const response = await axios.get(url);
-
-      console.log(response.data);
-
-      return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
 export const getPTODetails = createAsyncThunk(
   "pto/getPTODetails",
   async ({docnum}: FetchDocnumDetails, {rejectWithValue, getState}) => {

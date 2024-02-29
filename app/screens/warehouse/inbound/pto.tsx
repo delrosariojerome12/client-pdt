@@ -49,7 +49,7 @@ const PTO = () => {
 
   const fetchData = () => {
     setPaginating(true);
-    const newOffset = pto.data.length + 10; // Calculate new offset by adding the current length of data array with the limit
+    const newOffset = pto.data.length + 10;
     dispatch(getPTO({limit: 10, offset: newOffset, paginating: true})).then(
       () => {
         ToastMessage("Table updated.", 1000);

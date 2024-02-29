@@ -2,7 +2,6 @@ import {createSlice} from "@reduxjs/toolkit";
 import {
   getPTO,
   getPTODetails,
-  paginatePTO,
 } from "../../store/actions/warehouse/warehouseActions";
 import {PTOData} from "../../models/warehouse/inbound/PTO";
 import {ProductData} from "../../models/generic/ProductData";
@@ -53,18 +52,6 @@ const inboundReducer = createSlice({
       })
       .addCase(getPTO.rejected, (state, action) => {
         state.pto.status = "failed";
-      });
-    builder
-      .addCase(paginatePTO.pending, (state, action) => {
-        // state.pto.status = "loading";
-      })
-      .addCase(paginatePTO.fulfilled, (state, action) => {
-        console.log("eto nga", action.payload.data.length);
-        state.pto.data = [...state.pto.data, ...action.payload.data];
-        // state.pto.status = "success";
-      })
-      .addCase(paginatePTO.rejected, (state, action) => {
-        // state.pto.status = "failed";
       });
     builder
       .addCase(getPTODetails.pending, (state, action) => {

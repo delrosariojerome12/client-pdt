@@ -38,6 +38,8 @@ const ItemsList = (props: Props) => {
     }
   };
 
+  console.log(ptoDetails);
+
   const renderView = () => {
     switch (uses) {
       case "inbound":
