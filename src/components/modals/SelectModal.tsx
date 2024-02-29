@@ -10,10 +10,7 @@ import {
 } from "react-native";
 import {FontAwesome5} from "@expo/vector-icons";
 import {shadows} from "../../styles/styles";
-// import CustomButton from "../forms/buttons/CustomButton";
-// import {useDocumentHooks} from "../../hooks/documentHooks";
-// import ScanModal from "./ScanModal";
-// import {useAppSelector} from "../../store/store";
+import LoadingSpinner from "../load-spinner/LoadingSpinner";
 
 interface SelectModalProps {
   visible: boolean;
@@ -22,6 +19,7 @@ interface SelectModalProps {
   title: string;
   propertiesToShow: {name: string; label: string}[];
   customContent: JSX.Element;
+  loadingStatus?: boolean;
 }
 
 const SelectModal = React.memo((props: SelectModalProps) => {
@@ -32,10 +30,12 @@ const SelectModal = React.memo((props: SelectModalProps) => {
     title,
     propertiesToShow,
     customContent,
+    loadingStatus,
   } = props;
 
-  // const {isScanModal} = useAppSelector((state) => state.modal);
-  // const {handleScanModal} = useDocumentHooks();
+  if (loadingStatus) {
+    return <LoadingSpinner />;
+  }
 
   if (selectedItem) {
     return (

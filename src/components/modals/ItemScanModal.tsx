@@ -12,6 +12,7 @@ import {FontAwesome5, Ionicons} from "@expo/vector-icons";
 import {useAppSelector} from "../../store/store";
 import CustomButton from "../forms/buttons/CustomButton";
 import {useDocumentHooks} from "../../hooks/documentHooks";
+import {format} from "../../styles/styles";
 
 interface ScanModalProps {
   visible: boolean;
@@ -34,6 +35,8 @@ const ItemScanModal = (props: ScanModalProps) => {
   const handleOnQuantityChange = (key: string, value: number | string) => {
     setQuantityField(parseInt(value as any));
   };
+
+  console.log(item);
 
   if (item) {
     return (
@@ -81,13 +84,27 @@ const ItemScanModal = (props: ScanModalProps) => {
               >
                 Item Details
               </Text>
-              <Text>Line no: 2</Text>
-              <Text>Item Code: {item.itemCode}</Text>
-              <Text>Item Description: {item.itemName}</Text>
-              <Text>Int Quantity: {`${item.pieces} PCS`}</Text>
-              <Text>
-                Receieved Quantity: {`Receieved Qty: ${item.receiveQty}`}
-              </Text>
+              <View style={format.twoRowText}>
+                <Text style={{fontWeight: "bold"}}>Line No: </Text>
+                <Text>{item.copyline}</Text>
+              </View>
+              <View style={format.twoRowText}>
+                <Text style={{fontWeight: "bold"}}>Item Code: </Text>
+                <Text>{item.itmcde}</Text>
+              </View>
+              <View style={format.twoRowText}>
+                <Text style={{fontWeight: "bold"}}>Item Description: </Text>
+                <Text> {item.itmdsc}</Text>
+              </View>
+              <View style={format.twoRowText}>
+                <Text style={{fontWeight: "bold"}}>Int Quantity: </Text>
+                <Text> {`${item.intqty} PCS`}</Text>
+              </View>
+
+              <View style={format.twoRowText}>
+                <Text style={{fontWeight: "bold"}}> Receieved Quantity: </Text>
+                <Text> {`${item.itmqty} PCS`}</Text>
+              </View>
             </View>
 
             <View style={styles.buttonContainer}>

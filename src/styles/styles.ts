@@ -72,7 +72,7 @@ export const bgColors = StyleSheet.create({
 export const format = StyleSheet.create({
   twoRowText: {
     flexDirection: "row",
-    gap: 10,
+    gap: 5,
     flexWrap: "wrap",
   },
   twoRowTextBetween: {

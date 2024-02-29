@@ -19,6 +19,7 @@ interface Props {
 const ItemsList = (props: Props) => {
   const {uses} = props;
   const {selectedDocument} = useAppSelector((state) => state.document);
+  const {ptoDetails} = useAppSelector((state) => state.inbound);
 
   const renderItems = (item: any, index: number) => {
     switch (uses) {
@@ -37,14 +38,19 @@ const ItemsList = (props: Props) => {
     }
   };
 
-  if (selectedDocument) {
-    return (
-      <View style={styles.container}>
-        {selectedDocument.items.map((item: any, index: number) => {
+  const renderView = () => {
+    switch (uses) {
+      case "inbound":
+        return ptoDetails.data.map((item: any, index: number) => {
           return renderItems(item, index);
-        })}
-      </View>
-    );
+        });
+      default:
+        break;
+    }
+  };
+
+  if (selectedDocument) {
+    return <View style={styles.container}>{renderView()}</View>;
   }
 };
 

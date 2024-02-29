@@ -7,9 +7,10 @@ import {useDocumentHooks} from "../../hooks/documentHooks";
 import ItemScanModal from "../modals/ItemScanModal";
 import {useAppSelector} from "../../store/store";
 import {format} from "../../styles/styles";
+import {ProductData} from "../../models/generic/ProductData";
 
 interface Items {
-  item: any;
+  item: ProductData;
 }
 const PTOItems = (props: Items) => {
   const {isScanItemModal} = useAppSelector((state) => state.modal);
@@ -21,11 +22,11 @@ const PTOItems = (props: Items) => {
     <>
       <View style={[styles.container, bgColors.mediumGrayishBG]}>
         <View style={styles.leftContainer}>
-          <Text>{item.itemName}</Text>
-          <Text>{item.itemCode}</Text>
-          <Text>{`${item.pieces} PCS`}</Text>
+          <Text>{item.itmdsc}</Text>
+          <Text>{item.itmcde}</Text>
+          <Text>{`${item.itmqty} PCS`}</Text>
           <View style={styles.remove}>
-            <Text>{`Receieved Qty: ${item.receiveQty}`}</Text>
+            <Text>{`Received Qty: ${item.itmqty}`}</Text>
             <TouchableOpacity
               onPress={() => {
                 removeScannedQuantity(item);
@@ -40,21 +41,21 @@ const PTOItems = (props: Items) => {
           {/* <Text style={{fontWeight: "bold"}}>**VALIDATED**</Text> */}
           <View style={{flexDirection: "row", gap: 5}}>
             <Text style={{fontWeight: "bold"}}>LPN: </Text>
-            <Text>{`${item.LPNNumber}`}</Text>
+            <Text>{`${item.lpnnum}`}</Text>
           </View>
           <View style={styles.datesContainer}>
             <View>
               <View style={format.twoRowText}>
                 <Text style={{fontWeight: "bold"}}>Batch No.:</Text>
-                <Text>{` ${item.batchNumber}`}</Text>
+                <Text>{` ${item.batchnum || "No BatchNo."}`}</Text>
               </View>
               <View style={format.twoRowText}>
                 <Text style={{fontWeight: "bold"}}>Mfg. Date:</Text>
-                <Text>{` ${item.expDate}`}</Text>
+                <Text>{` ${item.mfgdte || "No Date"} `}</Text>
               </View>
               <View style={format.twoRowText}>
                 <Text style={{fontWeight: "bold"}}>Exp. Date:</Text>
-                <Text>{` ${item.mfgDate}`}</Text>
+                <Text>{` ${item.expdte || "No Date"}`}</Text>
               </View>
             </View>
             <TouchableOpacity onPress={() => {}}>
@@ -69,7 +70,9 @@ const PTOItems = (props: Items) => {
           />
         </View>
       </View>
-      <ItemScanModal visible={isScanItemModal} onClose={closeItemScanModal} />
+      {isScanItemModal && (
+        <ItemScanModal visible={isScanItemModal} onClose={closeItemScanModal} />
+      )}
     </>
   );
 };
@@ -99,10 +102,9 @@ const styles = StyleSheet.create({
     // borderWidth: 1,
   },
   datesContainer: {
-    // alignItems: "flex-start",
     borderWidth: 1,
     width: "100%",
-    padding: 7,
+    padding: 5,
     borderRadius: 50 / 10,
     flexDirection: "row",
     justifyContent: "space-between",

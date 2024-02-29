@@ -7,7 +7,8 @@ import {
   handleToggleSearchModal,
   handleSetSearchModalContent,
 } from "../reducers/modalReducer";
-
+import {getPTODetails} from "../store/actions/warehouse/warehouseActions";
+import {PTOData} from "../models/warehouse/inbound/PTO";
 import {handleSetDocument, handleSetItem} from "../reducers/documentReducer";
 
 interface SearchContent {
@@ -18,10 +19,12 @@ export const useDocumentHooks = () => {
   const {selectedDocument} = useAppSelector((state) => state.document);
   const dispatch = useAppDispatch();
 
-  const handleSelectModal = (item: any) => {
+  const handleSelectModal = (item: PTOData) => {
+    dispatch(getPTODetails({docnum: item.docnum}));
     dispatch(handleSetDocument(item));
     dispatch(handleToggleSelectModal());
   };
+
   const handleScanModal = () => {
     dispatch(handleToggleScanModal());
   };

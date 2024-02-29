@@ -1,15 +1,14 @@
 import {createSlice} from "@reduxjs/toolkit";
+import {ProductData} from "../models/generic/ProductData";
 
 interface Document {
   selectedDocument: any | null;
-  selectedItem: any | null;
-  // scanFields: string;
+  selectedItem: ProductData | null;
 }
 
 const initialState: Document = {
   selectedDocument: null,
   selectedItem: null,
-  // scanFields: "",
 };
 
 const documentReducer = createSlice({
