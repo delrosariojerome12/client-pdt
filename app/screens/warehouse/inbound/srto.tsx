@@ -1,129 +1,111 @@
-import {View, Text} from "react-native";
-import React, {useEffect, useState} from "react";
+import {
+  View,
+  Text,
+  ScrollView,
+  RefreshControl,
+  ActivityIndicator,
+} from "react-native";
+import React from "react";
 import CustomButton from "../../../../src/components/forms/buttons/CustomButton";
 import CustomTable from "../../../../src/components/forms/table/CustomTable";
 import ScanModal from "../../../../src/components/modals/ScanModal";
 import {useDocumentHooks} from "../../../../src/hooks/documentHooks";
-import {useAppSelector} from "../../../../src/store/store";
 import {generalStyles} from "../../../../src/styles/styles";
 import SelectModal from "../../../../src/components/modals/SelectModal";
 import ItemsList from "../../../../src/components/list-holder/ItemsList";
+import {useInboundHooks} from "../../../../src/hooks/inboundHooks";
+import LoadingSpinner from "../../../../src/components/load-spinner/LoadingSpinner";
+
+const tableHeaders = ["Date", "Document No.", "SRT No.", ""];
+const tableVisibleProps = ["trndte", "docnum", "srtdocnum"];
 
 const SRTO = () => {
-  const {isScanModal, isSelectModal} = useAppSelector((state) => state.modal);
-  const {selectedDocument} = useAppSelector((state) => state.document);
+  const {
+    handleScroll,
+    isPaginating,
+    onRefresh,
+    refreshing,
+    srto,
+    isScanModal,
+    isSelectModal,
+    selectedDocument,
+  } = useInboundHooks({
+    page: "srto",
+  });
 
   const {handleScanModal, handleSelectModal, closeSelectModal, handlePost} =
     useDocumentHooks();
-  const tableHeaders = ["Date", "Document No.", "SRT No.", ""];
-  const tableData = [
-    {
-      trndte: "01-26-2024",
-      docnum: "PTO-002021",
-      inrnum: "INT-003333",
-      items: [
-        {
-          itemCode: "ABC123",
-          itemName: "Item 1",
-          pieces: 5,
-          receiveQty: 5,
-          LPNNumber: "LPN123",
-          batchNumber: "BATCH001",
-          mfgDate: "2023-01-01",
-          expDate: "2024-12-31",
-        },
-        {
-          itemCode: "DEF456",
-          itemName: "Item 2",
-          pieces: 10,
-          receiveQty: 10,
-          LPNNumber: "LPN456",
-          batchNumber: "BATCH002",
-          mfgDate: "2023-02-01",
-          expDate: "2024-12-31",
-        },
-        {
-          itemCode: "GHI789",
-          itemName: "Item 3",
-          pieces: 15,
-          receiveQty: 15,
-          LPNNumber: "LPN789",
-          batchNumber: "BATCH003",
-          mfgDate: "2023-03-01",
-          expDate: "2024-12-31",
-        },
-      ],
-    },
-    {
-      trndte: "01-26-2024",
-      docnum: "PTO-002021",
-      inrnum: "INT-002222",
-      items: [
-        {
-          itemCode: "DEF456",
-          itemName: "Item 2",
-          pieces: 10,
-          receiveQty: 10,
-          LPNNumber: "LPN456",
-          batchNumber: "BATCH002",
-          mfgDate: "2023-02-01",
-          expDate: "2024-12-31",
-        },
-      ],
-    },
-    {
-      trndte: "01-26-2024",
-      docnum: "PTO-002021",
-      inrnum: "INT-001111",
-      items: [
-        {
-          itemCode: "GHI789",
-          itemName: "Item 3",
-          pieces: 15,
-          receiveQty: 15,
-          LPNNumber: "LPN789",
-          batchNumber: "BATCH003",
-          mfgDate: "2023-03-01",
-          expDate: "2024-12-31",
-        },
-      ],
-    },
-  ];
-  const tableVisibleProps = ["trndte", "docnum", "inrnum"];
 
-  useEffect(() => {
-    console.log("api call");
-  }, []);
+  if (srto.status === "loading" && !refreshing && !isPaginating) {
+    return <LoadingSpinner />;
+  }
 
   console.log("SRTO");
 
   return (
-    <View style={generalStyles.innerContainer}>
+    <View style={generalStyles.outerContainer}>
       <CustomButton title="SCAN SRT" onPress={handleScanModal} type="regular" />
-      <CustomTable
-        tableHeaders={tableHeaders}
-        tableData={tableData}
-        visibleProperties={tableVisibleProps}
-        isPostDisable={true}
-        onSelect={handleSelectModal}
-      />
-      <ScanModal
-        visible={isScanModal}
-        onClose={handleScanModal}
-        placeholder="Waiting to Scan SRT Barcode..."
-      />
+      <ScrollView
+        style={generalStyles.innerContainer}
+        contentContainerStyle={{flexGrow: 1}}
+        refreshControl={
+          <RefreshControl refreshing={false} onRefresh={onRefresh} />
+        }
+        onScroll={handleScroll}
+        scrollEventThrottle={150}
+      >
+        <CustomTable
+          tableHeaders={tableHeaders}
+          tableData={srto.data}
+          visibleProperties={tableVisibleProps}
+          isPostDisable={true}
+          onSelect={handleSelectModal}
+          selectType="srto"
+        />
 
-      <SelectModal
-        visible={isSelectModal}
-        onClose={closeSelectModal}
-        selectedItem={selectedDocument}
-        title="Sales Return Transfer Order Details"
-        propertiesToShow={[
-          {name: "docnum", label: "Document Number"},
-          {name: "inrnum", label: "Other Number"},
-        ]}
-        customContent={<ItemsList uses="inbound" />}
-      />
+        {isScanModal && (
+          <ScanModal
+            visible={isScanModal}
+            onClose={handleScanModal}
+            placeholder="Waiting to Scan SRT Barcode..."
+            scanParams={{category: "lpnnum_srto"}}
+          />
+        )}
+
+        {isSelectModal && (
+          <SelectModal
+            visible={isSelectModal}
+            onClose={closeSelectModal}
+            selectedItem={selectedDocument}
+            title="Sales Return Transfer Order Details"
+            propertiesToShow={[
+              {name: "docnum", label: "Document Number"},
+              {name: "srtdocnum", label: "SRT Number"},
+            ]}
+            customContent={
+              <ItemsList
+                uses="inbound"
+                subcategory="srto"
+                options={{removeEdit: true, removeLpn: true}}
+              />
+            }
+          />
+        )}
+      </ScrollView>
+
+      {isPaginating && (
+        <View
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+            paddingVertical: 10,
+            height: 100,
+          }}
+        >
+          <ActivityIndicator size="large" color="#0000ff" />
+          <Text>Loading more data...</Text>
+        </View>
+      )}
     </View>
   );
 };

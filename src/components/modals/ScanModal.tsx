@@ -1,5 +1,4 @@
 import React, {useState} from "react";
-
 import {
   Modal,
   View,
@@ -13,17 +12,19 @@ import CustomInputs from "../forms/inputs/CustomInputs";
 import CustomButton from "../forms/buttons/CustomButton";
 import {useDocumentHooks} from "../../hooks/documentHooks";
 import {FontAwesome5} from "@expo/vector-icons";
+import {ScanCategory} from "../../models/generic/ScanCategory";
 
 interface ScanModalProps {
   visible: boolean;
   onClose: () => void;
   placeholder: string;
   isNextBtn?: boolean;
+  scanParams: ScanCategory;
 }
 
 const ScanModal = React.memo((props: ScanModalProps) => {
   const {handleScan, validateBin} = useDocumentHooks();
-  const {visible, onClose, placeholder, isNextBtn} = props;
+  const {visible, onClose, placeholder, isNextBtn, scanParams} = props;
   const [scanfield, setScanfield] = useState<string>("");
   const [binfield, setBinfield] = useState<string>("");
   const [itemDetails, setItemDetails] = useState<any | null>(null);
@@ -52,7 +53,9 @@ const ScanModal = React.memo((props: ScanModalProps) => {
       if (isNextBtn) {
         return (
           <CustomButton
-            onPress={handleScan}
+            onPress={() =>
+              handleScan({barcode: scanfield, category: scanParams.category})
+            }
             title="Next"
             type="regular"
             isWidthNotFull={true}
@@ -62,7 +65,9 @@ const ScanModal = React.memo((props: ScanModalProps) => {
       return (
         <View style={styles.buttonContainer}>
           <CustomButton
-            onPress={handleScan}
+            onPress={() =>
+              handleScan({barcode: scanfield, category: scanParams.category})
+            }
             title="Continue"
             type="regular"
             isWidthNotFull={true}
@@ -101,13 +106,6 @@ const ScanModal = React.memo((props: ScanModalProps) => {
                 inputKey="scan"
               />
             </View>
-
-            {/* <CustomButton
-              onPress={onScan}
-              title="VALIDATE"
-              type="save"
-              isWidthNotFull={true}
-            /> */}
 
             {renderButtons()}
 

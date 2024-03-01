@@ -11,12 +11,19 @@ import {ProductData} from "../../models/generic/ProductData";
 
 interface Items {
   item: ProductData;
+  options?: {
+    removeEdit?: boolean;
+    removeDelete?: boolean;
+    removeLpn?: boolean;
+  };
 }
-const PTOItems = (props: Items) => {
+const PTOItems = React.memo((props: Items) => {
   const {isScanItemModal} = useAppSelector((state) => state.modal);
   const {handleItemScanModal, closeItemScanModal, removeScannedQuantity} =
     useDocumentHooks();
-  const {item} = props;
+  const {item, options} = props;
+
+  console.log(options);
 
   return (
     <>
@@ -27,22 +34,27 @@ const PTOItems = (props: Items) => {
           <Text>{`${item.itmqty} PCS`}</Text>
           <View style={styles.remove}>
             <Text>{`Received Qty: ${item.itmqty}`}</Text>
-            <TouchableOpacity
-              onPress={() => {
-                removeScannedQuantity(item);
-              }}
-            >
-              <FontAwesome name="remove" size={24} color="black" />
-            </TouchableOpacity>
+            {!options?.removeDelete && (
+              <TouchableOpacity
+                onPress={() => {
+                  removeScannedQuantity(item);
+                }}
+              >
+                <FontAwesome name="remove" size={24} color="black" />
+              </TouchableOpacity>
+            )}
           </View>
         </View>
         <View style={styles.rightContainer}>
           {/* if validated */}
           {/* <Text style={{fontWeight: "bold"}}>**VALIDATED**</Text> */}
-          <View style={{flexDirection: "row", gap: 5}}>
-            <Text style={{fontWeight: "bold"}}>LPN: </Text>
-            <Text>{`${item.lpnnum}`}</Text>
-          </View>
+          {!options?.removeLpn && (
+            <View style={{flexDirection: "row", gap: 5}}>
+              <Text style={{fontWeight: "bold"}}>LPN: </Text>
+              <Text>{`${item.lpnnum}`}</Text>
+            </View>
+          )}
+
           <View style={styles.datesContainer}>
             <View>
               <View style={format.twoRowText}>
@@ -58,9 +70,11 @@ const PTOItems = (props: Items) => {
                 <Text>{` ${item.expdte || "No Date"}`}</Text>
               </View>
             </View>
-            <TouchableOpacity onPress={() => {}}>
-              <FontAwesome name="edit" size={24} color="black" />
-            </TouchableOpacity>
+            {!options?.removeEdit && (
+              <TouchableOpacity onPress={() => {}}>
+                <FontAwesome name="edit" size={24} color="black" />
+              </TouchableOpacity>
+            )}
           </View>
           <CustomButton
             onPress={() => handleItemScanModal(item)}
@@ -75,7 +89,7 @@ const PTOItems = (props: Items) => {
       )}
     </>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -84,11 +98,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
     borderRadius: 100 / 10,
+    gap: 10,
   },
   leftContainer: {
     gap: 5,
-    width: "45%",
-    // borderWidth: 1,
+    width: "40%",
   },
   remove: {
     flexDirection: "row",
@@ -98,7 +112,7 @@ const styles = StyleSheet.create({
   rightContainer: {
     gap: 5,
     alignItems: "flex-end",
-    width: "55%",
+    width: "60%",
     // borderWidth: 1,
   },
   datesContainer: {

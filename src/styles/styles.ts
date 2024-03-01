@@ -14,10 +14,16 @@ export const generalStyles = StyleSheet.create({
     padding: 25,
   },
   innerContainer: {
-    padding: 7,
+    // padding: 7,
     paddingTop: 10,
     flex: 1,
     gap: 15,
+  },
+  outerContainer: {
+    padding: 10,
+    paddingTop: 10,
+    flex: 1,
+    // gap: 200,
   },
 
   boldText: {

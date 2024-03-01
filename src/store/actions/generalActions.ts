@@ -2,9 +2,9 @@ import {createAsyncThunk} from "@reduxjs/toolkit";
 import axios from "axios";
 import {RootState} from "../store";
 
-interface FetchDocnumDetails {
-  docnum: string;
-  req_category:
+export interface ScanDocumentParams {
+  barcode: string;
+  category:
     | "wrr"
     | "lpnum"
     | "lpnnum_wto"
@@ -36,7 +36,7 @@ interface FetchDocnumDetails {
     | "tms_SO_item";
 }
 
-interface PutawaDetails {
+interface PutawayDetails {
   limit: number;
   offset: number;
   category: "PUR" | "WHS" | "SRTO";
@@ -45,16 +45,17 @@ interface PutawaDetails {
 export const getDocument = createAsyncThunk(
   "general/getDocument",
   async (
-    {docnum, req_category}: FetchDocnumDetails,
+    {barcode, category}: ScanDocumentParams,
     {rejectWithValue, getState}
   ) => {
     try {
       const state = getState() as RootState;
       const {ipAddress, port, protocol} = state.auth.server;
 
-      const url = `${protocol}://${ipAddress}:${port}/api/getPTODetails/?docnum=${docnum}`;
+      const url = `${protocol}://${ipAddress}:${port}/api/scanBarcode/?barcode=${barcode}&category=${category}`;
 
       const response = await axios.get(url);
+      console.log(response.data);
 
       return response.data;
     } catch (error: any) {
@@ -66,7 +67,7 @@ export const getDocument = createAsyncThunk(
 export const getPutaway = createAsyncThunk(
   "general/getPutaway",
   async (
-    {category, limit, offset}: PutawaDetails,
+    {category, limit, offset}: PutawayDetails,
     {rejectWithValue, getState}
   ) => {
     try {

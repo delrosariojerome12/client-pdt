@@ -62,7 +62,6 @@ export const useServiceHooks = () => {
 
     try {
       const response = await axios.post(completeUrl, requestData);
-      console.log(response.data);
 
       setData(response.data);
       setStatus("success");

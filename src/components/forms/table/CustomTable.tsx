@@ -8,6 +8,8 @@ import {
 } from "react-native";
 import {Table, Row, Rows} from "react-native-reanimated-table";
 import {generalStyles} from "../../../styles/styles";
+import {SelectProps} from "../../../hooks/documentHooks";
+import {TypeSelect} from "../../../hooks/documentHooks";
 
 interface TableProps {
   tableHeaders: string[];
@@ -15,8 +17,9 @@ interface TableProps {
   visibleProperties: string[];
   isSelectDisable?: boolean;
   isPostDisable?: boolean;
-  onSelect?: (selectedItem: any) => void;
+  onSelect?: ({item, type}: SelectProps) => void;
   onPost?: (selectedItem: any) => void;
+  selectType?: TypeSelect;
 }
 
 const CustomTable = (props: TableProps) => {
@@ -28,6 +31,7 @@ const CustomTable = (props: TableProps) => {
     isPostDisable,
     onSelect,
     onPost,
+    selectType,
   } = props;
 
   const renderButtons = (rowData: any) => {
@@ -36,7 +40,11 @@ const CustomTable = (props: TableProps) => {
         {!isSelectDisable && (
           <TouchableOpacity
             style={styles.buttons}
-            onPress={() => onSelect && onSelect(rowData)}
+            onPress={() =>
+              onSelect &&
+              selectType &&
+              onSelect({item: rowData, type: selectType})
+            }
           >
             <Text style={styles.buttonText}>SELECT</Text>
           </TouchableOpacity>

@@ -16,7 +16,6 @@ export const useBarcodeScanner = () => {
   useEffect(() => {
     // Define the action for DataWedge Intents
     const action = "com.zebra.dwintents.ACTION";
-
     // Register a receiver for the barcode scans with the appropriate action
     DataWedgeIntents.registerReceiver(action, "");
 
@@ -26,7 +25,6 @@ export const useBarcodeScanner = () => {
       console.log("Scanned barcode:", barcodeValue);
       // Perform further actions with the barcode value here
     };
-
     // Listen for scan events sent from the module
     DeviceEventEmitter.addListener("barcode_scan", scanHandler);
 

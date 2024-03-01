@@ -1,119 +1,84 @@
-import {View, Text} from "react-native";
-import React, {useEffect, useState} from "react";
+import {
+  View,
+  Text,
+  ScrollView,
+  RefreshControl,
+  ActivityIndicator,
+} from "react-native";
+import React from "react";
 import CustomButton from "../../../../src/components/forms/buttons/CustomButton";
 import CustomTable from "../../../../src/components/forms/table/CustomTable";
 import ScanModal from "../../../../src/components/modals/ScanModal";
 import {useDocumentHooks} from "../../../../src/hooks/documentHooks";
-import {useAppSelector} from "../../../../src/store/store";
 import {generalStyles} from "../../../../src/styles/styles";
+import {useInboundHooks} from "../../../../src/hooks/inboundHooks";
+import LoadingSpinner from "../../../../src/components/load-spinner/LoadingSpinner";
+
+const tableHeaders = ["Date", "Document No.", "Intransit No.", ""];
+const tableVisibleProps = ["trndte", "docnum", "intnum"];
 
 const WHS = () => {
-  const {isScanModal} = useAppSelector((state) => state.modal);
+  const {handleScroll, isPaginating, onRefresh, refreshing, whs, isScanModal} =
+    useInboundHooks({
+      page: "whs",
+    });
 
   const {handleScanModal, handlePost} = useDocumentHooks();
 
-  const tableHeaders = ["Date", "Document No.", "Intransit No.", ""];
-  const tableData = [
-    {
-      trndte: "01-26-2024",
-      docnum: "WT01-1234",
-      inrnum: "INT-003333",
-      items: [
-        {
-          itemCode: "ABC123",
-          itemName: "Item 1",
-          pieces: 5,
-          receiveQty: 5,
-          LPNNumber: "LPN123",
-          batchNumber: "BATCH001",
-          mfgDate: "2023-01-01",
-          expDate: "2024-12-31",
-        },
-        {
-          itemCode: "DEF456",
-          itemName: "Item 2",
-          pieces: 10,
-          receiveQty: 10,
-          LPNNumber: "LPN456",
-          batchNumber: "BATCH002",
-          mfgDate: "2023-02-01",
-          expDate: "2024-12-31",
-        },
-        {
-          itemCode: "GHI789",
-          itemName: "Item 3",
-          pieces: 15,
-          receiveQty: 15,
-          LPNNumber: "LPN789",
-          batchNumber: "BATCH003",
-          mfgDate: "2023-03-01",
-          expDate: "2024-12-31",
-        },
-      ],
-    },
-    {
-      trndte: "01-26-2024",
-      docnum: "WT01-5678",
-      inrnum: "INT-002222",
-      items: [
-        {
-          itemCode: "DEF456",
-          itemName: "Item 2",
-          pieces: 10,
-          receiveQty: 10,
-          LPNNumber: "LPN456",
-          batchNumber: "BATCH002",
-          mfgDate: "2023-02-01",
-          expDate: "2024-12-31",
-        },
-      ],
-    },
-    {
-      trndte: "01-26-2024",
-      docnum: "WT01-9012",
-      inrnum: "INT-001111",
-      items: [
-        {
-          itemCode: "GHI789",
-          itemName: "Item 3",
-          pieces: 15,
-          receiveQty: 15,
-          LPNNumber: "LPN789",
-          batchNumber: "BATCH003",
-          mfgDate: "2023-03-01",
-          expDate: "2024-12-31",
-        },
-      ],
-    },
-  ];
-  const tableVisibleProps = ["trndte", "docnum", "inrnum"];
-
-  useEffect(() => {
-    console.log("api call");
-  }, []);
+  if (whs.status === "loading" && !refreshing && !isPaginating) {
+    return <LoadingSpinner />;
+  }
 
   console.log("WHS");
 
   return (
-    <View style={generalStyles.innerContainer}>
+    <View style={generalStyles.outerContainer}>
       <CustomButton
         title="SCAN LPN NO."
         onPress={handleScanModal}
         type="regular"
       />
-      <CustomTable
-        tableHeaders={tableHeaders}
-        tableData={tableData}
-        visibleProperties={tableVisibleProps}
-        onPost={handlePost}
-        isSelectDisable={true}
-      />
-      <ScanModal
-        visible={isScanModal}
-        onClose={handleScanModal}
-        placeholder="Waiting to Scan LPN No."
-        isNextBtn={true}
-      />
+      <ScrollView
+        style={generalStyles.innerContainer}
+        contentContainerStyle={{flexGrow: 1}}
+        refreshControl={
+          <RefreshControl refreshing={false} onRefresh={onRefresh} />
+        }
+        onScroll={handleScroll}
+        scrollEventThrottle={150}
+      >
+        <CustomTable
+          tableHeaders={tableHeaders}
+          tableData={whs.data}
+          visibleProperties={tableVisibleProps}
+          onPost={handlePost}
+          isSelectDisable={true}
+        />
+
+        {isScanModal && (
+          <ScanModal
+            visible={isScanModal}
+            onClose={handleScanModal}
+            placeholder="Waiting to Scan LPN No."
+            isNextBtn={true}
+            scanParams={{category: "lpnum"}}
+          />
+        )}
+      </ScrollView>
+
+      {isPaginating && (
+        <View
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+            paddingVertical: 10,
+            height: 100,
+          }}
+        >
+          <ActivityIndicator size="large" color="#0000ff" />
+          <Text>Loading more data...</Text>
+        </View>
+      )}
     </View>
   );
 };

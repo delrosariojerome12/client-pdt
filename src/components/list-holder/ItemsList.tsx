@@ -14,17 +14,23 @@ interface Props {
     | "subcon"
     | "stockTransfer"
     | "physicalInventory";
+  subcategory?: "srto" | "pto";
+  options?: {
+    removeEdit?: boolean;
+    removeDelete?: boolean;
+    removeLpn?: boolean;
+  };
 }
 
-const ItemsList = (props: Props) => {
-  const {uses} = props;
+const ItemsList = React.memo((props: Props) => {
+  const {uses, subcategory, options} = props;
   const {selectedDocument} = useAppSelector((state) => state.document);
-  const {ptoDetails} = useAppSelector((state) => state.inbound);
+  const {ptoDetails, srtoDetails} = useAppSelector((state) => state.inbound);
 
   const renderItems = (item: any, index: number) => {
     switch (uses) {
       case "inbound":
-        return <PTOItems item={item} key={index} />;
+        return <PTOItems item={item} key={index} options={options} />;
       case "outbound":
         return <WTODetails item={item} key={index} />;
       case "subcon":
@@ -38,23 +44,26 @@ const ItemsList = (props: Props) => {
     }
   };
 
-  console.log(ptoDetails);
-
   const renderView = () => {
     switch (uses) {
       case "inbound":
-        return ptoDetails.data.map((item: any, index: number) => {
-          return renderItems(item, index);
-        });
-      default:
-        break;
+        switch (subcategory) {
+          case "pto":
+            return ptoDetails.data.map((item: any, index: number) => {
+              return renderItems(item, index);
+            });
+          case "srto":
+            return srtoDetails.data.map((item: any, index: number) => {
+              return renderItems(item, index);
+            });
+        }
     }
   };
 
   if (selectedDocument) {
     return <View style={styles.container}>{renderView()}</View>;
   }
-};
+});
 
 const styles = StyleSheet.create({
   container: {

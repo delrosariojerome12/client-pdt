@@ -7,20 +7,48 @@ import {
   handleToggleSearchModal,
   handleSetSearchModalContent,
 } from "../reducers/modalReducer";
-import {getPTODetails} from "../store/actions/warehouse/warehouseActions";
-import {PTOData} from "../models/warehouse/inbound/PTO";
+import {
+  getPTODetails,
+  getSRTODetails,
+} from "../store/actions/warehouse/warehouseActions";
 import {handleSetDocument, handleSetItem} from "../reducers/documentReducer";
+import {getDocument} from "../store/actions/generalActions";
+import {ScanDocumentParams} from "../store/actions/generalActions";
 
 interface SearchContent {
   content: "warehouse" | "bin" | "item";
+}
+
+export type TypeSelect = "pto" | "srto" | "wto-inbound";
+
+export interface SelectProps {
+  type: TypeSelect;
+  item: any;
 }
 
 export const useDocumentHooks = () => {
   const {selectedDocument} = useAppSelector((state) => state.document);
   const dispatch = useAppDispatch();
 
-  const handleSelectModal = (item: PTOData) => {
-    dispatch(getPTODetails({docnum: item.docnum}));
+  const checkSelectType = ({item, type}: SelectProps) => {
+    // console.log(type, item);
+
+    switch (type) {
+      case "pto":
+        dispatch(getPTODetails({docnum: item.docnum}));
+        break;
+      case "srto":
+        dispatch(getSRTODetails({docnum: item.docnum}));
+        break;
+      default:
+        break;
+    }
+  };
+
+  const handleSelectModal = ({item, type}: SelectProps) => {
+    console.log(item, type);
+
+    checkSelectType({item, type});
     dispatch(handleSetDocument(item));
     dispatch(handleToggleSelectModal());
   };
@@ -52,8 +80,13 @@ export const useDocumentHooks = () => {
       {text: "No", style: "cancel"}, // Just close the alert without any action
     ]);
   };
-  const handleScan = () => {
-    alert("No api yet");
+
+  const handleScan = ({barcode, category}: ScanDocumentParams) => {
+    if (!barcode) {
+      alert("Please make sure barcode field is filled.");
+    } else {
+      dispatch(getDocument({barcode, category}));
+    }
   };
   const validateBin = () => {
     alert("No api yet");

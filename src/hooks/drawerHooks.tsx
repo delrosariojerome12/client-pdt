@@ -23,8 +23,6 @@ interface customDrawers {
 export const useDrawerHooks = () => {
   const {previousRoutes} = useAppSelector((state) => state.router);
 
-  // console.log(userDetails);
-
   const dispatch = useAppDispatch();
 
   const [customDrawers, setCustomDrawers] =
@@ -85,7 +83,6 @@ export const useDrawerHooks = () => {
                     borderRadius: 50 / 3,
                   }}
                   onPress={() => {
-                    // router.back();
                     console.log(previousRoutes);
                     console.log(previousRoutes.length);
 

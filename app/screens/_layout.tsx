@@ -9,7 +9,7 @@ import {
   DrawerItem,
 } from "@react-navigation/drawer";
 import {useAuthHooks} from "../../src/hooks/authHooks";
-import {View, SafeAreaView} from "react-native";
+import {View, SafeAreaView, Alert} from "react-native";
 import {Text} from "react-native";
 import {useAppSelector} from "../../src/store/store";
 import {format, textFormat} from "../../src/styles/styles";
@@ -40,7 +40,18 @@ const CustomDrawers = (props: any) => {
           label={"Logout"}
           labelStyle={{fontSize: 18}}
           onPress={() => {
-            handleLogout();
+            Alert.alert(
+              "Transaction Posting",
+              `Do you want to logout: ${userDetails?.usrname}?`,
+              [
+                {
+                  text: "Yes",
+                  onPress: () => handleLogout(),
+                  style: "destructive",
+                },
+                {text: "No", style: "cancel"},
+              ]
+            );
           }}
           icon={({size, color}) => (
             <FontAwesome name="sign-out" size={size} color={color} />
