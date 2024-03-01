@@ -23,8 +23,6 @@ const PTOItems = React.memo((props: Items) => {
     useDocumentHooks();
   const {item, options} = props;
 
-  console.log(options);
-
   return (
     <>
       <View style={[styles.container, bgColors.mediumGrayishBG]}>
@@ -85,7 +83,11 @@ const PTOItems = React.memo((props: Items) => {
         </View>
       </View>
       {isScanItemModal && (
-        <ItemScanModal visible={isScanItemModal} onClose={closeItemScanModal} />
+        <ItemScanModal
+          visible={isScanItemModal}
+          onClose={closeItemScanModal}
+          scanParams={{category: "bnt_item"}}
+        />
       )}
     </>
   );

@@ -14,7 +14,7 @@ interface Props {
     | "subcon"
     | "stockTransfer"
     | "physicalInventory";
-  subcategory?: "srto" | "pto";
+  subcategory?: "srto" | "pto" | "wto-outbound";
   options?: {
     removeEdit?: boolean;
     removeDelete?: boolean;
@@ -26,6 +26,7 @@ const ItemsList = React.memo((props: Props) => {
   const {uses, subcategory, options} = props;
   const {selectedDocument} = useAppSelector((state) => state.document);
   const {ptoDetails, srtoDetails} = useAppSelector((state) => state.inbound);
+  const {wtoOutboundDetails} = useAppSelector((state) => state.outbound);
 
   const renderItems = (item: any, index: number) => {
     switch (uses) {
@@ -44,6 +45,8 @@ const ItemsList = React.memo((props: Props) => {
     }
   };
 
+  console.log(wtoOutboundDetails);
+
   const renderView = () => {
     switch (uses) {
       case "inbound":
@@ -54,6 +57,13 @@ const ItemsList = React.memo((props: Props) => {
             });
           case "srto":
             return srtoDetails.data.map((item: any, index: number) => {
+              return renderItems(item, index);
+            });
+        }
+      case "outbound":
+        switch (subcategory) {
+          case "wto-outbound":
+            return wtoOutboundDetails.data.map((item: any, index: number) => {
               return renderItems(item, index);
             });
         }

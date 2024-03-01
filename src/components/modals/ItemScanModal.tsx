@@ -13,20 +13,24 @@ import {useAppSelector} from "../../store/store";
 import CustomButton from "../forms/buttons/CustomButton";
 import {useDocumentHooks} from "../../hooks/documentHooks";
 import {format} from "../../styles/styles";
+import {ScanCategory} from "../../models/generic/ScanCategory";
 
 interface ScanModalProps {
   visible: boolean;
   onClose: () => void;
+  scanParams: ScanCategory;
 }
 
 const ItemScanModal = (props: ScanModalProps) => {
-  const {selectedItem: item} = useAppSelector((state) => state.document);
+  const {selectedItem} = useAppSelector((state) => state.document);
   const {handleScan} = useDocumentHooks();
+  // item propeties varies
+  const item: any = selectedItem;
 
   const [scanfield, setScanfield] = useState<string>("");
   const [quantityField, setQuantityField] = useState<number>(1);
 
-  const {visible, onClose} = props;
+  const {visible, onClose, scanParams} = props;
 
   const handleOnChange = (key: string, value: string | number) => {
     setScanfield(String(value));
@@ -86,7 +90,7 @@ const ItemScanModal = (props: ScanModalProps) => {
               </Text>
               <View style={format.twoRowText}>
                 <Text style={{fontWeight: "bold"}}>Line No: </Text>
-                <Text>{item.copyline}</Text>
+                <Text>{item.linenum}</Text>
               </View>
               <View style={format.twoRowText}>
                 <Text style={{fontWeight: "bold"}}>Item Code: </Text>
@@ -109,7 +113,12 @@ const ItemScanModal = (props: ScanModalProps) => {
 
             <View style={styles.buttonContainer}>
               <CustomButton
-                onPress={handleScan}
+                onPress={() => {
+                  handleScan({
+                    barcode: scanfield,
+                    category: scanParams.category,
+                  });
+                }}
                 title="NEXT"
                 type="regular"
                 isWidthNotFull={true}

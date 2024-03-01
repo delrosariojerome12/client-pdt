@@ -7,9 +7,10 @@ import {useDocumentHooks} from "../../hooks/documentHooks";
 import ItemScanModal from "../modals/ItemScanModal";
 import {useAppSelector} from "../../store/store";
 import {format} from "../../styles/styles";
+import {OutboundItem} from "../../models/warehouse/outbound/wto-outbound-item";
 
 interface Items {
-  item: any;
+  item: OutboundItem;
 }
 const WTODetails = (props: Items) => {
   const {isScanItemModal} = useAppSelector((state) => state.modal);
@@ -23,28 +24,28 @@ const WTODetails = (props: Items) => {
         <View style={styles.leftContainer}>
           <View style={format.twoRowText}>
             <Text style={{fontWeight: "bold"}}>{`Line No:`}</Text>
-            <Text>{`1`}</Text>
+            <Text>{`${item.linenum}`}</Text>
           </View>
           <View style={format.twoRowText}>
             <Text style={{fontWeight: "bold"}}>Item Code:</Text>
-            <Text>{` ${item.itemCode}`}</Text>
+            <Text>{` ${item.itmcde}`}</Text>
           </View>
           <View style={format.twoRowText}>
             <Text style={{fontWeight: "bold"}}>Description:</Text>
-            <Text>{` ${item.itemName}`}</Text>
+            <Text>{` ${item.itmdsc}`}</Text>
           </View>
           <View style={format.twoRowText}>
             <Text style={{fontWeight: "bold"}}>UOM:</Text>
-            <Text>{` PCS`}</Text>
+            <Text>{`${item.untmea}`}</Text>
           </View>
           <View style={format.twoRowText}>
             <Text style={{fontWeight: "bold"}}>Qty:</Text>
-            <Text>{` ${item.pieces}`}</Text>
+            <Text>{` ${item.itmqty}`}</Text>
           </View>
           <View style={styles.remove}>
             <View style={format.twoRowText}>
               <Text style={{fontWeight: "bold"}}>Scanned Qty:</Text>
-              <Text>{` ${item.receiveQty}`}</Text>
+              <Text>{` ${item.scanqty}`}</Text>
             </View>
             <TouchableOpacity
               onPress={() => {
@@ -58,28 +59,29 @@ const WTODetails = (props: Items) => {
         <View style={styles.rightContainer}>
           {/* if validated */}
           {/* <Text style={{fontWeight: "bold"}}>**VALIDATED**</Text> */}
-          <View style={{flexDirection: "row", gap: 5}}>
+          {/* <View style={{flexDirection: "row", gap: 5}}>
             <Text style={{fontWeight: "bold"}}>LPN: </Text>
-            <Text>{`${item.LPNNumber}`}</Text>
-          </View>
+            <Text>{`${item.lpnnum}`}</Text>
+          </View> */}
           <View style={styles.datesContainer}>
             <View>
               <View style={format.twoRowText}>
+                <Text style={{fontWeight: "bold"}}>Bin No.:</Text>
+                <Text>{` ${item.binnum2}`}</Text>
+              </View>
+              <View style={format.twoRowText}>
                 <Text style={{fontWeight: "bold"}}>Batch No.:</Text>
-                <Text>{` ${item.batchNumber}`}</Text>
+                <Text>{` ${item.batchnum}`}</Text>
               </View>
               <View style={format.twoRowText}>
                 <Text style={{fontWeight: "bold"}}>Mfg. Date:</Text>
-                <Text>{` ${item.expDate}`}</Text>
+                <Text>{` ${item.mfgdte}`}</Text>
               </View>
               <View style={format.twoRowText}>
                 <Text style={{fontWeight: "bold"}}>Exp. Date:</Text>
-                <Text>{` ${item.mfgDate}`}</Text>
+                <Text>{` ${item.expdte}`}</Text>
               </View>
             </View>
-            <TouchableOpacity onPress={() => {}}>
-              <FontAwesome name="edit" size={24} color="black" />
-            </TouchableOpacity>
           </View>
           <CustomButton
             onPress={() => handleItemScanModal(item)}
@@ -89,7 +91,13 @@ const WTODetails = (props: Items) => {
           />
         </View>
       </View>
-      <ItemScanModal visible={isScanItemModal} onClose={closeItemScanModal} />
+      {isScanItemModal && (
+        <ItemScanModal
+          visible={isScanItemModal}
+          onClose={closeItemScanModal}
+          scanParams={{category: "wrr_wto_outbound"}}
+        />
+      )}
     </>
   );
 };
@@ -100,13 +108,14 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     // borderWidth: 1,
-    height: 200,
-    padding: 10,
+    padding: 15,
     borderRadius: 100 / 10,
+    gap: 5,
   },
   leftContainer: {
     gap: 5,
     // borderWidth: 1,
+    width: "50%",
   },
   remove: {
     flexDirection: "row",
@@ -116,12 +125,13 @@ const styles = StyleSheet.create({
   rightContainer: {
     gap: 5,
     alignItems: "flex-end",
-    width: "55%",
+    width: "50%",
+    height: "100%",
+    // justifyContent: "flex-start",
     // borderWidth: 1,
   },
   datesContainer: {
     // alignItems: "flex-start",
-    borderWidth: 1,
     width: "100%",
     padding: 7,
     borderRadius: 50 / 10,

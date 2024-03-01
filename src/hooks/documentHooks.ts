@@ -10,6 +10,7 @@ import {
 import {
   getPTODetails,
   getSRTODetails,
+  getWTOOutboundDetails,
 } from "../store/actions/warehouse/warehouseActions";
 import {handleSetDocument, handleSetItem} from "../reducers/documentReducer";
 import {getDocument} from "../store/actions/generalActions";
@@ -19,7 +20,7 @@ interface SearchContent {
   content: "warehouse" | "bin" | "item";
 }
 
-export type TypeSelect = "pto" | "srto" | "wto-inbound";
+export type TypeSelect = "pto" | "srto" | "wto-inbound" | "wto-outbound";
 
 export interface SelectProps {
   type: TypeSelect;
@@ -31,7 +32,7 @@ export const useDocumentHooks = () => {
   const dispatch = useAppDispatch();
 
   const checkSelectType = ({item, type}: SelectProps) => {
-    // console.log(type, item);
+    console.log(item, type);
 
     switch (type) {
       case "pto":
@@ -40,14 +41,14 @@ export const useDocumentHooks = () => {
       case "srto":
         dispatch(getSRTODetails({docnum: item.docnum}));
         break;
+      case "wto-outbound":
+        dispatch(getWTOOutboundDetails({docnum: item.docnum}));
       default:
         break;
     }
   };
 
   const handleSelectModal = ({item, type}: SelectProps) => {
-    console.log(item, type);
-
     checkSelectType({item, type});
     dispatch(handleSetDocument(item));
     dispatch(handleToggleSelectModal());
