@@ -67,7 +67,7 @@ const WTODetails = (props: Items) => {
             <View>
               <View style={format.twoRowText}>
                 <Text style={{fontWeight: "bold"}}>Bin No.:</Text>
-                <Text>{` ${item.binnum2}`}</Text>
+                <Text>{` ${item.binnum2 || item.binnum} `}</Text>
               </View>
               <View style={format.twoRowText}>
                 <Text style={{fontWeight: "bold"}}>Batch No.:</Text>

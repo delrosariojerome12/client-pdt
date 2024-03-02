@@ -18,7 +18,9 @@ interface PutawayDetails {
   // category: "PUR" | "WHS" | "SRTO";
 }
 
-// INBOUND
+// INBOUND //
+
+// PTO
 export const getPTO = createAsyncThunk(
   "inbound/getPTO",
   async (
@@ -42,7 +44,7 @@ export const getPTO = createAsyncThunk(
     }
   }
 );
-
+// PUR
 export const getPUR = createAsyncThunk(
   "inbound/getPUR",
   async (
@@ -66,7 +68,7 @@ export const getPUR = createAsyncThunk(
     }
   }
 );
-
+// WHS - needed to change the api
 export const getWHS = createAsyncThunk(
   "wto/getWHS",
   async (
@@ -90,7 +92,7 @@ export const getWHS = createAsyncThunk(
     }
   }
 );
-
+// SRTO
 export const getSRTO = createAsyncThunk(
   "wto/getSRTO",
   async (
@@ -114,7 +116,7 @@ export const getSRTO = createAsyncThunk(
     }
   }
 );
-
+// WHS
 export const getWTO = createAsyncThunk(
   "inbound/getWTO",
   async (
@@ -138,7 +140,7 @@ export const getWTO = createAsyncThunk(
     }
   }
 );
-
+// PTO-DETAILS
 export const getPTODetails = createAsyncThunk(
   "inbound/getPTODetails",
   async ({docnum}: FetchDocnumDetails, {rejectWithValue, getState}) => {
@@ -156,7 +158,7 @@ export const getPTODetails = createAsyncThunk(
     }
   }
 );
-
+// SRTO-DETAILS
 export const getSRTODetails = createAsyncThunk(
   "inbound/getSRTODetails",
   async ({docnum}: FetchDocnumDetails, {rejectWithValue, getState}) => {
@@ -175,8 +177,9 @@ export const getSRTODetails = createAsyncThunk(
   }
 );
 
-// OUTBOUND
+// OUTBOUND //
 
+// WTO-OUTBOUND-VALID
 export const getWTOOutboundValid = createAsyncThunk(
   "outbound/getWTOValid",
   async (
@@ -191,6 +194,8 @@ export const getWTOOutboundValid = createAsyncThunk(
 
       const response = await axios.get(url);
 
+      console.log("huy", response.data);
+
       return {
         data: response.data,
         paginating: paginating,
@@ -200,7 +205,7 @@ export const getWTOOutboundValid = createAsyncThunk(
     }
   }
 );
-
+// WTO-OUTBOUND-POSTING
 export const getWTOOutboundPost = createAsyncThunk(
   "outbound/getWTOPost",
   async (
@@ -225,6 +230,7 @@ export const getWTOOutboundPost = createAsyncThunk(
   }
 );
 
+// WTO-OUTBOUND-VALID-SELECT
 export const getWTOOutboundDetails = createAsyncThunk(
   "inbound/getSRTODetails",
   async ({docnum}: FetchDocnumDetails, {rejectWithValue, getState}) => {
@@ -237,6 +243,74 @@ export const getWTOOutboundDetails = createAsyncThunk(
       const response = await axios.get(url);
 
       console.log("xxx", response);
+
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// WAVEPICK-VALID
+export const getWPTOValid = createAsyncThunk(
+  "outbound/getWPTOValid",
+  async (
+    {limit, offset, paginating}: FetchPayload,
+    {rejectWithValue, getState}
+  ) => {
+    try {
+      const state = getState() as RootState;
+      const {ipAddress, port, protocol} = state.auth.server;
+
+      const url = `${protocol}://${ipAddress}:${port}/api/getWPTO_Outbound?posted=0&canceldoc=0&limit=${limit}&offset=${offset}&category=validation`;
+
+      const response = await axios.get(url);
+
+      return {
+        data: response.data,
+        paginating: paginating,
+      };
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+// WAVEPICK-POST
+export const getWPTOPost = createAsyncThunk(
+  "outbound/getWPTOPost",
+  async (
+    {limit, offset, paginating}: FetchPayload,
+    {rejectWithValue, getState}
+  ) => {
+    try {
+      const state = getState() as RootState;
+      const {ipAddress, port, protocol} = state.auth.server;
+
+      const url = `${protocol}://${ipAddress}:${port}/api/getWPTO_Outbound?posted=0&canceldoc=0&limit=${limit}&offset=${offset}&category=posting`;
+
+      const response = await axios.get(url);
+
+      return {
+        data: response.data,
+        paginating: paginating,
+      };
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// WAVEPICK-VALID-SELECT
+export const getWPTODetails = createAsyncThunk(
+  "outbound/getWPTODetails",
+  async ({docnum}: FetchDocnumDetails, {rejectWithValue, getState}) => {
+    try {
+      const state = getState() as RootState;
+      const {ipAddress, port, protocol} = state.auth.server;
+
+      const url = `${protocol}://${ipAddress}:${port}/api/getWPTOOutboundDetails?docnum=${docnum}`;
+
+      const response = await axios.get(url);
 
       return response.data;
     } catch (error: any) {

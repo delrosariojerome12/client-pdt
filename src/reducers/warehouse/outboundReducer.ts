@@ -1,11 +1,16 @@
 import {createSlice} from "@reduxjs/toolkit";
 import {WTO_OUTBOUND} from "../../models/warehouse/outbound/wto-outbound";
 import {OutboundItem} from "../../models/warehouse/outbound/wto-outbound-item";
+import {WavepickDocument} from "../../models/warehouse/outbound/wavepick";
+import {WavepickItem} from "../../models/warehouse/outbound/wavepickDetails";
 
 import {
   getWTOOutboundPost,
   getWTOOutboundValid,
   getWTOOutboundDetails,
+  getWPTODetails,
+  getWPTOValid,
+  getWPTOPost,
 } from "../../store/actions/warehouse/warehouseActions";
 
 interface Outbound {
@@ -21,11 +26,11 @@ interface Outbound {
   };
   wavepick: {
     validation: {
-      data: any[] | [];
+      data: WavepickDocument[] | [];
       status: "idle" | "loading" | "success" | "failed";
     };
     forPosting: {
-      data: any[] | [];
+      data: WavepickDocument[] | [];
       status: "idle" | "loading" | "success" | "failed";
     };
   };
@@ -41,6 +46,10 @@ interface Outbound {
   };
   wtoOutboundDetails: {
     data: OutboundItem[];
+    status: "idle" | "loading" | "success" | "failed";
+  };
+  wavepickDetails: {
+    data: WavepickItem[] | [];
     status: "idle" | "loading" | "success" | "failed";
   };
 }
@@ -80,6 +89,10 @@ const initialState: Outbound = {
       data: [],
       status: "idle",
     },
+  },
+  wavepickDetails: {
+    data: [],
+    status: "idle",
   },
 };
 
@@ -140,6 +153,61 @@ const outboundReducer = createSlice({
       })
       .addCase(getWTOOutboundDetails.rejected, (state, action) => {
         state.wtoOutboundDetails.status = "failed";
+      });
+
+    builder
+      .addCase(getWPTOValid.pending, (state, action) => {
+        state.wavepick.validation.status = "loading";
+      })
+      .addCase(getWPTOValid.fulfilled, (state, action) => {
+        const {data, paginating} = action.payload;
+        if (paginating) {
+          console.log("paginating");
+          state.wavepick.validation.data = [
+            ...state.wavepick.validation.data,
+            ...data.data,
+          ];
+        } else {
+          console.log("normal fetch");
+          state.wavepick.validation.data = data.data;
+        }
+        state.wavepick.validation.status = "success";
+      })
+      .addCase(getWPTOValid.rejected, (state, action) => {
+        state.wavepick.validation.status = "failed";
+      });
+    builder
+      .addCase(getWPTOPost.pending, (state, action) => {
+        state.wavepick.forPosting.status = "loading";
+      })
+      .addCase(getWPTOPost.fulfilled, (state, action) => {
+        const {data, paginating} = action.payload;
+        if (paginating) {
+          console.log("paginating");
+          state.wavepick.forPosting.data = [
+            ...state.wavepick.forPosting.data,
+            ...data.data,
+          ];
+        } else {
+          console.log("normal fetch");
+
+          state.wavepick.forPosting.data = data.data;
+        }
+        state.wavepick.forPosting.status = "success";
+      })
+      .addCase(getWPTOPost.rejected, (state, action) => {
+        state.wavepick.forPosting.status = "failed";
+      });
+    builder
+      .addCase(getWPTODetails.pending, (state, action) => {
+        state.wavepickDetails.status = "loading";
+      })
+      .addCase(getWPTODetails.fulfilled, (state, action) => {
+        state.wavepickDetails.status = "success";
+        state.wavepickDetails.data = action.payload.data;
+      })
+      .addCase(getWPTODetails.rejected, (state, action) => {
+        state.wavepickDetails.status = "failed";
       });
   },
 });

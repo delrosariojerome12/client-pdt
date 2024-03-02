@@ -5,12 +5,11 @@ import {
   RefreshControl,
   ActivityIndicator,
 } from "react-native";
-import React, {useEffect, useState} from "react";
+import React from "react";
 import CustomButton from "../../../../src/components/forms/buttons/CustomButton";
 import CustomTable from "../../../../src/components/forms/table/CustomTable";
 import ScanModal from "../../../../src/components/modals/ScanModal";
 import {useDocumentHooks} from "../../../../src/hooks/documentHooks";
-import {useAppSelector} from "../../../../src/store/store";
 import {generalStyles} from "../../../../src/styles/styles";
 import SelectModal from "../../../../src/components/modals/SelectModal";
 import ItemsList from "../../../../src/components/list-holder/ItemsList";
@@ -35,7 +34,6 @@ const WTO = () => {
     handleIndexChange,
   } = useOutboundHooks({
     page: "wto",
-    tabs: ["FOR VALIDATION", "FOR POSTING"],
   });
 
   const {handleScanModal, handleSelectModal, closeSelectModal, handlePost} =
@@ -61,7 +59,7 @@ const WTO = () => {
 
       <SwitchButton
         options={["FOR VALIDATION", "FOR POSTING"]}
-        activeIndex={activeIndex}
+        activeIndex={!activeIndex ? 0 : activeIndex}
         onChange={handleIndexChange}
       />
 
@@ -69,12 +67,12 @@ const WTO = () => {
         style={generalStyles.innerContainer}
         contentContainerStyle={{flexGrow: 1}}
         refreshControl={
-          <RefreshControl refreshing={false} onRefresh={onRefresh} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
         onScroll={handleScroll}
         scrollEventThrottle={150}
       >
-        {activeIndex === 0 ? (
+        {activeIndex === 0 || activeIndex === null ? (
           <CustomTable
             tableHeaders={tableHeaders}
             tableData={wto.validation.data}
@@ -93,26 +91,30 @@ const WTO = () => {
           />
         )}
 
-        <ScanModal
-          visible={isScanModal}
-          onClose={handleScanModal}
-          placeholder="Waiting to Scan SRT No. Barcode..."
-          scanParams={{category: "lpnnum_srto"}}
-        />
+        {isScanModal && (
+          <ScanModal
+            visible={isScanModal}
+            onClose={handleScanModal}
+            placeholder="Waiting to Scan SRT No. Barcode..."
+            scanParams={{category: "lpnnum_srto"}}
+          />
+        )}
 
-        <SelectModal
-          visible={isSelectModal}
-          onClose={closeSelectModal}
-          selectedItem={selectedDocument}
-          title="Warehouse Transfer Order Details"
-          propertiesToShow={[
-            {name: "docnum", label: "TO Number"},
-            {name: "strnum", label: "STR Number"},
-          ]}
-          customContent={
-            <ItemsList uses="outbound" subcategory="wto-outbound" />
-          }
-        />
+        {isSelectModal && (
+          <SelectModal
+            visible={isSelectModal}
+            onClose={closeSelectModal}
+            selectedItem={selectedDocument}
+            title="Warehouse Transfer Order Details"
+            propertiesToShow={[
+              {name: "docnum", label: "TO Number"},
+              {name: "strnum", label: "STR Number"},
+            ]}
+            customContent={
+              <ItemsList uses="outbound" subcategory="wto-outbound" />
+            }
+          />
+        )}
       </ScrollView>
       {isPaginating && (
         <View

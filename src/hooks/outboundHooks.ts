@@ -4,11 +4,12 @@ import {ToastMessage} from "../helper/Toast";
 import {
   getWTOOutboundPost,
   getWTOOutboundValid,
+  getWPTOValid,
+  getWPTOPost,
 } from "../store/actions/warehouse/warehouseActions";
 
 interface OutboundUse {
   page: "singlepick" | "wavepick" | "wto";
-  tabs: string[];
 }
 
 export const useOutboundHooks = ({page}: OutboundUse) => {
@@ -20,7 +21,7 @@ export const useOutboundHooks = ({page}: OutboundUse) => {
 
   const [refreshing, setRefreshing] = useState(false);
   const [isPaginating, setPaginating] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   // onload
   const checkPageToLoad = () => {
@@ -29,22 +30,22 @@ export const useOutboundHooks = ({page}: OutboundUse) => {
         dispatch(getWTOOutboundValid({limit: 10, offset: 0}));
         break;
       case "wavepick":
-        // dispatch(getWHS({limit: 10, offset: 0}));
+        dispatch(getWPTOValid({limit: 10, offset: 0}));
         break;
-      case "singlepick":
-        // dispatch(getSRTO({limit: 10, offset: 0}));
-        break;
-      default:
-        break;
+      // case "singlepick":
+      // dispatch(getSRTO({limit: 10, offset: 0}));
+      // break;
     }
   };
 
   // onpaginate
   const checkPageToPaginate = () => {
+    console.log("scroll-paginate");
     setPaginating(true);
     switch (page) {
       case "wto":
         switch (activeIndex) {
+          // valid
           case 0:
             const wtoValidOffset = wto.validation.data.length + 10;
             dispatch(
@@ -57,10 +58,16 @@ export const useOutboundHooks = ({page}: OutboundUse) => {
               ToastMessage("Table updated.", 1000);
               setPaginating(false);
             });
+            break;
           case 1:
+            // posting
             const wtoPostOffset = wto.forPosting.data.length + 10;
             dispatch(
-              getWTOOutboundPost({limit: 10, offset: wtoPostOffset})
+              getWTOOutboundPost({
+                limit: 10,
+                offset: wtoPostOffset,
+                paginating: true,
+              })
             ).then(() => {
               ToastMessage("Table updated.", 1000);
               setPaginating(false);
@@ -69,7 +76,38 @@ export const useOutboundHooks = ({page}: OutboundUse) => {
         }
         break;
       case "wavepick":
-        // dispatch(getWHS({limit: 10, offset: 0}));
+        switch (activeIndex) {
+          // valid
+          case 0:
+            const wptoValidOffset = wavepick.validation.data.length + 10;
+            dispatch(
+              getWPTOValid({
+                limit: 10,
+                offset: wptoValidOffset,
+                paginating: true,
+              })
+            ).then(() => {
+              ToastMessage("Table updated.", 1000);
+              setPaginating(false);
+            });
+            break;
+          // posting
+          case 1:
+            const wptoPostOffset = wavepick.forPosting.data.length + 10;
+            dispatch(
+              getWPTOPost({
+                limit: 10,
+                offset: wptoPostOffset,
+                paginating: true,
+              })
+            ).then(() => {
+              ToastMessage("Table updated.", 1000);
+              setPaginating(false);
+            });
+            break;
+          default:
+            break;
+        }
         break;
       case "singlepick":
         // dispatch(getSRTO({limit: 10, offset: 0}));
@@ -97,13 +135,23 @@ export const useOutboundHooks = ({page}: OutboundUse) => {
               ToastMessage("Refresh Success", 1000);
             });
             break;
-
-          default:
-            break;
         }
         break;
       case "wavepick":
-        // dispatch(getWHS({limit: 10, offset: 0}));
+        switch (activeIndex) {
+          case 0:
+            dispatch(getWPTOValid({limit: 10, offset: 0})).then(() => {
+              setRefreshing(false);
+              ToastMessage("Refresh Success", 1000);
+            });
+            break;
+          case 1:
+            dispatch(getWPTOPost({limit: 10, offset: 0})).then(() => {
+              setRefreshing(false);
+              ToastMessage("Refresh Success", 1000);
+            });
+            break;
+        }
         break;
       case "singlepick":
         // dispatch(getSRTO({limit: 10, offset: 0}));
@@ -115,6 +163,8 @@ export const useOutboundHooks = ({page}: OutboundUse) => {
 
   // on tab change
   const checkOnTabChange = () => {
+    console.log("tab change");
+
     switch (page) {
       case "wto":
         switch (activeIndex) {
@@ -125,22 +175,28 @@ export const useOutboundHooks = ({page}: OutboundUse) => {
             dispatch(getWTOOutboundPost({limit: 10, offset: 0}));
             break;
         }
-
         break;
-
-      default:
+      case "wavepick":
+        switch (activeIndex) {
+          case 0:
+            dispatch(getWPTOValid({limit: 10, offset: 0}));
+            break;
+          case 1:
+            dispatch(getWPTOPost({limit: 10, offset: 0}));
+            break;
+        }
         break;
     }
   };
 
   useEffect(() => {
-    console.log("xxx");
-
     checkPageToLoad();
   }, []);
 
   useEffect(() => {
-    checkOnTabChange();
+    if (activeIndex !== null) {
+      checkOnTabChange();
+    }
   }, [activeIndex]);
 
   const handleScroll = (event: any) => {
@@ -161,7 +217,7 @@ export const useOutboundHooks = ({page}: OutboundUse) => {
   };
 
   const handleIndexChange = (index: number) => {
-    setActiveIndex(index); // Update the active index
+    setActiveIndex(index);
   };
 
   return {

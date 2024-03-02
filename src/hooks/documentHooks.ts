@@ -11,6 +11,7 @@ import {
   getPTODetails,
   getSRTODetails,
   getWTOOutboundDetails,
+  getWPTODetails,
 } from "../store/actions/warehouse/warehouseActions";
 import {handleSetDocument, handleSetItem} from "../reducers/documentReducer";
 import {getDocument} from "../store/actions/generalActions";
@@ -20,7 +21,12 @@ interface SearchContent {
   content: "warehouse" | "bin" | "item";
 }
 
-export type TypeSelect = "pto" | "srto" | "wto-inbound" | "wto-outbound";
+export type TypeSelect =
+  | "pto"
+  | "srto"
+  | "wto-inbound"
+  | "wto-outbound"
+  | "wavepick";
 
 export interface SelectProps {
   type: TypeSelect;
@@ -32,7 +38,7 @@ export const useDocumentHooks = () => {
   const dispatch = useAppDispatch();
 
   const checkSelectType = ({item, type}: SelectProps) => {
-    console.log(item, type);
+    console.log(type);
 
     switch (type) {
       case "pto":
@@ -43,12 +49,19 @@ export const useDocumentHooks = () => {
         break;
       case "wto-outbound":
         dispatch(getWTOOutboundDetails({docnum: item.docnum}));
+        break;
+      case "wavepick":
+        dispatch(getWPTODetails({docnum: item.docnum}));
+        break;
       default:
         break;
     }
   };
 
   const handleSelectModal = ({item, type}: SelectProps) => {
+    console.log(type, item);
+
+    // FETCH-DOCNUM-DETAILS-ONSELECT
     checkSelectType({item, type});
     dispatch(handleSetDocument(item));
     dispatch(handleToggleSelectModal());
