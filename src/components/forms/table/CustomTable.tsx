@@ -15,6 +15,8 @@ interface TableProps {
   tableHeaders: string[];
   tableData: any[];
   visibleProperties: string[];
+  isSelectShown?: boolean;
+  isPostShown?: boolean;
   isSelectDisable?: boolean;
   isPostDisable?: boolean;
   onSelect?: ({item, type}: SelectProps) => void;

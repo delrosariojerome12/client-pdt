@@ -1,4 +1,4 @@
-import {Alert} from "react-native";
+import {Alert, Keyboard} from "react-native";
 import {useAppSelector, useAppDispatch} from "../store/store";
 import {
   handleToggleScanModal,
@@ -104,6 +104,7 @@ export const useDocumentHooks = () => {
     if (!barcode) {
       alert("Please make sure barcode field is filled.");
     } else {
+      console.log("shet");
       dispatch(getDocument({barcode, category}));
     }
   };

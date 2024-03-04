@@ -23,12 +23,14 @@ const PTOItems = React.memo((props: Items) => {
     useDocumentHooks();
   const {item, options} = props;
 
+  console.log("xx", item);
+
   return (
     <>
       <View style={[styles.container, bgColors.mediumGrayishBG]}>
         <View style={styles.leftContainer}>
-          <Text>{item.itmdsc}</Text>
           <Text>{item.itmcde}</Text>
+          <Text>{item.itmdsc}</Text>
           <Text>{`${item.itmqty} PCS`}</Text>
           <View style={styles.remove}>
             <Text>{`Received Qty: ${item.itmqty}`}</Text>
@@ -42,6 +44,13 @@ const PTOItems = React.memo((props: Items) => {
               </TouchableOpacity>
             )}
           </View>
+          <CustomButton
+            onPress={() => handleItemScanModal(item)}
+            title="SCAN ITEM"
+            type="regular"
+            isWidthNotFull={true}
+            fontSize={12}
+          />
         </View>
         <View style={styles.rightContainer}>
           {/* if validated */}
@@ -54,7 +63,7 @@ const PTOItems = React.memo((props: Items) => {
           )}
 
           <View style={styles.datesContainer}>
-            <View>
+            <View style={{flexWrap: "wrap"}}>
               <View style={format.twoRowText}>
                 <Text style={{fontWeight: "bold"}}>Batch No.:</Text>
                 <Text>{` ${item.batchnum || "No BatchNo."}`}</Text>
@@ -69,16 +78,21 @@ const PTOItems = React.memo((props: Items) => {
               </View>
             </View>
             {!options?.removeEdit && (
-              <TouchableOpacity onPress={() => {}}>
+              <TouchableOpacity
+                onPress={() => {
+                  alert("no api yet");
+                }}
+              >
                 <FontAwesome name="edit" size={24} color="black" />
               </TouchableOpacity>
             )}
           </View>
           <CustomButton
-            onPress={() => handleItemScanModal(item)}
-            title="SCAN ITEM"
+            onPress={() => alert("No api yet")}
+            title="ADD ANOTHER BATCHING"
             type="regular"
             isWidthNotFull={true}
+            fontSize={12}
           />
         </View>
       </View>
@@ -103,7 +117,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   leftContainer: {
-    gap: 5,
+    gap: 10,
     width: "40%",
   },
   remove: {
@@ -112,7 +126,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   rightContainer: {
-    gap: 5,
+    gap: 10,
     alignItems: "flex-end",
     width: "60%",
     // borderWidth: 1,
@@ -120,6 +134,7 @@ const styles = StyleSheet.create({
   datesContainer: {
     borderWidth: 1,
     width: "100%",
+
     padding: 5,
     borderRadius: 50 / 10,
     flexDirection: "row",

@@ -9,6 +9,7 @@ interface CustomInputsProps {
   inputKey: string;
   customWidth?: number;
   useFlex?: boolean; // for row automatic width
+  isFocus?: boolean;
 }
 
 const CustomInputs = (props: CustomInputsProps) => {
@@ -20,6 +21,7 @@ const CustomInputs = (props: CustomInputsProps) => {
     inputKey,
     customWidth,
     useFlex,
+    isFocus,
   } = props;
 
   const handleChange = (value: string) => {
@@ -44,6 +46,7 @@ const CustomInputs = (props: CustomInputsProps) => {
       }}
     >
       <TextInput
+        autoFocus={isFocus ? true : false}
         style={styles.input}
         placeholder={placeHolder}
         value={inputValue.toString()}

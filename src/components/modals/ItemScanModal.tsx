@@ -6,6 +6,7 @@ import {
   Button,
   StyleSheet,
   TouchableOpacity,
+  ScrollView,
 } from "react-native";
 import CustomInputs from "../forms/inputs/CustomInputs";
 import {FontAwesome5, Ionicons} from "@expo/vector-icons";
@@ -14,7 +15,7 @@ import CustomButton from "../forms/buttons/CustomButton";
 import {useDocumentHooks} from "../../hooks/documentHooks";
 import {format} from "../../styles/styles";
 import {ScanCategory} from "../../models/generic/ScanCategory";
-// import CustomLoadingText from "../load-spinner/CustomLoadingText";
+import MessageToast from "../message-toast/MessageToast";
 
 interface ScanModalProps {
   visible: boolean;
@@ -50,6 +51,12 @@ const ItemScanModal = (props: ScanModalProps) => {
       <Modal visible={visible} onRequestClose={onClose} transparent>
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
+            <MessageToast
+              status="success"
+              text="Success message"
+              speed={1000}
+            />
+
             <View style={styles.headerContainer}>
               <TouchableOpacity onPress={onClose}>
                 <FontAwesome5 name="arrow-left" size={24} color="black" />
@@ -66,6 +73,7 @@ const ItemScanModal = (props: ScanModalProps) => {
               type="text"
               placeHolder="Waiting to Scan Barcode..."
               inputKey="scan"
+              isFocus={true}
             />
 
             <View style={styles.quantityContainer}>
@@ -93,7 +101,7 @@ const ItemScanModal = (props: ScanModalProps) => {
               </Text>
               <View style={format.twoRowText}>
                 <Text style={{fontWeight: "bold"}}>Line No: </Text>
-                <Text>{item.linenum}</Text>
+                <Text>{item.copyline}</Text>
               </View>
               <View style={format.twoRowText}>
                 <Text style={{fontWeight: "bold"}}>Item Code: </Text>
@@ -109,7 +117,7 @@ const ItemScanModal = (props: ScanModalProps) => {
               </View>
 
               <View style={format.twoRowText}>
-                <Text style={{fontWeight: "bold"}}> Receieved Quantity: </Text>
+                <Text style={{fontWeight: "bold"}}>Receieved Quantity: </Text>
                 <Text> {`${item.itmqty} PCS`}</Text>
               </View>
             </View>
@@ -187,6 +195,7 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   item: {
+    gap: 10,
     borderWidth: 1,
     borderRadius: 10,
     padding: 15,
