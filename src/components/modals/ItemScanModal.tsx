@@ -14,12 +14,15 @@ import CustomButton from "../forms/buttons/CustomButton";
 import {useDocumentHooks} from "../../hooks/documentHooks";
 import {format} from "../../styles/styles";
 import {ScanCategory} from "../../models/generic/ScanCategory";
+// import CustomLoadingText from "../load-spinner/CustomLoadingText";
 
 interface ScanModalProps {
   visible: boolean;
   onClose: () => void;
   scanParams: ScanCategory;
 }
+
+// fix item modal layout!
 
 const ItemScanModal = (props: ScanModalProps) => {
   const {selectedItem} = useAppSelector((state) => state.document);

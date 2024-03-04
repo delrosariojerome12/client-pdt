@@ -6,6 +6,7 @@ import WTODetails from "../outbound/wtoDetails";
 import SubConBinDetails from "../inventory-management/subConBinDetails";
 import StockTransferDetails from "../stockTransfer/stockTransferDetails";
 import PhysicalInventoryDetails from "../physical-inventory/physicalInventoryDetails";
+import CustomLoadingText from "../load-spinner/CustomLoadingText";
 
 interface Props {
   uses:

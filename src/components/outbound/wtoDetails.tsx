@@ -8,7 +8,6 @@ import ItemScanModal from "../modals/ItemScanModal";
 import {useAppSelector} from "../../store/store";
 import {format} from "../../styles/styles";
 import {OutboundItem} from "../../models/warehouse/outbound/wto-outbound-item";
-
 interface Items {
   item: OutboundItem;
 }
