@@ -11,6 +11,11 @@ import {
   getWPTODetails,
   getWPTOValid,
   getWPTOPost,
+  getPKValidate,
+  getINVPosting,
+  getSTGValidate,
+  getSPLPosting,
+  getSTGValidateDetails,
 } from "../../store/actions/warehouse/warehouseActions";
 
 interface Outbound {
@@ -35,11 +40,19 @@ interface Outbound {
     };
   };
   singlepick: {
-    validation: {
+    pkValidate: {
       data: any[] | [];
       status: "idle" | "loading" | "success" | "failed";
     };
-    forPosting: {
+    invPosting: {
+      data: any[] | [];
+      status: "idle" | "loading" | "success" | "failed";
+    };
+    stgValidate: {
+      data: any[] | [];
+      status: "idle" | "loading" | "success" | "failed";
+    };
+    splPosting: {
       data: any[] | [];
       status: "idle" | "loading" | "success" | "failed";
     };
@@ -49,6 +62,11 @@ interface Outbound {
     status: "idle" | "loading" | "success" | "failed";
   };
   wavepickDetails: {
+    data: WavepickItem[] | [];
+    status: "idle" | "loading" | "success" | "failed";
+  };
+
+  stgDetails: {
     data: WavepickItem[] | [];
     status: "idle" | "loading" | "success" | "failed";
   };
@@ -71,11 +89,19 @@ const initialState: Outbound = {
   },
 
   singlepick: {
-    forPosting: {
+    pkValidate: {
       data: [],
       status: "idle",
     },
-    validation: {
+    invPosting: {
+      data: [],
+      status: "idle",
+    },
+    stgValidate: {
+      data: [],
+      status: "idle",
+    },
+    splPosting: {
       data: [],
       status: "idle",
     },
@@ -94,6 +120,10 @@ const initialState: Outbound = {
     data: [],
     status: "idle",
   },
+  stgDetails: {
+    data: [],
+    status: "idle",
+  },
 };
 
 const outboundReducer = createSlice({
@@ -101,6 +131,7 @@ const outboundReducer = createSlice({
   initialState,
   reducers: {},
   extraReducers(builder) {
+    // WTO
     builder
       .addCase(getWTOOutboundValid.pending, (state, action) => {
         state.wto.validation.status = "loading";
@@ -154,7 +185,7 @@ const outboundReducer = createSlice({
       .addCase(getWTOOutboundDetails.rejected, (state, action) => {
         state.wtoOutboundDetails.status = "failed";
       });
-
+    // WAVEPICK
     builder
       .addCase(getWPTOValid.pending, (state, action) => {
         state.wavepick.validation.status = "loading";
@@ -208,6 +239,107 @@ const outboundReducer = createSlice({
       })
       .addCase(getWPTODetails.rejected, (state, action) => {
         state.wavepickDetails.status = "failed";
+      });
+    //SINGLEPICK
+
+    builder
+      .addCase(getPKValidate.pending, (state, action) => {
+        state.singlepick.pkValidate.status = "loading";
+      })
+      .addCase(getPKValidate.fulfilled, (state, action) => {
+        const {data, paginating} = action.payload;
+        if (paginating) {
+          console.log("paginating");
+          state.singlepick.pkValidate.data = [
+            ...state.singlepick.pkValidate.data,
+            ...data.data,
+          ];
+        } else {
+          console.log("normal fetch");
+          state.singlepick.pkValidate.data = data.data;
+        }
+        state.singlepick.pkValidate.status = "success";
+      })
+      .addCase(getPKValidate.rejected, (state, action) => {
+        state.singlepick.pkValidate.status = "failed";
+      });
+
+    builder
+      .addCase(getINVPosting.pending, (state, action) => {
+        state.singlepick.invPosting.status = "loading";
+      })
+      .addCase(getINVPosting.fulfilled, (state, action) => {
+        const {data, paginating} = action.payload;
+        if (paginating) {
+          console.log("paginating");
+          state.singlepick.invPosting.data = [
+            ...state.singlepick.invPosting.data,
+            ...data.data,
+          ];
+        } else {
+          console.log("normal fetch");
+          state.singlepick.invPosting.data = data.data;
+        }
+        state.singlepick.invPosting.status = "success";
+      })
+      .addCase(getINVPosting.rejected, (state, action) => {
+        state.singlepick.invPosting.status = "failed";
+      });
+
+    builder
+      .addCase(getSTGValidate.pending, (state, action) => {
+        state.singlepick.stgValidate.status = "loading";
+      })
+      .addCase(getSTGValidate.fulfilled, (state, action) => {
+        const {data, paginating} = action.payload;
+        if (paginating) {
+          console.log("paginating");
+          state.singlepick.stgValidate.data = [
+            ...state.singlepick.stgValidate.data,
+            ...data.data,
+          ];
+        } else {
+          console.log("normal fetch");
+          state.singlepick.stgValidate.data = data.data;
+        }
+        state.singlepick.stgValidate.status = "success";
+      })
+      .addCase(getSTGValidate.rejected, (state, action) => {
+        state.singlepick.stgValidate.status = "failed";
+      });
+
+    builder
+      .addCase(getSPLPosting.pending, (state, action) => {
+        state.singlepick.splPosting.status = "loading";
+      })
+      .addCase(getSPLPosting.fulfilled, (state, action) => {
+        const {data, paginating} = action.payload;
+        if (paginating) {
+          console.log("paginating");
+          state.singlepick.splPosting.data = [
+            ...state.singlepick.splPosting.data,
+            ...data.data,
+          ];
+        } else {
+          console.log("normal fetch");
+          state.singlepick.splPosting.data = data.data;
+        }
+        state.singlepick.splPosting.status = "success";
+      })
+      .addCase(getSPLPosting.rejected, (state, action) => {
+        state.singlepick.splPosting.status = "failed";
+      });
+
+    builder
+      .addCase(getSTGValidateDetails.pending, (state, action) => {
+        state.stgDetails.status = "loading";
+      })
+      .addCase(getSTGValidateDetails.fulfilled, (state, action) => {
+        state.stgDetails.status = "success";
+        state.stgDetails.data = action.payload.data;
+      })
+      .addCase(getSTGValidateDetails.rejected, (state, action) => {
+        state.stgDetails.status = "failed";
       });
   },
 });

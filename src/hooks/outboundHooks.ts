@@ -6,6 +6,11 @@ import {
   getWTOOutboundValid,
   getWPTOValid,
   getWPTOPost,
+  getPKValidate,
+  getINVPosting,
+  getSTGValidate,
+  getSPLPosting,
+  getSTGValidateDetails,
 } from "../store/actions/warehouse/warehouseActions";
 
 interface OutboundUse {
@@ -32,8 +37,8 @@ export const useOutboundHooks = ({page}: OutboundUse) => {
       case "wavepick":
         dispatch(getWPTOValid({limit: 10, offset: 0}));
         break;
-      // case "singlepick":
-      // dispatch(getSRTO({limit: 10, offset: 0}));
+      case "singlepick":
+        dispatch(getPKValidate({limit: 10, offset: 0}));
       // break;
     }
   };
@@ -46,7 +51,8 @@ export const useOutboundHooks = ({page}: OutboundUse) => {
       case "wto":
         switch (activeIndex) {
           // valid
-          case 0 || null:
+          case 0:
+          case null:
             const wtoValidOffset = wto.validation.data.length + 10;
             dispatch(
               getWTOOutboundValid({
@@ -78,7 +84,8 @@ export const useOutboundHooks = ({page}: OutboundUse) => {
       case "wavepick":
         switch (activeIndex) {
           // valid
-          case 0 || null:
+          case 0:
+          case null:
             const wptoValidOffset = wavepick.validation.data.length + 10;
             dispatch(
               getWPTOValid({
@@ -86,15 +93,11 @@ export const useOutboundHooks = ({page}: OutboundUse) => {
                 offset: wptoValidOffset,
                 paginating: true,
               })
-            )
-              .then(() => {
-                ToastMessage("Table updated.", 1000);
-                setPaginating(false);
-              })
-              .catch((err) => {
-                console.log(err);
-                console.log("oops");
-              });
+            ).then(() => {
+              ToastMessage("Table updated.", 1000);
+              setPaginating(false);
+            });
+
             break;
           // posting
           case 1:
@@ -115,9 +118,61 @@ export const useOutboundHooks = ({page}: OutboundUse) => {
         }
         break;
       case "singlepick":
-        // dispatch(getSRTO({limit: 10, offset: 0}));
-        break;
-      default:
+        switch (activeIndex) {
+          case 0:
+          case null:
+            const pkOffset = singlepick.pkValidate.data.length + 10;
+            dispatch(
+              getPKValidate({
+                limit: 10,
+                offset: pkOffset,
+                paginating: true,
+              })
+            ).then(() => {
+              ToastMessage("Table updated.", 1000);
+              setPaginating(false);
+            });
+            break;
+          case 1:
+            const invOffset = singlepick.invPosting.data.length + 10;
+            dispatch(
+              getINVPosting({
+                limit: 10,
+                offset: invOffset,
+                paginating: true,
+              })
+            ).then(() => {
+              ToastMessage("Table updated.", 1000);
+              setPaginating(false);
+            });
+            break;
+          case 2:
+            const stgOffset = singlepick.stgValidate.data.length + 10;
+            dispatch(
+              getSTGValidate({
+                limit: 10,
+                offset: stgOffset,
+                paginating: true,
+              })
+            ).then(() => {
+              ToastMessage("Table updated.", 1000);
+              setPaginating(false);
+            });
+            break;
+          case 3:
+            const splOffset = singlepick.splPosting.data.length + 10;
+            dispatch(
+              getSTGValidate({
+                limit: 10,
+                offset: splOffset,
+                paginating: true,
+              })
+            ).then(() => {
+              ToastMessage("Table updated.", 1000);
+              setPaginating(false);
+            });
+            break;
+        }
         break;
     }
   };
@@ -125,10 +180,13 @@ export const useOutboundHooks = ({page}: OutboundUse) => {
   // on refresh
   const checkPageToRefesh = () => {
     setRefreshing(true);
+    console.log(activeIndex);
+
     switch (page) {
       case "wto":
         switch (activeIndex) {
-          case 0 || null:
+          case 0:
+          case null:
             dispatch(getWTOOutboundValid({limit: 10, offset: 0})).then(() => {
               setRefreshing(false);
               ToastMessage("Refresh Success", 1000);
@@ -144,7 +202,8 @@ export const useOutboundHooks = ({page}: OutboundUse) => {
         break;
       case "wavepick":
         switch (activeIndex) {
-          case 0 || null:
+          case 0:
+          case null:
             dispatch(getWPTOValid({limit: 10, offset: 0})).then(() => {
               setRefreshing(false);
               ToastMessage("Refresh Success", 1000);
@@ -159,7 +218,33 @@ export const useOutboundHooks = ({page}: OutboundUse) => {
         }
         break;
       case "singlepick":
-        // dispatch(getSRTO({limit: 10, offset: 0}));
+        switch (activeIndex) {
+          case 0:
+          case null:
+            dispatch(getPKValidate({limit: 10, offset: 0})).then(() => {
+              setRefreshing(false);
+              ToastMessage("Refresh Success", 1000);
+            });
+            break;
+          case 1:
+            dispatch(getINVPosting({limit: 10, offset: 0})).then(() => {
+              setRefreshing(false);
+              ToastMessage("Refresh Success", 1000);
+            });
+            break;
+          case 2:
+            dispatch(getSTGValidate({limit: 10, offset: 0})).then(() => {
+              setRefreshing(false);
+              ToastMessage("Refresh Success", 1000);
+            });
+            break;
+          case 3:
+            dispatch(getSPLPosting({limit: 10, offset: 0})).then(() => {
+              setRefreshing(false);
+              ToastMessage("Refresh Success", 1000);
+            });
+            break;
+        }
         break;
       default:
         break;
@@ -191,6 +276,21 @@ export const useOutboundHooks = ({page}: OutboundUse) => {
             break;
         }
         break;
+      case "singlepick":
+        switch (activeIndex) {
+          case 0:
+            dispatch(getPKValidate({limit: 10, offset: 0}));
+            break;
+          case 1:
+            dispatch(getINVPosting({limit: 10, offset: 0}));
+            break;
+          case 2:
+            dispatch(getSTGValidate({limit: 10, offset: 0}));
+            break;
+          case 3:
+            dispatch(getSPLPosting({limit: 10, offset: 0}));
+            break;
+        }
     }
   };
 

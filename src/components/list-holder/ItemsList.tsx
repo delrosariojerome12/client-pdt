@@ -6,7 +6,7 @@ import WTODetails from "../outbound/wtoDetails";
 import SubConBinDetails from "../inventory-management/subConBinDetails";
 import StockTransferDetails from "../stockTransfer/stockTransferDetails";
 import PhysicalInventoryDetails from "../physical-inventory/physicalInventoryDetails";
-import CustomLoadingText from "../load-spinner/CustomLoadingText";
+import STGDetails from "../outbound/stgDetails";
 
 interface Props {
   uses:
@@ -14,8 +14,9 @@ interface Props {
     | "outbound"
     | "subcon"
     | "stockTransfer"
-    | "physicalInventory";
-  subcategory?: "srto" | "pto" | "wto-outbound" | "wavepick";
+    | "physicalInventory"
+    | "stgDetails";
+  subcategory?: "srto" | "pto" | "wto-outbound" | "wavepick" | "stg-validate";
   options?: {
     removeEdit?: boolean;
     removeDelete?: boolean;
@@ -27,7 +28,7 @@ const ItemsList = React.memo((props: Props) => {
   const {uses, subcategory, options} = props;
   const {selectedDocument} = useAppSelector((state) => state.document);
   const {ptoDetails, srtoDetails} = useAppSelector((state) => state.inbound);
-  const {wtoOutboundDetails, wavepickDetails} = useAppSelector(
+  const {wtoOutboundDetails, wavepickDetails, stgDetails} = useAppSelector(
     (state) => state.outbound
   );
 
@@ -37,6 +38,8 @@ const ItemsList = React.memo((props: Props) => {
         return <PTOItems item={item} key={index} options={options} />;
       case "outbound":
         return <WTODetails item={item} key={index} />;
+      case "stgDetails":
+        return <STGDetails item={item} key={index} />;
       case "subcon":
         return <SubConBinDetails item={item} key={index} />;
       case "stockTransfer":
@@ -72,6 +75,10 @@ const ItemsList = React.memo((props: Props) => {
               return renderItems(item, index);
             });
         }
+      case "stgDetails":
+        return stgDetails.data.map((item: any, index: number) => {
+          return renderItems(item, index);
+        });
     }
   };
 

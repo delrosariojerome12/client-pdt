@@ -12,6 +12,7 @@ import {
   getSRTODetails,
   getWTOOutboundDetails,
   getWPTODetails,
+  getSTGValidateDetails,
 } from "../store/actions/warehouse/warehouseActions";
 import {handleSetDocument, handleSetItem} from "../reducers/documentReducer";
 import {getDocument} from "../store/actions/generalActions";
@@ -26,7 +27,8 @@ export type TypeSelect =
   | "srto"
   | "wto-inbound"
   | "wto-outbound"
-  | "wavepick";
+  | "wavepick"
+  | "stg-validate";
 
 export interface SelectProps {
   type: TypeSelect;
@@ -52,6 +54,9 @@ export const useDocumentHooks = () => {
         break;
       case "wavepick":
         dispatch(getWPTODetails({docnum: item.docnum}));
+        break;
+      case "stg-validate":
+        dispatch(getSTGValidateDetails({docnum: item.docnum}));
         break;
       default:
         break;

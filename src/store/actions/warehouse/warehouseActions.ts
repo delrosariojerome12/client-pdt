@@ -318,3 +318,123 @@ export const getWPTODetails = createAsyncThunk(
     }
   }
 );
+
+// SINGLE-PICK PK-VALIDATE
+export const getPKValidate = createAsyncThunk(
+  "outbound/getPKValidate",
+  async (
+    {limit, offset, paginating}: FetchPayload,
+    {rejectWithValue, getState}
+  ) => {
+    try {
+      const state = getState() as RootState;
+      const {ipAddress, port, protocol} = state.auth.server;
+
+      const url = `${protocol}://${ipAddress}:${port}/api/getSPL_Outbound_pkval?posted=0&canceldoc=0&limit=${limit}&offset=${offset}&category=pk_validation`;
+
+      const response = await axios.get(url);
+
+      return {
+        data: response.data,
+        paginating: paginating,
+      };
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+// SINGLE-PICK INV-POSTING
+export const getINVPosting = createAsyncThunk(
+  "outbound/getINVPosting",
+  async (
+    {limit, offset, paginating}: FetchPayload,
+    {rejectWithValue, getState}
+  ) => {
+    try {
+      const state = getState() as RootState;
+      const {ipAddress, port, protocol} = state.auth.server;
+
+      const url = `${protocol}://${ipAddress}:${port}/api/getSPL_Outbound_invpost?posted=0&canceldoc=0&limit=${limit}&offset=${offset}&category=inv_posting`;
+
+      const response = await axios.get(url);
+
+      return {
+        data: response.data,
+        paginating: paginating,
+      };
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+// SINGLE-PICK STG-VALIDATE
+export const getSTGValidate = createAsyncThunk(
+  "outbound/getSTGValidate",
+  async (
+    {limit, offset, paginating}: FetchPayload,
+    {rejectWithValue, getState}
+  ) => {
+    try {
+      const state = getState() as RootState;
+      const {ipAddress, port, protocol} = state.auth.server;
+
+      const url = `${protocol}://${ipAddress}:${port}/api/getSPL_Outbound_stgval?posted=0&canceldoc=0&limit=${limit}&offset=${offset}&category=stg_validation`;
+
+      const response = await axios.get(url);
+
+      return {
+        data: response.data,
+        paginating: paginating,
+      };
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+// SINGLE-PICK SPL-POSTING
+export const getSPLPosting = createAsyncThunk(
+  "outbound/getSPLPosting",
+  async (
+    {limit, offset, paginating}: FetchPayload,
+    {rejectWithValue, getState}
+  ) => {
+    try {
+      const state = getState() as RootState;
+      const {ipAddress, port, protocol} = state.auth.server;
+
+      const url = `${protocol}://${ipAddress}:${port}/api/getSPL_Outbound_stgpost?posted=0&canceldoc=0&limit=${limit}&offset=${offset}&category=spl_posting`;
+
+      const response = await axios.get(url);
+
+      return {
+        data: response.data,
+        paginating: paginating,
+      };
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// PK DETAILS
+// SAME AS WPTO DETAILS
+//
+
+// STG-VALIDATE DETAILS
+export const getSTGValidateDetails = createAsyncThunk(
+  "outbound/getSTGDetails",
+  async ({docnum}: FetchDocnumDetails, {rejectWithValue, getState}) => {
+    try {
+      const state = getState() as RootState;
+      const {ipAddress, port, protocol} = state.auth.server;
+
+      const url = `${protocol}://${ipAddress}:${port}/api/getSPLOutboundDetails?docnum=${docnum}`;
+
+      const response = await axios.get(url);
+
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
