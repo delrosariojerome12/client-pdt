@@ -13,16 +13,20 @@ import {
   getWTOOutboundDetails,
   getWPTODetails,
   getSTGValidateDetails,
+  getPTO,
+  getPUR,
 } from "../store/actions/warehouse/warehouseActions";
 import {handleSetDocument, handleSetItem} from "../reducers/documentReducer";
 import {getDocument} from "../store/actions/generalActions";
 import {ScanDocumentParams} from "../store/actions/generalActions";
-import {useConnectPHPHook} from "./connectPHPHook";
+// import {useConnectPHPHook} from "./connectPHPHook";
+import {connectToPHP} from "../store/actions/generalActions";
+import {resetStatus} from "../reducers/statusReducer";
 
 interface SearchContent {
   content: "warehouse" | "bin" | "item";
 }
-export type TypePost = "pto";
+export type TypePost = "pto" | "pur";
 
 export type TypeSelect =
   | "pto"
@@ -45,7 +49,7 @@ export interface PostProps {
 export const useDocumentHooks = () => {
   const {selectedDocument} = useAppSelector((state) => state.document);
   const dispatch = useAppDispatch();
-  const {connectToPHP} = useConnectPHPHook();
+  // const {connectToPHP} = useConnectPHPHook();
 
   const checkSelectType = ({item, type}: SelectProps) => {
     console.log(type);
@@ -74,9 +78,44 @@ export const useDocumentHooks = () => {
   const checkPostType = (item: any, type: TypePost) => {
     switch (type) {
       case "pto":
-        const x = connectToPHP(item.recid, item.docnum, "PTO");
-        console.log("return", x);
+        console.log(item.recid, item.docnum);
+
+        dispatch(
+          connectToPHP({
+            recid: item.recid,
+            docnum: item.docnum,
+            type: "PTO",
+            onSuccess: () => {
+              dispatch(getPTO({limit: 10, offset: 0}));
+              dispatch(resetStatus());
+            },
+            onFailure: (e) => {
+              Alert.alert("Transaction Posting", `Something Went Wrong: ${e}`, [
+                {
+                  text: "Ok",
+                  onPress: () => {},
+                  style: "destructive",
+                },
+              ]);
+            },
+          })
+        );
         break;
+      case "pur":
+        dispatch(
+          connectToPHP({
+            recid: item.recid,
+            docnum: item.docnum,
+            type: "PTAPUR",
+            onSuccess: () => {
+              dispatch(getPUR({limit: 10, offset: 0}));
+              dispatch(resetStatus());
+            },
+            onFailure: () => {},
+          })
+        );
+        break;
+
       default:
         alert("No api yet.");
         break;

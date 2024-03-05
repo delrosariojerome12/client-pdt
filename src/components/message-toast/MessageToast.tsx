@@ -44,7 +44,7 @@ const MessageToast = ({status, text, speed}: MessageProps) => {
 
   const interpolateY = position.interpolate({
     inputRange: [0, 1],
-    outputRange: [-100, 0],
+    outputRange: [-200, -80],
   });
 
   return (
@@ -70,14 +70,18 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     alignItems: "center",
-    // width: "100%",
+    justifyContent: "center",
+    width: "100%",
     zIndex: 20,
+    paddingHorizontal: 10,
   },
   text: {
     fontSize: 16,
     fontWeight: "bold",
-    padding: 10,
+    padding: 20,
     borderRadius: 5,
+    width: "100%",
+    textAlign: "center",
   },
   success: {
     backgroundColor: "green",

@@ -43,12 +43,6 @@ const ItemScanModal = (props: ScanModalProps) => {
       <Modal visible={visible} onRequestClose={onClose} transparent>
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
-            {/* <MessageToast
-              status="success"
-              text="Success message"
-              speed={1000}
-            /> */}
-
             <View style={styles.headerContainer}>
               <TouchableOpacity onPress={onClose}>
                 <FontAwesome5 name="arrow-left" size={24} color="black" />

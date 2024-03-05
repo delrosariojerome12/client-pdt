@@ -1,29 +1,49 @@
 import {useAppSelector} from "../store/store";
+import {useState} from "react";
 import {Alert} from "react-native";
+
+interface ConnectToPHPParams {
+  recid: any;
+  docnum: string;
+  type: string;
+  refnum?: string;
+  lpnnum?: string;
+  itmcde?: string;
+  itmdsc?: string;
+  batchnum?: string;
+  mfgdte?: string;
+  expdte?: string;
+  copyline?: string;
+  spldocnum?: string;
+  soconum?: string;
+}
 
 export const useConnectPHPHook = () => {
   const {
-    user: {userDetails},
+    user: {userDetails, sesid},
     phpServer: {traccDomain, traccDirectory},
   } = useAppSelector((state) => state.auth);
 
-  const connectToPHP = async (
-    recid: any,
-    docnum: string,
-    type: string,
-    loadingmsg = "Posting...",
-    refnum = "",
-    lpnnum = "",
-    itmcde = "",
-    itmdsc = "",
-    batchnum = "",
-    mfgdte = "",
-    expdte = "",
-    copyline = "",
-    spldocnum = "",
-    soconum = ""
-  ) => {
-    if (userDetails) {
+  const connectToPHP = async (props: ConnectToPHPParams) => {
+    const {
+      docnum,
+      recid,
+      type,
+      batchnum = "",
+      copyline = "",
+      expdte = "",
+      itmcde = "",
+      itmdsc = "",
+      lpnnum = "",
+      mfgdte = "",
+      refnum = "",
+      soconum = "",
+      spldocnum = "",
+    } = props;
+
+    console.log(userDetails, sesid);
+
+    if (userDetails && sesid) {
       try {
         let targerPPHP = "",
           event_action = "",
@@ -32,10 +52,7 @@ export const useConnectPHPHook = () => {
         let formData = new FormData();
         //   const userdevice = await this.getDeviceCredentials();
         //   let tokenval = await this.userService.getAll({usrcde: userdevice.usrcde});
-        formData.append(
-          "asdfglmiwms",
-          "b513dc8437bf30ea6ab63a833d43bdbcf975ec2a558937d783d7311b457ddad3"
-        );
+        formData.append("asdfglmiwms", sesid);
         formData.append("pdt_usrcde", userDetails.usrcde);
         formData.append("from_pdt", true.toString());
 
@@ -376,6 +393,8 @@ export const useConnectPHPHook = () => {
           };
         }
 
+        console.log("posted", return_data);
+
         return return_data;
       } catch (e) {
         console.log(e);
@@ -392,6 +411,19 @@ export const useConnectPHPHook = () => {
           {cancelable: false}
         );
       }
+    } else {
+      Alert.alert(
+        "Auth Error",
+        `User Details and sesid missing`,
+        [
+          {
+            text: "OK",
+            onPress: () => console.log("OK Pressed"),
+            style: "cancel",
+          },
+        ],
+        {cancelable: false}
+      );
     }
   };
 

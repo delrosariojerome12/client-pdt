@@ -4,13 +4,7 @@ import {useState} from "react";
 import {ToastMessage} from "../helper/Toast";
 import {useRouter} from "expo-router";
 import {useServiceHooks} from "./serviceHooks";
-import {NativeModules} from "react-native";
-
-const generateRandomString = (length: number) => {
-  const crypto = NativeModules.Crypto;
-  const randomBytes = crypto.getRandomBytes(length);
-  return Buffer.from(randomBytes).toString("hex");
-};
+import {generateRandomString} from "../helper/RandomString";
 
 export const useAuthHooks = () => {
   const dispatch = useAppDispatch();
@@ -26,17 +20,22 @@ export const useAuthHooks = () => {
     //   ToastMessage("Please Fill the fields first", 1000);
     //   return;
     // }
-    const randomString = generateRandomString(32);
-    console.log(randomString);
+    const randomString = await generateRandomString(32);
+
     await handlePost({
       url: "auth/login",
       requestData: {
         usrpwd: "5436",
         usrcde: "Msumang",
       },
+      toastMessage: {
+        error: "Login Failed",
+        loading: "Logging in...",
+        success: "Login Success!",
+      },
       onSuccess: (data) => {
         setTimeout(async () => {
-          dispatch(onLogin(data));
+          dispatch(onLogin({sesidData: randomString, userData: data}));
           router.replace("screens/home/");
 
           await handleGet({
@@ -46,18 +45,18 @@ export const useAuthHooks = () => {
             },
             disableToast: true,
           });
-          // await handlePatch({
-          //   url: "lst_tracc/userfile",
-          //   requestData: {
-          //     field: {
-          //       usrcde: "msumang",
-          //     },
-          //     data: {
-          //       sesid: randomString,
-          //     },
-          //   },
-          //   disableToast: true,
-          // });
+          await handlePatch({
+            url: "lst_tracc/userfile",
+            requestData: {
+              field: {
+                usrcde: "msumang",
+              },
+              data: {
+                sesid: randomString,
+              },
+            },
+            disableToast: true,
+          });
         }, 1500);
       },
     });

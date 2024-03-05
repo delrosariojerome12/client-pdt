@@ -1,12 +1,27 @@
 import React from "react";
-import {View, Text, ActivityIndicator, StyleSheet} from "react-native";
+import {View, Text, ActivityIndicator, StyleSheet, Modal} from "react-native";
 
-const CustomLoadingText = ({text}: {text: string}) => {
+const CustomLoadingText = ({
+  text,
+  visible,
+}: {
+  text: string;
+  visible: boolean;
+}) => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>{text}</Text>
-      <ActivityIndicator size="large" color="#0000ff" />
-    </View>
+    <Modal
+      animationType="fade"
+      transparent={true}
+      visible={visible}
+      onRequestClose={() => {}}
+    >
+      <View style={styles.container}>
+        <View style={styles.modalView}>
+          <Text style={styles.text}>{text}</Text>
+          <ActivityIndicator size="large" color="#0000ff" />
+        </View>
+      </View>
+    </Modal>
   );
 };
 
@@ -15,6 +30,15 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalView: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 25,
+    alignItems: "center",
+    elevation: 5,
+    width: 250,
   },
   text: {
     marginBottom: 20,

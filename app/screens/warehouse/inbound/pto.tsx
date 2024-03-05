@@ -15,9 +15,10 @@ import SelectModal from "../../../../src/components/modals/SelectModal";
 import ItemsList from "../../../../src/components/list-holder/ItemsList";
 import {useInboundHooks} from "../../../../src/hooks/inboundHooks";
 import LoadingSpinner from "../../../../src/components/load-spinner/LoadingSpinner";
-
+import CustomLoadingText from "../../../../src/components/load-spinner/CustomLoadingText";
 const tableHeaders = ["Date", "Document No.", "Intransit No.", ""];
 const tableVisibleProps = ["trndte", "docnum", "intnum"];
+import MessageToast from "../../../../src/components/message-toast/MessageToast";
 
 const PTO = () => {
   const {
@@ -30,6 +31,7 @@ const PTO = () => {
     isScanModal,
     isSelectModal,
     selectedDocument,
+    status,
   } = useInboundHooks({
     page: "pto",
   });
@@ -42,65 +44,84 @@ const PTO = () => {
   }
 
   return (
-    <View style={generalStyles.outerContainer}>
-      <CustomButton title="SCAN WRR" onPress={handleScanModal} type="regular" />
-
-      <ScrollView
-        style={generalStyles.innerContainer}
-        contentContainerStyle={{flexGrow: 1}}
-        refreshControl={
-          <RefreshControl refreshing={false} onRefresh={onRefresh} />
-        }
-        onScroll={handleScroll}
-        scrollEventThrottle={150}
-      >
-        <CustomTable
-          tableHeaders={tableHeaders}
-          tableData={pto.data}
-          visibleProperties={tableVisibleProps}
-          onSelect={handleSelectModal}
-          onPost={handlePost}
-          selectType="pto"
-          postType="pto"
+    <>
+      {status === "success" && (
+        <MessageToast
+          status="success"
+          text="Document Successfully Posted"
+          speed={2000}
         />
-
-        {isScanModal && (
-          <ScanModal
-            visible={isScanModal}
-            onClose={handleScanModal}
-            placeholder="Waiting to Scan WRR Barcode"
-            scanParams={{category: "wrr"}}
-          />
-        )}
-
-        <SelectModal
-          visible={isSelectModal}
-          onClose={closeSelectModal}
-          selectedItem={selectedDocument}
-          loadingStatus={ptoDetails.status === "loading"}
-          title="Purchase Transfer Order Details"
-          propertiesToShow={[
-            {name: "docnum", label: "Document Number"},
-            {name: "intnum", label: "Intransit Number"},
-          ]}
-          customContent={<ItemsList uses="inbound" subcategory="pto" />}
-        />
-      </ScrollView>
-
-      {isPaginating && (
-        <View
-          style={{
-            justifyContent: "center",
-            alignItems: "center",
-            paddingVertical: 10,
-            height: 100,
-          }}
-        >
-          <ActivityIndicator size="large" color="#0000ff" />
-          <Text>Loading more data...</Text>
-        </View>
       )}
-    </View>
+
+      <View style={generalStyles.outerContainer}>
+        <CustomButton
+          title="SCAN WRR"
+          onPress={handleScanModal}
+          type="regular"
+        />
+
+        <ScrollView
+          style={generalStyles.innerContainer}
+          contentContainerStyle={{flexGrow: 1}}
+          refreshControl={
+            <RefreshControl refreshing={false} onRefresh={onRefresh} />
+          }
+          onScroll={handleScroll}
+          scrollEventThrottle={150}
+        >
+          {status === "loading" && (
+            <CustomLoadingText text="Posting..." visible={true} />
+          )}
+
+          <CustomTable
+            tableHeaders={tableHeaders}
+            tableData={pto.data}
+            visibleProperties={tableVisibleProps}
+            onSelect={handleSelectModal}
+            onPost={handlePost}
+            selectType="pto"
+            postType="pto"
+          />
+
+          {isScanModal && (
+            <ScanModal
+              visible={isScanModal}
+              onClose={handleScanModal}
+              placeholder="Waiting to Scan WRR Barcode"
+              scanParams={{category: "wrr"}}
+            />
+          )}
+
+          <SelectModal
+            visible={isSelectModal}
+            onClose={closeSelectModal}
+            selectedItem={selectedDocument}
+            loadingStatus={ptoDetails.status === "loading"}
+            title="Purchase Transfer Order Details"
+            propertiesToShow={[
+              {name: "docnum", label: "Document Number"},
+              {name: "intnum", label: "Intransit Number"},
+            ]}
+            customContent={<ItemsList uses="inbound" subcategory="pto" />}
+          />
+        </ScrollView>
+
+        {isPaginating && (
+          <View
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              paddingVertical: 10,
+              height: 100,
+              gap: 10,
+            }}
+          >
+            <ActivityIndicator size="large" color="#0000ff" />
+            <Text>Loading more data...</Text>
+          </View>
+        )}
+      </View>
+    </>
   );
 };
 

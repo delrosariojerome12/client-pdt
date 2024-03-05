@@ -11,6 +11,7 @@ interface AuthUser {
   user: {
     status: "logged-out" | "logged-in";
     userDetails: UserDetails | null;
+    sesid: string;
   };
   server: {
     protocol: string;
@@ -24,7 +25,7 @@ interface AuthUser {
 }
 
 const initialState: AuthUser = {
-  user: {status: "logged-out", userDetails: null},
+  user: {status: "logged-out", userDetails: null, sesid: ""},
   server: {ipAddress: "192.168.100.4", port: 5901, protocol: "http"},
   phpServer: {
     traccDirectory: "",
@@ -37,8 +38,11 @@ const authUser = createSlice({
   initialState,
   reducers: {
     onLogin: (state, action) => {
+      const {userData, sesidData} = action.payload;
+      console.log(action.payload);
       state.user.status = "logged-in";
-      state.user.userDetails = action.payload;
+      state.user.userDetails = userData;
+      state.user.sesid = sesidData;
     },
     onLogout: (state) => {
       state.user.status = "logged-out";

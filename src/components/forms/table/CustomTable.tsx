@@ -15,8 +15,6 @@ interface TableProps {
   tableHeaders: string[];
   tableData: any[];
   visibleProperties: string[];
-  isSelectShown?: boolean;
-  isPostShown?: boolean;
   isSelectDisable?: boolean;
   isPostDisable?: boolean;
   onSelect?: ({item, type}: SelectProps) => void;
@@ -43,7 +41,11 @@ const CustomTable = (props: TableProps) => {
       <View style={{gap: 10}}>
         {!isSelectDisable && (
           <TouchableOpacity
-            style={styles.buttons}
+            style={[
+              styles.buttons,
+              rowData.validated ? {opacity: 0.7, backgroundColor: "gray"} : {},
+            ]}
+            disabled={rowData.validated}
             onPress={() =>
               onSelect &&
               selectType &&
@@ -56,7 +58,11 @@ const CustomTable = (props: TableProps) => {
 
         {!isPostDisable && (
           <TouchableOpacity
-            style={styles.postbutton}
+            style={[
+              styles.postbutton,
+              rowData.posted ? {opacity: 0.7, backgroundColor: "gray"} : {},
+            ]}
+            disabled={rowData.posted}
             onPress={() =>
               onPost && postType && onPost({item: rowData, type: postType})
             }

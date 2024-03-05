@@ -16,6 +16,8 @@ export const useInboundHooks = ({page}: InboundUse) => {
   const {pto, pur, srto, whs, ptoDetails} = useAppSelector(
     (state) => state.inbound
   );
+  const {status} = useAppSelector((state) => state.status);
+
   const {isScanModal, isSelectModal} = useAppSelector((state) => state.modal);
   const {selectedDocument} = useAppSelector((state) => state.document);
 
@@ -163,5 +165,6 @@ export const useInboundHooks = ({page}: InboundUse) => {
     selectedDocument,
     isScanModal,
     isSelectModal,
+    status,
   };
 };
