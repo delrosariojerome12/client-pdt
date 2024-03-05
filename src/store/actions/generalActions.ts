@@ -55,6 +55,8 @@ export const getDocument = createAsyncThunk(
       const url = `${protocol}://${ipAddress}:${port}/api/scanBarcode/?barcode=${barcode}&category=${category}`;
 
       const response = await axios.get(url);
+      console.log("eto");
+
       console.log(response.data);
 
       return response.data;

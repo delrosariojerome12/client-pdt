@@ -9,6 +9,21 @@ interface ToastMessage {
   success: string;
 }
 
+interface GetProps {
+  url: string;
+  toastMessage?: ToastMessage;
+  onSuccess?: (data: any) => void; // Callback function for success
+  disableToast?: boolean;
+}
+
+interface SendProps {
+  url: string;
+  requestData: any;
+  toastMessage?: ToastMessage;
+  onSuccess?: (data: any) => void; // Callback function for success
+  disableToast?: boolean;
+}
+
 export const useServiceHooks = () => {
   const {
     server: {ipAddress, port, protocol},
@@ -20,16 +35,22 @@ export const useServiceHooks = () => {
   >("idle");
   const [data, setData] = useState<any>(null);
 
-  const handleGet = async (
-    url: string,
-    toastMessage?: ToastMessage,
-    onSuccess?: (data: any) => void // Callback function for success
-  ) => {
+  const handleGet = async ({
+    url,
+    disableToast,
+    onSuccess,
+    toastMessage,
+  }: GetProps) => {
     const completeUrl = `${baseURl}/api/${url}`;
+
     console.log(completeUrl);
 
     setStatus("loading");
-    ToastMessage(toastMessage?.loading || "Loading...", 1000);
+
+    if (!disableToast) {
+      ToastMessage(toastMessage?.loading || "Loading...", 1000);
+    }
+
     try {
       const response = await axios.get(completeUrl);
 
@@ -48,17 +69,19 @@ export const useServiceHooks = () => {
     }
   };
 
-  const handlePost = async (
-    url: string,
-    requestData: any,
-    toastMessage?: ToastMessage,
-    onSuccess?: (data: any) => void // Callback function for success
-  ) => {
+  const handlePost = async ({
+    url,
+    requestData,
+    disableToast,
+    onSuccess,
+    toastMessage,
+  }: SendProps) => {
     const completeUrl = `${baseURl}/api/${url}`;
-    // const completeUrl = `http://10.0.2.2:5901/api/${url}`;
 
     setStatus("loading");
-    ToastMessage(toastMessage?.loading || "Loading...", 500);
+    if (!disableToast) {
+      ToastMessage(toastMessage?.loading || "Loading...", 500);
+    }
 
     try {
       const response = await axios.post(completeUrl, requestData);
@@ -76,19 +99,54 @@ export const useServiceHooks = () => {
     }
   };
 
-  const handlePut = async (
-    url: string,
-    requestData: any,
-    toastMessage?: ToastMessage,
-    onSuccess?: (data: any) => void // Callback function for success
-  ) => {
+  const handlePut = async ({
+    url,
+    requestData,
+    disableToast,
+    onSuccess,
+    toastMessage,
+  }: SendProps) => {
     const completeUrl = `${baseURl}/${url}`;
 
     setStatus("loading");
-    ToastMessage(toastMessage?.loading || "Loading...", 1000);
+    if (!disableToast) {
+      ToastMessage(toastMessage?.loading || "Loading...", 1000);
+    }
 
     try {
       const response = await axios.put(completeUrl, requestData);
+
+      setData(response.data);
+      setStatus("success");
+      ToastMessage(toastMessage?.success || "Update Success!", 1000);
+
+      // Invoke the onSuccess callback with response data
+      onSuccess && onSuccess(response.data);
+
+      return response.data;
+    } catch (error) {
+      setStatus("failed");
+      ToastMessage(toastMessage?.error || "Update Failed!", 1000);
+      throw error;
+    }
+  };
+
+  const handlePatch = async ({
+    url,
+    requestData,
+    disableToast,
+    onSuccess,
+    toastMessage,
+  }: SendProps) => {
+    const completeUrl = `${baseURl}/${url}`;
+
+    setStatus("loading");
+    if (!disableToast) {
+      ToastMessage(toastMessage?.loading || "Loading...", 1000);
+    }
+
+    try {
+      const response = await axios.patch(completeUrl, requestData);
 
       setData(response.data);
       setStatus("success");
@@ -111,5 +169,6 @@ export const useServiceHooks = () => {
     handleGet,
     handlePost,
     handlePut,
+    handlePatch,
   };
 };

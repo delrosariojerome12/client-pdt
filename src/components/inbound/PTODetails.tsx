@@ -23,8 +23,6 @@ const PTOItems = React.memo((props: Items) => {
     useDocumentHooks();
   const {item, options} = props;
 
-  console.log("xx", item);
-
   return (
     <>
       <View style={[styles.container, bgColors.mediumGrayishBG]}>

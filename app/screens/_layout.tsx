@@ -13,7 +13,6 @@ import {View, SafeAreaView, Alert} from "react-native";
 import {Text} from "react-native";
 import {useAppSelector} from "../../src/store/store";
 import {format, textFormat} from "../../src/styles/styles";
-import {FontAwesome5} from "@expo/vector-icons";
 
 const CustomDrawers = (props: any) => {
   const {

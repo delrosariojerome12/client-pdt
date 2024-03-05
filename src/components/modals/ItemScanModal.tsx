@@ -1,13 +1,5 @@
 import React, {useState} from "react";
-import {
-  Modal,
-  View,
-  Text,
-  Button,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-} from "react-native";
+import {Modal, View, Text, StyleSheet, TouchableOpacity} from "react-native";
 import CustomInputs from "../forms/inputs/CustomInputs";
 import {FontAwesome5, Ionicons} from "@expo/vector-icons";
 import {useAppSelector} from "../../store/store";
@@ -51,11 +43,11 @@ const ItemScanModal = (props: ScanModalProps) => {
       <Modal visible={visible} onRequestClose={onClose} transparent>
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
-            <MessageToast
+            {/* <MessageToast
               status="success"
               text="Success message"
               speed={1000}
-            />
+            /> */}
 
             <View style={styles.headerContainer}>
               <TouchableOpacity onPress={onClose}>

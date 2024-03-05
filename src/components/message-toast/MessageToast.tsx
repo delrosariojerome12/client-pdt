@@ -57,8 +57,7 @@ const MessageToast = ({status, text, speed}: MessageProps) => {
           status === "success" ? styles.success : styles.error,
         ]}
       >
-        {/* {text} */}
-        xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        {text}
       </Text>
     </Animated.View>
   );

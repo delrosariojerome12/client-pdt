@@ -17,10 +17,12 @@ import {
 import {handleSetDocument, handleSetItem} from "../reducers/documentReducer";
 import {getDocument} from "../store/actions/generalActions";
 import {ScanDocumentParams} from "../store/actions/generalActions";
+import {useConnectPHPHook} from "./connectPHPHook";
 
 interface SearchContent {
   content: "warehouse" | "bin" | "item";
 }
+export type TypePost = "pto";
 
 export type TypeSelect =
   | "pto"
@@ -35,9 +37,15 @@ export interface SelectProps {
   item: any;
 }
 
+export interface PostProps {
+  type: TypePost;
+  item: any;
+}
+
 export const useDocumentHooks = () => {
   const {selectedDocument} = useAppSelector((state) => state.document);
   const dispatch = useAppDispatch();
+  const {connectToPHP} = useConnectPHPHook();
 
   const checkSelectType = ({item, type}: SelectProps) => {
     console.log(type);
@@ -59,6 +67,18 @@ export const useDocumentHooks = () => {
         dispatch(getSTGValidateDetails({docnum: item.docnum}));
         break;
       default:
+        break;
+    }
+  };
+
+  const checkPostType = (item: any, type: TypePost) => {
+    switch (type) {
+      case "pto":
+        const x = connectToPHP(item.recid, item.docnum, "PTO");
+        console.log("return", x);
+        break;
+      default:
+        alert("No api yet.");
         break;
     }
   };
@@ -93,9 +113,15 @@ export const useDocumentHooks = () => {
     dispatch(handleToggleItemScanModal());
   };
 
-  const handlePost = (item: any) => {
+  const handlePost = ({item, type}: PostProps) => {
     Alert.alert("Transaction Posting", `Do you want to post '${item.docnum}'`, [
-      {text: "Yes", onPress: () => alert("No api yet."), style: "destructive"},
+      {
+        text: "Yes",
+        onPress: () => {
+          checkPostType(item, type);
+        },
+        style: "destructive",
+      },
       {text: "No", style: "cancel"}, // Just close the alert without any action
     ]);
   };

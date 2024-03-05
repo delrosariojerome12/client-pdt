@@ -8,8 +8,8 @@ import {
 } from "react-native";
 import {Table, Row, Rows} from "react-native-reanimated-table";
 import {generalStyles} from "../../../styles/styles";
-import {SelectProps} from "../../../hooks/documentHooks";
-import {TypeSelect} from "../../../hooks/documentHooks";
+import {SelectProps, PostProps} from "../../../hooks/documentHooks";
+import {TypeSelect, TypePost} from "../../../hooks/documentHooks";
 
 interface TableProps {
   tableHeaders: string[];
@@ -20,8 +20,9 @@ interface TableProps {
   isSelectDisable?: boolean;
   isPostDisable?: boolean;
   onSelect?: ({item, type}: SelectProps) => void;
-  onPost?: (selectedItem: any) => void;
+  onPost?: ({item, type}: PostProps) => void;
   selectType?: TypeSelect;
+  postType?: TypePost;
 }
 
 const CustomTable = (props: TableProps) => {
@@ -34,6 +35,7 @@ const CustomTable = (props: TableProps) => {
     onSelect,
     onPost,
     selectType,
+    postType,
   } = props;
 
   const renderButtons = (rowData: any) => {
@@ -55,7 +57,9 @@ const CustomTable = (props: TableProps) => {
         {!isPostDisable && (
           <TouchableOpacity
             style={styles.postbutton}
-            onPress={() => onPost && onPost(rowData)}
+            onPress={() =>
+              onPost && postType && onPost({item: rowData, type: postType})
+            }
           >
             <Text style={styles.buttonText}>POST</Text>
           </TouchableOpacity>

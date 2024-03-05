@@ -1,15 +1,22 @@
 import {useAppDispatch, useAppSelector} from "../store/store";
-import {onLogin, onLogout} from "../reducers/authReducer";
+import {onLogin, onLogout, setPhpServer} from "../reducers/authReducer";
 import {useState} from "react";
 import {ToastMessage} from "../helper/Toast";
 import {useRouter} from "expo-router";
 import {useServiceHooks} from "./serviceHooks";
+import {NativeModules} from "react-native";
+
+const generateRandomString = (length: number) => {
+  const crypto = NativeModules.Crypto;
+  const randomBytes = crypto.getRandomBytes(length);
+  return Buffer.from(randomBytes).toString("hex");
+};
 
 export const useAuthHooks = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
 
-  const {handlePost, status, data} = useServiceHooks();
+  const {handlePost, handleGet, handlePatch, status} = useServiceHooks();
 
   const [userID, setUserID] = useState<any>("");
   const [password, setPassword] = useState<any>("");
@@ -19,29 +26,41 @@ export const useAuthHooks = () => {
     //   ToastMessage("Please Fill the fields first", 1000);
     //   return;
     // }
-    await handlePost(
-      "auth/login",
-      {
+    const randomString = generateRandomString(32);
+    console.log(randomString);
+    await handlePost({
+      url: "auth/login",
+      requestData: {
         usrpwd: "5436",
         usrcde: "Msumang",
       },
-      // {
-      //   usrpwd: password,
-      //   usrcde: userID,
-      // },
-      {
-        error: "Login Failed",
-        loading: "Logging in...",
-        success: "Login Success",
-      },
-      (data) => {
-        console.log(data);
-        setTimeout(() => {
+      onSuccess: (data) => {
+        setTimeout(async () => {
           dispatch(onLogin(data));
           router.replace("screens/home/");
+
+          await handleGet({
+            url: "lst_tracc/syspar2?_includes=tracc_progdomain,tracc_progdir",
+            onSuccess: (data) => {
+              dispatch(setPhpServer(data[0]));
+            },
+            disableToast: true,
+          });
+          // await handlePatch({
+          //   url: "lst_tracc/userfile",
+          //   requestData: {
+          //     field: {
+          //       usrcde: "msumang",
+          //     },
+          //     data: {
+          //       sesid: randomString,
+          //     },
+          //   },
+          //   disableToast: true,
+          // });
         }, 1500);
-      }
-    );
+      },
+    });
   };
 
   const handleLogout = () => {

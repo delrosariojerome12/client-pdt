@@ -61,6 +61,7 @@ const PTO = () => {
           onSelect={handleSelectModal}
           onPost={handlePost}
           selectType="pto"
+          postType="pto"
         />
 
         {isScanModal && (
