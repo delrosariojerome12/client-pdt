@@ -92,18 +92,20 @@ const PTO = () => {
             />
           )}
 
-          <SelectModal
-            visible={isSelectModal}
-            onClose={closeSelectModal}
-            selectedItem={selectedDocument}
-            loadingStatus={ptoDetails.status === "loading"}
-            title="Purchase Transfer Order Details"
-            propertiesToShow={[
-              {name: "docnum", label: "Document Number"},
-              {name: "intnum", label: "Intransit Number"},
-            ]}
-            customContent={<ItemsList uses="inbound" subcategory="pto" />}
-          />
+          {isSelectModal && (
+            <SelectModal
+              visible={isSelectModal}
+              onClose={closeSelectModal}
+              selectedItem={selectedDocument}
+              loadingStatus={ptoDetails.status === "loading"}
+              title="Purchase Transfer Order Details"
+              propertiesToShow={[
+                {name: "docnum", label: "Document Number"},
+                {name: "intnum", label: "Intransit Number"},
+              ]}
+              customContent={<ItemsList uses="inbound" subcategory="pto" />}
+            />
+          )}
         </ScrollView>
 
         {isPaginating && (

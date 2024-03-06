@@ -6,6 +6,9 @@ interface Modal {
   isScanItemModal: boolean;
   isSearchModal: boolean;
   searchModalContent: "warehouse" | "bin" | "item" | null;
+  isAddBatchModal: boolean;
+  isSearchBatchModal: boolean;
+  isEditBatchModal: boolean;
 }
 
 const initialState: Modal = {
@@ -14,6 +17,9 @@ const initialState: Modal = {
   isScanItemModal: false,
   isSearchModal: false,
   searchModalContent: null,
+  isAddBatchModal: false,
+  isSearchBatchModal: false,
+  isEditBatchModal: false,
 };
 
 const modalReducer = createSlice({
@@ -37,6 +43,16 @@ const modalReducer = createSlice({
       state.searchModalContent = action.payload;
     },
     handleCloseModal: (state, action) => {},
+
+    handleToggleAddBatchModal: (state) => {
+      state.isAddBatchModal = !state.isAddBatchModal;
+    },
+    handleToggleSearchBatchModal: (state) => {
+      state.isSearchBatchModal = !state.isSearchBatchModal;
+    },
+    handleToggleEditBatchModal: (state) => {
+      state.isEditBatchModal = !state.isEditBatchModal;
+    },
   },
   extraReducers(builder) {},
 });
@@ -48,6 +64,10 @@ export const {
   handleToggleItemScanModal,
   handleToggleSearchModal,
   handleSetSearchModalContent,
+
+  handleToggleAddBatchModal,
+  handleToggleEditBatchModal,
+  handleToggleSearchBatchModal,
 } = modalReducer.actions;
 
 export default modalReducer.reducer;

@@ -4,11 +4,13 @@ import {ProductData} from "../models/generic/ProductData";
 interface Document {
   selectedDocument: any | null;
   selectedItem: ProductData | null;
+  selectedBatchItem: any | null;
 }
 
 const initialState: Document = {
   selectedDocument: null,
   selectedItem: null,
+  selectedBatchItem: null,
 };
 
 const documentReducer = createSlice({
@@ -21,12 +23,11 @@ const documentReducer = createSlice({
     handleClearDocument: (state) => {
       state.selectedDocument = null;
     },
-
     handleSetItem: (state, action) => {
       state.selectedItem = action.payload;
     },
-    handleSetScanFields: (state, action) => {
-      // state.scanFields = action.payload;
+    handleSetBatchItem: (state, action) => {
+      state.selectedBatchItem = action.payload;
     },
   },
   extraReducers(builder) {},
@@ -35,8 +36,8 @@ const documentReducer = createSlice({
 export const {
   handleSetDocument,
   handleClearDocument,
-  handleSetScanFields,
   handleSetItem,
+  handleSetBatchItem,
 } = documentReducer.actions;
 
 export default documentReducer.reducer;

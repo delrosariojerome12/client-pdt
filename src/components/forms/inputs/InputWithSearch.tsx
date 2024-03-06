@@ -44,7 +44,7 @@ const InputWithSearch = (props: InputProps) => {
 
 const style = StyleSheet.create({
   inputWithSearchContainer: {
-    marginBottom: 20,
+    // marginBottom: 20,
   },
   inputFieldWrapper: {
     flexDirection: "row",

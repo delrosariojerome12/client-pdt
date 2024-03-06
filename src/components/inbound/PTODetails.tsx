@@ -4,10 +4,13 @@ import {FontAwesome} from "@expo/vector-icons";
 import CustomButton from "../forms/buttons/CustomButton";
 import {bgColors} from "../../styles/styles";
 import {useDocumentHooks} from "../../hooks/documentHooks";
-import ItemScanModal from "../modals/ItemScanModal";
 import {useAppSelector} from "../../store/store";
 import {format} from "../../styles/styles";
 import {ProductData} from "../../models/generic/ProductData";
+import ItemScanModal from "../modals/ItemScanModal";
+import AddBatchModal from "../modals/AddBatchModal";
+import EditBatchModal from "../modals/EditBatchModal";
+import {useBatchHooks} from "../../hooks/batchHooks";
 
 interface Items {
   item: ProductData;
@@ -18,10 +21,53 @@ interface Items {
   };
 }
 const PTOItems = React.memo((props: Items) => {
-  const {isScanItemModal} = useAppSelector((state) => state.modal);
+  const {isScanItemModal, isAddBatchModal, isEditBatchModal} = useAppSelector(
+    (state) => state.modal
+  );
   const {handleItemScanModal, closeItemScanModal, removeScannedQuantity} =
     useDocumentHooks();
+  const {
+    handleAddBatchModal,
+    handleCloseAddBatchModal,
+    handleEditBatchModal,
+    handleCloseEditBatchModal,
+    batchNo,
+    expDate,
+    mfgDate,
+    handleBatchNo,
+    handleExpDate,
+    handleMfgDate,
+    handleSave,
+  } = useBatchHooks({uses: "update"});
   const {item, options} = props;
+
+  if (isAddBatchModal) {
+    return (
+      <AddBatchModal
+        visible={isAddBatchModal}
+        onClose={handleCloseAddBatchModal}
+      />
+    );
+  }
+
+  if (isEditBatchModal) {
+    return (
+      <EditBatchModal
+        isEmpty={false}
+        onClose={handleCloseEditBatchModal}
+        visible={isEditBatchModal}
+        onSave={handleSave}
+        batchData={{
+          batchNo,
+          mfgDate,
+          expDate,
+          handleBatchNo,
+          handleExpDate,
+          handleMfgDate,
+        }}
+      />
+    );
+  }
 
   return (
     <>
@@ -29,7 +75,7 @@ const PTOItems = React.memo((props: Items) => {
         <View style={styles.leftContainer}>
           <Text>{item.itmcde}</Text>
           <Text>{item.itmdsc}</Text>
-          <Text>{`${item.itmqty} PCS`}</Text>
+          <Text>{`${item.intqty} PCS`}</Text>
           <View style={styles.remove}>
             <Text>{`Received Qty: ${item.itmqty}`}</Text>
             {!options?.removeDelete && (
@@ -61,7 +107,7 @@ const PTOItems = React.memo((props: Items) => {
           )}
 
           <View style={styles.datesContainer}>
-            <View style={{flexWrap: "wrap"}}>
+            <View style={{flexWrap: "wrap", width: "80%"}}>
               <View style={format.twoRowText}>
                 <Text style={{fontWeight: "bold"}}>Batch No.:</Text>
                 <Text>{` ${item.batchnum || "No BatchNo."}`}</Text>
@@ -76,17 +122,14 @@ const PTOItems = React.memo((props: Items) => {
               </View>
             </View>
             {!options?.removeEdit && (
-              <TouchableOpacity
-                onPress={() => {
-                  alert("no api yet");
-                }}
-              >
+              <TouchableOpacity onPress={() => handleEditBatchModal(item)}>
                 <FontAwesome name="edit" size={24} color="black" />
               </TouchableOpacity>
             )}
           </View>
+
           <CustomButton
-            onPress={() => alert("No api yet")}
+            onPress={() => handleAddBatchModal(item)}
             title="ADD ANOTHER BATCHING"
             type="regular"
             isWidthNotFull={true}
@@ -116,7 +159,7 @@ const styles = StyleSheet.create({
   },
   leftContainer: {
     gap: 10,
-    width: "40%",
+    width: "45%",
   },
   remove: {
     flexDirection: "row",
@@ -126,13 +169,12 @@ const styles = StyleSheet.create({
   rightContainer: {
     gap: 10,
     alignItems: "flex-end",
-    width: "60%",
+    width: "55%",
     // borderWidth: 1,
   },
   datesContainer: {
     borderWidth: 1,
     width: "100%",
-
     padding: 5,
     borderRadius: 50 / 10,
     flexDirection: "row",

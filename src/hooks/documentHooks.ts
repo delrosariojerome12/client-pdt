@@ -6,6 +6,9 @@ import {
   handleToggleItemScanModal,
   handleToggleSearchModal,
   handleSetSearchModalContent,
+  handleToggleAddBatchModal,
+  handleToggleEditBatchModal,
+  handleToggleSearchBatchModal,
 } from "../reducers/modalReducer";
 import {
   getPTODetails,
@@ -16,17 +19,21 @@ import {
   getPTO,
   getPUR,
 } from "../store/actions/warehouse/warehouseActions";
-import {handleSetDocument, handleSetItem} from "../reducers/documentReducer";
-import {getDocument} from "../store/actions/generalActions";
+import {
+  handleSetDocument,
+  handleSetItem,
+  handleSetBatchItem,
+} from "../reducers/documentReducer";
+import {getDocument, getBatch} from "../store/actions/generalActions";
 import {ScanDocumentParams} from "../store/actions/generalActions";
-// import {useConnectPHPHook} from "./connectPHPHook";
 import {connectToPHP} from "../store/actions/generalActions";
 import {resetStatus} from "../reducers/statusReducer";
+// import {useConnectPHPHook} from "./connectPHPHook";
 
 interface SearchContent {
   content: "warehouse" | "bin" | "item";
 }
-export type TypePost = "pto" | "pur";
+export type TypePost = "pto" | "pur" | "pto-add-batch";
 
 export type TypeSelect =
   | "pto"
@@ -44,13 +51,24 @@ export interface SelectProps {
 export interface PostProps {
   type: TypePost;
   item: any;
+  customMessage?: {
+    header: string;
+    body: string;
+  };
 }
 
 export const useDocumentHooks = () => {
-  const {selectedDocument} = useAppSelector((state) => state.document);
+  const {selectedDocument, selectedBatchItem} = useAppSelector(
+    (state) => state.document
+  );
+  const {
+    batchDetails: {batchNo, expDate, mfgDate},
+  } = useAppSelector((state) => state.general);
+
   const dispatch = useAppDispatch();
   // const {connectToPHP} = useConnectPHPHook();
 
+  // checking uses
   const checkSelectType = ({item, type}: SelectProps) => {
     console.log(type);
 
@@ -78,8 +96,6 @@ export const useDocumentHooks = () => {
   const checkPostType = (item: any, type: TypePost) => {
     switch (type) {
       case "pto":
-        console.log(item.recid, item.docnum);
-
         dispatch(
           connectToPHP({
             recid: item.recid,
@@ -115,6 +131,39 @@ export const useDocumentHooks = () => {
           })
         );
         break;
+      case "pto-add-batch":
+        console.log(selectedDocument.docnum);
+        console.log(item.itmcde);
+
+        // format dates to yy--mm--dd
+        dispatch(
+          connectToPHP({
+            recid: item.recid,
+            docnum: selectedDocument.docnum,
+            type: "PTO_ADDBATCH",
+            lpnnum: selectedDocument.lpnnum,
+            itmcde: item.itmcde,
+            itmdsc: item.itmdsc,
+            batchnum: item.batchnum,
+            mfgdte: item.mfgdte,
+            expdte: item.expdte,
+            // copyline:
+            onSuccess: () => {
+              // dispatch(getPUR({limit: 10, offset: 0}));
+              dispatch(resetStatus());
+            },
+            onFailure: (e) => {
+              Alert.alert("Transaction Posting", `Something Went Wrong: ${e}`, [
+                {
+                  text: "Ok",
+                  onPress: () => {},
+                  style: "destructive",
+                },
+              ]);
+            },
+          })
+        );
+        break;
 
       default:
         alert("No api yet.");
@@ -143,7 +192,6 @@ export const useDocumentHooks = () => {
     dispatch(handleToggleItemScanModal());
     dispatch(handleSetItem(item));
   };
-
   const handleSearchModal = (content: SearchContent) => {
     dispatch(handleToggleSearchModal());
     dispatch(handleSetSearchModalContent(content.content));
@@ -152,17 +200,34 @@ export const useDocumentHooks = () => {
     dispatch(handleToggleItemScanModal());
   };
 
-  const handlePost = ({item, type}: PostProps) => {
-    Alert.alert("Transaction Posting", `Do you want to post '${item.docnum}'`, [
-      {
-        text: "Yes",
-        onPress: () => {
-          checkPostType(item, type);
+  const handlePost = ({item, type, customMessage}: PostProps) => {
+    if (customMessage) {
+      Alert.alert(`${customMessage.header}`, `${customMessage.body}'`, [
+        {
+          text: "Yes",
+          onPress: () => {
+            checkPostType(item, type);
+          },
+          style: "destructive",
         },
-        style: "destructive",
-      },
-      {text: "No", style: "cancel"}, // Just close the alert without any action
-    ]);
+        {text: "No", style: "cancel"}, // Just close the alert without any action
+      ]);
+    } else {
+      Alert.alert(
+        "Transaction Posting",
+        `Do you want to post '${item.docnum}'`,
+        [
+          {
+            text: "Yes",
+            onPress: () => {
+              checkPostType(item, type);
+            },
+            style: "destructive",
+          },
+          {text: "No", style: "cancel"}, // Just close the alert without any action
+        ]
+      );
+    }
   };
 
   const handleScan = ({barcode, category}: ScanDocumentParams) => {

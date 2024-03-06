@@ -35,6 +35,12 @@ export interface ScanDocumentParams {
     | "tms_shop_doc"
     | "tms_SO_item";
 }
+interface BatchPayload {
+  limit: number;
+  offset: number;
+  itmcde: string;
+  paginating?: boolean;
+}
 
 interface PutawayDetails {
   limit: number;
@@ -159,6 +165,22 @@ export const connectToPHP = createAsyncThunk(
         formData.append("docnum", docnum);
         break;
 
+      case "PTO_ADDBATCH":
+        targerPPHP = "trn_purchaseto_ajax.php";
+        event_action = "save_addbatch";
+
+        formData.append("event_action", event_action);
+        formData.append("recid", recid);
+        formData.append("ptodocnum", docnum);
+        formData.append("addlpnnum", lpnnum);
+        formData.append("additmcde", itmcde);
+        formData.append("additmdsc", itmdsc);
+        formData.append("addbatchnum", batchnum);
+        formData.append("addmfgdte", mfgdte);
+        formData.append("addexpdte", expdte);
+        formData.append("hid_addcopyline", copyline);
+        break;
+
       case "chk_binbatch_onhand":
         targerPPHP = "trn_wavepicksocoadd.php";
         event_action = "chk_binbatch_onhand";
@@ -206,22 +228,6 @@ export const connectToPHP = createAsyncThunk(
         formData.append("event_action", event_action);
         formData.append("recid", recid);
         formData.append("docnum", docnum);
-        break;
-
-      case "PTO_ADDBATCH":
-        targerPPHP = "trn_purchaseto_ajax.php";
-        event_action = "save_addbatch";
-
-        formData.append("event_action", event_action);
-        formData.append("recid", recid);
-        formData.append("ptodocnum", docnum);
-        formData.append("addlpnnum", lpnnum);
-        formData.append("additmcde", itmcde);
-        formData.append("additmdsc", itmdsc);
-        formData.append("addbatchnum", batchnum);
-        formData.append("addmfgdte", mfgdte);
-        formData.append("addexpdte", expdte);
-        formData.append("hid_addcopyline", copyline);
         break;
 
       case "WTO":
@@ -440,6 +446,31 @@ export const connectToPHP = createAsyncThunk(
     } catch (error: any) {
       console.log(error);
       onFailure(error);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const getBatch = createAsyncThunk(
+  "general/getBatch",
+  async (
+    {limit, offset, paginating, itmcde}: BatchPayload,
+    {rejectWithValue, getState}
+  ) => {
+    try {
+      const state = getState() as RootState;
+      const {ipAddress, port, protocol} = state.auth.server;
+
+      const url = `${protocol}://${ipAddress}:${port}/api/lst_tracc/batchfile?itmcde=${itmcde}&_limit=${limit}&_offset=${offset}`;
+
+      const response = await axios.get(url);
+
+      return {
+        data: response.data,
+        paginating: paginating,
+      };
+    } catch (error: any) {
+      console.log("mali:", error);
       return rejectWithValue(error.message);
     }
   }

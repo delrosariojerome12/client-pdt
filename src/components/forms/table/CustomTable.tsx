@@ -19,6 +19,7 @@ interface TableProps {
   isPostDisable?: boolean;
   onSelect?: ({item, type}: SelectProps) => void;
   onPost?: ({item, type}: PostProps) => void;
+  onBatchSelect?: (batchItem: any) => void;
   selectType?: TypeSelect;
   postType?: TypePost;
 }
@@ -32,6 +33,7 @@ const CustomTable = (props: TableProps) => {
     isPostDisable,
     onSelect,
     onPost,
+    onBatchSelect,
     selectType,
     postType,
   } = props;
@@ -39,6 +41,17 @@ const CustomTable = (props: TableProps) => {
   const renderButtons = (rowData: any) => {
     return (
       <View style={{gap: 10}}>
+        {onBatchSelect && (
+          <TouchableOpacity
+            style={styles.buttons}
+            onPress={() => {
+              onBatchSelect(rowData);
+            }}
+          >
+            <Text style={styles.buttonText}>Batch Select</Text>
+          </TouchableOpacity>
+        )}
+
         {!isSelectDisable && (
           <TouchableOpacity
             style={[

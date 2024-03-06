@@ -22,8 +22,6 @@ const statusReducer = createSlice({
   extraReducers(builder) {
     builder
       .addCase(connectToPHP.pending, (state) => {
-        console.log("dito?");
-
         state.status = "loading";
       })
       .addCase(connectToPHP.fulfilled, (state, action) => {
