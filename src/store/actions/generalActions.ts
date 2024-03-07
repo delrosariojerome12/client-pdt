@@ -542,10 +542,33 @@ export const updateBatch = createAsyncThunk(
   }
 );
 
+interface RemoveQuantity {
+  document: {
+    field: {
+      docnum: string;
+    };
+    data: {
+      pdtopen: "Y";
+      doclock: "Y";
+    };
+  };
+  item: {
+    field: {
+      recid: number;
+    };
+    data: {
+      itmqty: 0;
+    };
+  };
+  lpnnum: string;
+  onSuccess: () => void;
+}
+
+// delete gagawin natin bukas at search
 export const deleteScanQuantity = createAsyncThunk(
   "general/deleteScanQuantity",
   async (
-    {document, item, onSuccess}: BatchUpdate,
+    {document, item, onSuccess}: RemoveQuantity,
     {rejectWithValue, getState}
   ) => {
     try {
