@@ -1,69 +1,75 @@
-import React, {useEffect, useState} from "react";
+import React from "react";
 import {Modal, View, Text, StyleSheet, TouchableOpacity} from "react-native";
 import CustomButton from "../forms/buttons/CustomButton";
 import {FontAwesome5, FontAwesome} from "@expo/vector-icons";
-import {format} from "../../styles/styles";
 import {useAppSelector} from "../../store/store";
 import DateInput from "../forms/inputs/DateInput";
 import InputWithSearch from "../forms/inputs/InputWithSearch";
 import {useBatchHooks} from "../../hooks/batchHooks";
 import BatchSearch from "./BatchSearch";
+import CustomLoadingText from "../load-spinner/CustomLoadingText";
 
-interface EditBatchModalProps {
-  visible: boolean;
-  onClose: () => void;
-  onSave: () => void;
-  isEmpty: boolean;
-  batchData: {
-    batchNo: string;
-    mfgDate: Date;
-    expDate: Date;
-    handleBatchNo: (batch: any) => void;
-    handleMfgDate: (newDate: any) => void;
-    handleExpDate: (newDate: any) => void;
-  };
-}
-const EditBatchModal = React.memo(
-  ({
-    onClose,
-    onSave,
-    visible,
-    isEmpty,
-    batchData: {
-      batchNo,
-      expDate,
-      handleBatchNo,
-      handleExpDate,
-      handleMfgDate,
-      mfgDate,
-    },
-  }: EditBatchModalProps) => {
-    const {selectedBatchItem: item} = useAppSelector((state) => state.document);
-    const {isSearchBatchModal} = useAppSelector((state) => state.modal);
+const EditBatchModal = React.memo(() => {
+  const {isSearchBatchModal, isEditBatchModal} = useAppSelector(
+    (state) => state.modal
+  );
+  const {status} = useAppSelector((state) => state.status);
+  const {batchPostMode} = useAppSelector((state) => state.general);
+  const {
+    handleSearchBatchModal,
+    handleCloseSearchBatchModal,
+    handleCloseEditBatchModal,
+    batchNo,
+    mfgDate,
+    expDate,
+    handleBatchNo,
+    handleMfgDate,
+    handleExpDate,
+    handlePostUpdateBatch,
+    handleSaveUpdateBatch,
+  } = useBatchHooks();
 
-    const {handleSearchBatchModal, handleCloseSearchBatchModal} = useBatchHooks(
-      {uses: "modals"}
-    );
-
-    if (isSearchBatchModal) {
-      return (
-        <BatchSearch
-          onClose={handleCloseSearchBatchModal}
-          onSaveBatch={handleBatchNo}
-          visible={isSearchBatchModal}
-        />
-      );
-    }
-
-    console.log("edit batch modal");
-    console.log(batchNo);
-
+  if (isSearchBatchModal) {
     return (
-      <Modal visible={visible} onRequestClose={onClose} transparent>
+      <BatchSearch
+        onClose={handleCloseSearchBatchModal}
+        onSaveBatch={handleBatchNo}
+        visible={isSearchBatchModal}
+      />
+    );
+  }
+
+  console.log("edit batch modal");
+
+  const handleEditSave = () => {
+    switch (batchPostMode) {
+      case "postUpdateBatch":
+        handlePostUpdateBatch();
+        break;
+      case "updateBatch":
+        handleSaveUpdateBatch();
+        break;
+      default:
+        break;
+    }
+  };
+
+  console.log(status);
+
+  return (
+    <>
+      {status === "loading" && (
+        <CustomLoadingText text="Updating Batch.." visible={true} />
+      )}
+      <Modal
+        visible={isEditBatchModal}
+        onRequestClose={handleCloseEditBatchModal}
+        transparent
+      >
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
             <View style={styles.headerContainer}>
-              <TouchableOpacity onPress={onClose}>
+              <TouchableOpacity onPress={handleCloseEditBatchModal}>
                 <FontAwesome5 name="arrow-left" size={24} color="black" />
               </TouchableOpacity>
               <View style={{flexDirection: "row", gap: 10}}>
@@ -91,14 +97,14 @@ const EditBatchModal = React.memo(
 
             <View style={styles.buttonContainer}>
               <CustomButton
-                onPress={onSave}
+                onPress={handleEditSave}
                 title="SAVE"
                 type="save"
                 isWidthNotFull={true}
                 useFlex={true}
               />
               <CustomButton
-                onPress={onClose}
+                onPress={handleCloseEditBatchModal}
                 title="CLOSE"
                 type="delete"
                 isWidthNotFull={true}
@@ -108,9 +114,9 @@ const EditBatchModal = React.memo(
           </View>
         </View>
       </Modal>
-    );
-  }
-);
+    </>
+  );
+});
 const styles = StyleSheet.create({
   centeredView: {
     flex: 1,

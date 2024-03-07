@@ -24,11 +24,12 @@ import {
   handleSetItem,
   handleSetBatchItem,
 } from "../reducers/documentReducer";
-import {getDocument, getBatch} from "../store/actions/generalActions";
+import {getDocument, updateBatch} from "../store/actions/generalActions";
 import {ScanDocumentParams} from "../store/actions/generalActions";
 import {connectToPHP} from "../store/actions/generalActions";
 import {resetStatus} from "../reducers/statusReducer";
-// import {useConnectPHPHook} from "./connectPHPHook";
+import {formatDateYYYYMMDD} from "../helper/Date";
+import {clearBatchDetails} from "../reducers/generalReducer";
 
 interface SearchContent {
   content: "warehouse" | "bin" | "item";
@@ -103,9 +104,9 @@ export const useDocumentHooks = () => {
             type: "PTO",
             onSuccess: () => {
               dispatch(getPTO({limit: 10, offset: 0}));
-              dispatch(resetStatus());
             },
             onFailure: (e) => {
+              dispatch(resetStatus());
               Alert.alert("Transaction Posting", `Something Went Wrong: ${e}`, [
                 {
                   text: "Ok",
@@ -132,34 +133,34 @@ export const useDocumentHooks = () => {
         );
         break;
       case "pto-add-batch":
-        console.log(selectedDocument.docnum);
-        console.log(item.itmcde);
-
-        // format dates to yy--mm--dd
         dispatch(
           connectToPHP({
-            recid: item.recid,
+            recid: selectedDocument.recid,
             docnum: selectedDocument.docnum,
             type: "PTO_ADDBATCH",
-            lpnnum: selectedDocument.lpnnum,
+            refnum: "",
+            lpnnum: item.lpnnum,
             itmcde: item.itmcde,
             itmdsc: item.itmdsc,
-            batchnum: item.batchnum,
-            mfgdte: item.mfgdte,
-            expdte: item.expdte,
-            // copyline:
+            batchnum: batchNo,
+            mfgdte: formatDateYYYYMMDD(mfgDate),
+            expdte: formatDateYYYYMMDD(expDate),
+            copyline: item.copyline,
             onSuccess: () => {
-              // dispatch(getPUR({limit: 10, offset: 0}));
               dispatch(resetStatus());
+              dispatch(clearBatchDetails());
+              dispatch(getPTODetails({docnum: selectedDocument.docnum}));
+              dispatch(handleToggleAddBatchModal());
             },
             onFailure: (e) => {
-              Alert.alert("Transaction Posting", `Something Went Wrong: ${e}`, [
+              Alert.alert("Batch Details Posting", `Something Went Wrong`, [
                 {
                   text: "Ok",
                   onPress: () => {},
                   style: "destructive",
                 },
               ]);
+              console.log(e);
             },
           })
         );
@@ -173,11 +174,11 @@ export const useDocumentHooks = () => {
 
   const handleSelectModal = ({item, type}: SelectProps) => {
     console.log(type, item);
-
     // FETCH-DOCNUM-DETAILS-ONSELECT
     checkSelectType({item, type});
     dispatch(handleSetDocument(item));
     dispatch(handleToggleSelectModal());
+    dispatch(resetStatus());
   };
 
   const handleScanModal = () => {
@@ -186,23 +187,28 @@ export const useDocumentHooks = () => {
 
   const closeSelectModal = () => {
     dispatch(handleToggleSelectModal());
+    dispatch(resetStatus());
   };
 
   const handleItemScanModal = (item: any) => {
     dispatch(handleToggleItemScanModal());
     dispatch(handleSetItem(item));
+    dispatch(resetStatus());
   };
   const handleSearchModal = (content: SearchContent) => {
     dispatch(handleToggleSearchModal());
     dispatch(handleSetSearchModalContent(content.content));
+    dispatch(resetStatus());
   };
   const closeItemScanModal = () => {
     dispatch(handleToggleItemScanModal());
+    dispatch(resetStatus());
   };
 
   const handlePost = ({item, type, customMessage}: PostProps) => {
+    // checkPostType(item, type);
     if (customMessage) {
-      Alert.alert(`${customMessage.header}`, `${customMessage.body}'`, [
+      Alert.alert(`${customMessage.header}`, `${customMessage.body}`, [
         {
           text: "Yes",
           onPress: () => {
@@ -210,7 +216,7 @@ export const useDocumentHooks = () => {
           },
           style: "destructive",
         },
-        {text: "No", style: "cancel"}, // Just close the alert without any action
+        {text: "No", style: "cancel"},
       ]);
     } else {
       Alert.alert(

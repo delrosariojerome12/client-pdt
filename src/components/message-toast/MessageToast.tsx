@@ -5,9 +5,10 @@ interface MessageProps {
   status: "success" | "error";
   text: string;
   speed?: number;
+  customPosition?: [number, number];
 }
 
-const MessageToast = ({status, text, speed}: MessageProps) => {
+const MessageToast = ({status, text, speed, customPosition}: MessageProps) => {
   const [position] = useState(new Animated.Value(0));
 
   useEffect(() => {
@@ -44,7 +45,7 @@ const MessageToast = ({status, text, speed}: MessageProps) => {
 
   const interpolateY = position.interpolate({
     inputRange: [0, 1],
-    outputRange: [-200, -80],
+    outputRange: customPosition ? customPosition : [-200, -80],
   });
 
   return (
@@ -72,7 +73,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     width: "100%",
-    zIndex: 20,
+    zIndex: 99,
     paddingHorizontal: 10,
   },
   text: {

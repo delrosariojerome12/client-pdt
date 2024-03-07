@@ -23,7 +23,9 @@ interface GeneralProps {
     batchNo: string;
     mfgDate: Date;
     expDate: Date;
+    batchedSaved: boolean;
   };
+  batchPostMode: "postUpdateBatch" | "updateBatch";
 }
 
 const initialState: GeneralProps = {
@@ -32,7 +34,9 @@ const initialState: GeneralProps = {
     batchNo: "",
     expDate: new Date(),
     mfgDate: new Date(),
+    batchedSaved: false,
   },
+  batchPostMode: "updateBatch",
 };
 
 const generalReducer = createSlice({
@@ -48,10 +52,20 @@ const generalReducer = createSlice({
     setBatchNo: (state, action) => {
       state.batchDetails.batchNo = action.payload;
     },
+    setBatchedSaved: (state, action) => {
+      state.batchDetails.batchedSaved = action.payload;
+    },
+    setBatchPostMode: (
+      state,
+      action: {payload: "postUpdateBatch" | "updateBatch"}
+    ) => {
+      state.batchPostMode = action.payload;
+    },
     clearBatchDetails: (state) => {
       state.batchDetails.batchNo = "";
       state.batchDetails.expDate = new Date();
       state.batchDetails.mfgDate = new Date();
+      state.batchDetails.batchedSaved = false;
     },
   },
   extraReducers(builder) {
@@ -61,7 +75,6 @@ const generalReducer = createSlice({
       })
       .addCase(getBatch.fulfilled, (state, action) => {
         const {data, paginating} = action.payload;
-
         if (paginating) {
           console.log("paginating");
           state.batch.data = [...state.batch.data, ...data];
@@ -77,7 +90,13 @@ const generalReducer = createSlice({
   },
 });
 
-export const {setBatchNo, setMfgDate, setExpDate, clearBatchDetails} =
-  generalReducer.actions;
+export const {
+  setBatchNo,
+  setMfgDate,
+  setExpDate,
+  clearBatchDetails,
+  setBatchedSaved,
+  setBatchPostMode,
+} = generalReducer.actions;
 
 export default generalReducer.reducer;

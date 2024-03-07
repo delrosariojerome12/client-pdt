@@ -17,7 +17,7 @@ interface ScanModalProps {
 
 // fix item modal layout!
 
-const ItemScanModal = (props: ScanModalProps) => {
+const ItemScanModal = React.memo((props: ScanModalProps) => {
   const {selectedItem} = useAppSelector((state) => state.document);
   const {handleScan} = useDocumentHooks();
   // item propeties varies
@@ -119,12 +119,14 @@ const ItemScanModal = (props: ScanModalProps) => {
                 title="NEXT"
                 type="regular"
                 isWidthNotFull={true}
+                useFlex={true}
               />
               <CustomButton
                 onPress={onClose}
                 title="CLOSE"
                 type="delete"
                 isWidthNotFull={true}
+                useFlex={true}
               />
             </View>
           </View>
@@ -132,7 +134,7 @@ const ItemScanModal = (props: ScanModalProps) => {
       </Modal>
     );
   }
-};
+});
 
 const styles = StyleSheet.create({
   centeredView: {

@@ -1,46 +1,52 @@
 import React, {useState} from "react";
-import {Modal, View, Text, StyleSheet, TouchableOpacity} from "react-native";
+import {
+  Modal,
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import CustomButton from "../forms/buttons/CustomButton";
 import {FontAwesome5, FontAwesome} from "@expo/vector-icons";
 import {format} from "../../styles/styles";
 import {useAppSelector} from "../../store/store";
-import EditBatchModal from "./EditBatchModal";
 import {useDocumentHooks} from "../../hooks/documentHooks";
-import {formatDateDDMMYY} from "../../helper/Date";
+import {formatDateDDMMYYYY} from "../../helper/Date";
 import {useBatchHooks} from "../../hooks/batchHooks";
+import CustomLoadingText from "../load-spinner/CustomLoadingText";
 
-interface AddBatchModalProps {
-  visible: boolean;
-  onClose: () => void;
-}
-
-const AddBatchModal = React.memo(({onClose, visible}: AddBatchModalProps) => {
+const AddBatchModal = React.memo(() => {
   const {selectedBatchItem: item} = useAppSelector((state) => state.document);
-  const {isEditBatchModal} = useAppSelector((state) => state.modal);
+  const {isAddBatchModal} = useAppSelector((state) => state.modal);
+  const {status} = useAppSelector((state) => state.status);
+
   const {
     batchNo,
     expDate,
     mfgDate,
-    saved,
-    handleBatchNo,
-    handleExpDate,
-    handleMfgDate,
-    handleClose,
-    handleSave,
+    batchedSaved,
     handleEditBatchModal,
-  } = useBatchHooks({uses: "create"});
-
-  const {handlePost} = useDocumentHooks();
+    handlePostAnotherBatch,
+    handleCloseAddBatchModal,
+  } = useBatchHooks();
 
   if (item) {
     console.log("add batch modal");
     return (
       <>
-        <Modal visible={visible} onRequestClose={onClose} transparent>
+        {status === "loading" && (
+          <CustomLoadingText text="Updating Batch.." visible={true} />
+        )}
+        <Modal
+          visible={isAddBatchModal}
+          onRequestClose={handleCloseAddBatchModal}
+          transparent
+        >
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
               <View style={styles.headerContainer}>
-                <TouchableOpacity onPress={onClose}>
+                <TouchableOpacity onPress={handleCloseAddBatchModal}>
                   <FontAwesome5 name="arrow-left" size={24} color="black" />
                 </TouchableOpacity>
                 <View style={{flexDirection: "row", gap: 10}}>
@@ -71,37 +77,34 @@ const AddBatchModal = React.memo(({onClose, visible}: AddBatchModalProps) => {
                   <Text style={{fontWeight: "bold"}}>Item Description: </Text>
                   <Text> {item.itmdsc}</Text>
                 </View>
-                <View style={format.twoRowText}>
-                  <Text style={{fontWeight: "bold"}}>Int Quantity: </Text>
-                  <Text> {`${item.intqty} PCS`}</Text>
-                </View>
 
                 <View style={format.twoRowText}>
-                  <Text style={{fontWeight: "bold"}}>Receieved Quantity: </Text>
+                  <Text style={{fontWeight: "bold"}}>Received Quantity: </Text>
                   <Text> {`${item.itmqty} PCS`}</Text>
                 </View>
 
                 <View
                   style={{flexDirection: "row", gap: 10, alignItems: "center"}}
                 >
-                  <View>
+                  <View style={{gap: 10}}>
                     <View style={format.twoRowText}>
                       <Text style={{fontWeight: "bold"}}>Batch No.:</Text>
-                      <Text>{saved && batchNo}</Text>
+                      <Text>{batchedSaved && batchNo}</Text>
                     </View>
                     <View style={format.twoRowText}>
                       <Text style={{fontWeight: "bold"}}>Mfg. Date:</Text>
-                      <Text>{saved && formatDateDDMMYY(mfgDate)}</Text>
+                      <Text>{batchedSaved && formatDateDDMMYYYY(mfgDate)}</Text>
                     </View>
                     <View style={format.twoRowText}>
                       <Text style={{fontWeight: "bold"}}>Exp. Date:</Text>
-                      <Text>{saved && formatDateDDMMYY(expDate)}</Text>
+                      <Text>{batchedSaved && formatDateDDMMYYYY(expDate)}</Text>
                     </View>
                   </View>
 
                   <TouchableOpacity
                     onPress={() => {
-                      handleEditBatchModal(item);
+                      console.log(batchNo);
+                      handleEditBatchModal(item, "create");
                     }}
                   >
                     <FontAwesome name="edit" size={24} color="black" />
@@ -111,23 +114,14 @@ const AddBatchModal = React.memo(({onClose, visible}: AddBatchModalProps) => {
 
               <View style={styles.buttonContainer}>
                 <CustomButton
-                  onPress={() => {
-                    handlePost({
-                      item: item,
-                      type: "pto-add-batch",
-                      customMessage: {
-                        header: "Add Another PTO Batch Saving",
-                        body: "Do you want to save this details?",
-                      },
-                    });
-                  }}
+                  onPress={handlePostAnotherBatch}
                   title="SAVE"
                   type="save"
                   isWidthNotFull={true}
                   useFlex={true}
                 />
                 <CustomButton
-                  onPress={onClose}
+                  onPress={handleCloseAddBatchModal}
                   title="CLOSE"
                   type="delete"
                   isWidthNotFull={true}
@@ -137,23 +131,6 @@ const AddBatchModal = React.memo(({onClose, visible}: AddBatchModalProps) => {
             </View>
           </View>
         </Modal>
-
-        {isEditBatchModal && (
-          <EditBatchModal
-            isEmpty={true}
-            visible={isEditBatchModal}
-            onClose={handleClose}
-            onSave={handleSave}
-            batchData={{
-              batchNo,
-              mfgDate,
-              expDate,
-              handleBatchNo,
-              handleExpDate,
-              handleMfgDate,
-            }}
-          />
-        )}
       </>
     );
   }

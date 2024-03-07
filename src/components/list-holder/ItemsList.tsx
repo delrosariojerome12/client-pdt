@@ -7,7 +7,9 @@ import SubConBinDetails from "../inventory-management/subConBinDetails";
 import StockTransferDetails from "../stockTransfer/stockTransferDetails";
 import PhysicalInventoryDetails from "../physical-inventory/physicalInventoryDetails";
 import STGDetails from "../outbound/stgDetails";
-
+import AddBatchModal from "../modals/AddBatchModal";
+import EditBatchModal from "../modals/EditBatchModal";
+import {useBatchHooks} from "../../hooks/batchHooks";
 interface Props {
   uses:
     | "inbound"
@@ -25,13 +27,16 @@ interface Props {
 }
 
 const ItemsList = React.memo((props: Props) => {
+  const {isScanItemModal, isAddBatchModal, isEditBatchModal} = useAppSelector(
+    (state) => state.modal
+  );
   const {uses, subcategory, options} = props;
   const {selectedDocument} = useAppSelector((state) => state.document);
   const {ptoDetails, srtoDetails} = useAppSelector((state) => state.inbound);
   const {wtoOutboundDetails, wavepickDetails, stgDetails} = useAppSelector(
     (state) => state.outbound
   );
-
+  const {handleCloseAddBatchModal, handleCloseEditBatchModal} = useBatchHooks();
   const renderItems = (item: any, index: number) => {
     switch (uses) {
       case "inbound":
@@ -83,7 +88,14 @@ const ItemsList = React.memo((props: Props) => {
   };
 
   if (selectedDocument) {
-    return <View style={styles.container}>{renderView()}</View>;
+    return (
+      <>
+        {isAddBatchModal && <AddBatchModal />}
+        {isEditBatchModal && <EditBatchModal />}
+
+        <View style={styles.container}>{renderView()}</View>
+      </>
+    );
   }
 });
 

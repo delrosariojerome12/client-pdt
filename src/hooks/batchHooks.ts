@@ -1,75 +1,153 @@
-import {useAppSelector, AppDispatch, useAppDispatch} from "../store/store";
-import {useEffect, useState} from "react";
-
+import {useAppSelector, useAppDispatch} from "../store/store";
+import {Alert} from "react-native";
+import {getPTODetails} from "../store/actions/warehouse/warehouseActions";
 import {
   handleToggleAddBatchModal,
   handleToggleEditBatchModal,
   handleToggleSearchBatchModal,
 } from "../reducers/modalReducer";
 import {handleSetBatchItem} from "../reducers/documentReducer";
-import {getBatch, connectToPHP} from "../store/actions/generalActions";
+import {getBatch, updateBatch} from "../store/actions/generalActions";
 import {
   setMfgDate,
   setBatchNo,
   setExpDate,
   clearBatchDetails,
+  setBatchedSaved,
+  setBatchPostMode,
 } from "../reducers/generalReducer";
+import {useDocumentHooks} from "./documentHooks";
+import {formatDateYYYYMMDD} from "../helper/Date";
+type Uses = "update" | "create";
 
-interface BatchProps {
-  uses: "update" | "create" | "modals";
-}
-
-export const useBatchHooks = ({uses}: BatchProps) => {
-  const {selectedBatchItem} = useAppSelector((state) => state.document);
+export const useBatchHooks = () => {
+  const {selectedBatchItem, selectedDocument} = useAppSelector(
+    (state) => state.document
+  );
   const {
-    batchDetails: {batchNo, expDate, mfgDate},
+    batchDetails: {batchNo, expDate, mfgDate, batchedSaved},
   } = useAppSelector((state) => state.general);
   const dispatch = useAppDispatch();
-
-  const [saved, setSaved] = useState(false);
+  const {handlePost} = useDocumentHooks();
 
   const handleMfgDate = (newDate: any) => {
-    console.log(newDate);
     dispatch(setMfgDate(newDate));
   };
   const handleExpDate = (newDate: any) => {
-    console.log(newDate);
     dispatch(setExpDate(newDate));
   };
   const handleBatchNo = (batch: any) => {
-    console.log(batch);
-    setSaved(true);
+    dispatch(setBatchedSaved(true));
     dispatch(setBatchNo(batch.batchnum));
     dispatch(setExpDate(new Date(batch.expdte)));
     dispatch(setMfgDate(new Date(batch.mfgdte)));
     handleCloseSearchBatchModal();
   };
 
-  const handleSave = () => {
-    setSaved(true);
-    handleCloseEditBatchModal();
+  const handleSaveUpdateBatch = () => {
+    dispatch(setBatchedSaved(true));
+    dispatch(handleToggleEditBatchModal());
+  };
+  const handlePostAnotherBatch = () => {
+    if (!batchNo) {
+      Alert.alert(`Cannot Save!`, `Please fill Batch number first.`, [
+        {
+          text: "OK",
+          onPress: () => {},
+        },
+      ]);
+    } else {
+      handlePost({
+        item: selectedBatchItem,
+        type: "pto-add-batch",
+        customMessage: {
+          header: "Add Another PTO Batch Saving",
+          body: "Do you want to save this details?",
+        },
+      });
+    }
+  };
+  const handlePostUpdateBatch = () => {
+    Alert.alert(
+      `Batch Details Update Posting`,
+      `Do you want to update this batch details of: '${selectedBatchItem.lpnnum}'`,
+      [
+        {
+          text: "Yes",
+          onPress: () => {
+            dispatch(setBatchedSaved(true));
+            dispatch(
+              updateBatch({
+                document: {
+                  data: {doclock: "Y", pdtopen: "Y"},
+                  field: {docnum: selectedDocument.batchnum},
+                },
+                item: {
+                  field: {
+                    lpnnum: selectedBatchItem.lpnnum,
+                  },
+                  data: {
+                    batchnum: batchNo,
+                    expdte: formatDateYYYYMMDD(expDate),
+                    mdgdte: formatDateYYYYMMDD(mfgDate),
+                  },
+                },
+                onSuccess: () => {
+                  handleCloseEditBatchModal();
+                  dispatch(getPTODetails({docnum: selectedDocument.docnum}));
+                },
+              })
+            );
+          },
+        },
+        {text: "No", style: "cancel"},
+      ]
+    );
   };
 
-  const handleClose = () => {
-    handleCloseEditBatchModal();
-    setSaved(false);
-    dispatch(clearBatchDetails());
+  const removeScannedQuantity = (item: any) => {
+    // clear scanned items
+    Alert.alert(
+      "Remove Scanned Quantity",
+      `Are you sure you want to remove the scanned quantity of item: '${selectedBatchItem.itmdsc}'`,
+      [
+        {
+          text: "Yes",
+          onPress: () => alert("No api yet."),
+          style: "destructive",
+        },
+        {text: "No", style: "cancel"},
+      ]
+    );
+    console.log("remove", item);
+    console.log("parent", selectedDocument);
   };
+
+  // const handleClose = () => {
+  //   handleCloseEditBatchModal();
+  //   // setSaved(false);
+  //   dispatch(setBatchedSaved(false));
+  //   dispatch(clearBatchDetails());
+  // };
 
   // modals
   const handleAddBatchModal = (item: any) => {
+    dispatch(setBatchPostMode("updateBatch"));
     dispatch(handleToggleAddBatchModal());
     dispatch(handleSetBatchItem(item));
   };
   const handleCloseAddBatchModal = () => {
+    dispatch(setBatchedSaved(false));
     dispatch(handleToggleAddBatchModal());
+    dispatch(clearBatchDetails());
   };
-  const handleEditBatchModal = (item: any) => {
+  const handleEditBatchModal = (item: any, uses: Uses) => {
     switch (uses) {
       case "create":
         dispatch(clearBatchDetails());
         break;
       case "update":
+        dispatch(setBatchPostMode("postUpdateBatch"));
         dispatch(setBatchNo(item.batchnum));
         dispatch(setMfgDate(new Date(item.mfgdte)));
         dispatch(setExpDate(new Date(item.expdte)));
@@ -82,6 +160,8 @@ export const useBatchHooks = ({uses}: BatchProps) => {
   };
   const handleCloseEditBatchModal = () => {
     dispatch(handleToggleEditBatchModal());
+    dispatch(setBatchedSaved(false));
+    dispatch(clearBatchDetails());
   };
   const handleSearchBatchModal = () => {
     dispatch(
@@ -97,12 +177,12 @@ export const useBatchHooks = ({uses}: BatchProps) => {
     batchNo,
     expDate,
     mfgDate,
-    saved,
+    batchedSaved,
     handleMfgDate,
     handleExpDate,
     handleBatchNo,
-    handleSave,
-    handleClose,
+    // handleClose,
+    handleSaveUpdateBatch,
     // modals
     handleAddBatchModal,
     handleEditBatchModal,
@@ -110,5 +190,9 @@ export const useBatchHooks = ({uses}: BatchProps) => {
     handleCloseAddBatchModal,
     handleCloseEditBatchModal,
     handleCloseSearchBatchModal,
+    // api call
+    handlePostAnotherBatch,
+    handlePostUpdateBatch,
+    removeScannedQuantity,
   };
 };

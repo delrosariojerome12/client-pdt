@@ -39,13 +39,15 @@ const PTO = () => {
   const {handleScanModal, handleSelectModal, closeSelectModal, handlePost} =
     useDocumentHooks();
 
-  if (pto.status === "loading" && !refreshing && !isPaginating) {
-    return <LoadingSpinner />;
-  }
+  // if (pto.status === "loading" && !refreshing && !isPaginating) {
+  //   return <LoadingSpinner />;
+  // }
+
+  console.log(status);
 
   return (
     <>
-      {status === "success" && (
+      {status === "success" && !isSelectModal && !isScanModal && (
         <MessageToast
           status="success"
           text="Document Successfully Posted"
@@ -60,6 +62,10 @@ const PTO = () => {
           type="regular"
         />
 
+        {status === "loading" && !isSelectModal && !isScanModal && (
+          <CustomLoadingText text="Posting..." visible={true} />
+        )}
+
         <ScrollView
           style={generalStyles.innerContainer}
           contentContainerStyle={{flexGrow: 1}}
@@ -69,10 +75,6 @@ const PTO = () => {
           onScroll={handleScroll}
           scrollEventThrottle={150}
         >
-          {status === "loading" && (
-            <CustomLoadingText text="Posting..." visible={true} />
-          )}
-
           <CustomTable
             tableHeaders={tableHeaders}
             tableData={pto.data}

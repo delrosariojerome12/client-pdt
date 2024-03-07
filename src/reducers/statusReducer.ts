@@ -1,6 +1,6 @@
 import {createSlice} from "@reduxjs/toolkit";
 import {connectToPHP} from "../store/actions/generalActions";
-
+import {updateBatch} from "../store/actions/generalActions";
 interface Status {
   status: "idle" | "loading" | "success" | "failed";
   statusText: string; // custom message for statuses
@@ -16,7 +16,11 @@ const statusReducer = createSlice({
   initialState,
   reducers: {
     resetStatus: (state) => {
+      console.log("reset should work");
       state.status = "idle";
+    },
+    setStatusText: (state, action) => {
+      state.statusText = action.payload;
     },
   },
   extraReducers(builder) {
@@ -32,9 +36,22 @@ const statusReducer = createSlice({
       .addCase(connectToPHP.rejected, (state) => {
         state.status = "failed";
       });
+
+    builder
+      .addCase(updateBatch.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(updateBatch.fulfilled, (state, action) => {
+        console.log(action.payload);
+
+        state.status = "success";
+      })
+      .addCase(updateBatch.rejected, (state) => {
+        state.status = "failed";
+      });
   },
 });
 
-export const {resetStatus} = statusReducer.actions;
+export const {resetStatus, setStatusText} = statusReducer.actions;
 
 export default statusReducer.reducer;

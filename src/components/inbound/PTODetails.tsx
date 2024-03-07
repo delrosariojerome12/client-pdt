@@ -8,9 +8,8 @@ import {useAppSelector} from "../../store/store";
 import {format} from "../../styles/styles";
 import {ProductData} from "../../models/generic/ProductData";
 import ItemScanModal from "../modals/ItemScanModal";
-import AddBatchModal from "../modals/AddBatchModal";
-import EditBatchModal from "../modals/EditBatchModal";
 import {useBatchHooks} from "../../hooks/batchHooks";
+import {formatDateStringMMDDYYYY} from "../../helper/Date";
 
 interface Items {
   item: ProductData;
@@ -21,53 +20,11 @@ interface Items {
   };
 }
 const PTOItems = React.memo((props: Items) => {
-  const {isScanItemModal, isAddBatchModal, isEditBatchModal} = useAppSelector(
-    (state) => state.modal
-  );
-  const {handleItemScanModal, closeItemScanModal, removeScannedQuantity} =
-    useDocumentHooks();
-  const {
-    handleAddBatchModal,
-    handleCloseAddBatchModal,
-    handleEditBatchModal,
-    handleCloseEditBatchModal,
-    batchNo,
-    expDate,
-    mfgDate,
-    handleBatchNo,
-    handleExpDate,
-    handleMfgDate,
-    handleSave,
-  } = useBatchHooks({uses: "update"});
+  const {isScanItemModal} = useAppSelector((state) => state.modal);
+  const {handleItemScanModal, closeItemScanModal} = useDocumentHooks();
+  const {handleAddBatchModal, handleEditBatchModal, removeScannedQuantity} =
+    useBatchHooks();
   const {item, options} = props;
-
-  if (isAddBatchModal) {
-    return (
-      <AddBatchModal
-        visible={isAddBatchModal}
-        onClose={handleCloseAddBatchModal}
-      />
-    );
-  }
-
-  if (isEditBatchModal) {
-    return (
-      <EditBatchModal
-        isEmpty={false}
-        onClose={handleCloseEditBatchModal}
-        visible={isEditBatchModal}
-        onSave={handleSave}
-        batchData={{
-          batchNo,
-          mfgDate,
-          expDate,
-          handleBatchNo,
-          handleExpDate,
-          handleMfgDate,
-        }}
-      />
-    );
-  }
 
   return (
     <>
@@ -114,15 +71,21 @@ const PTOItems = React.memo((props: Items) => {
               </View>
               <View style={format.twoRowText}>
                 <Text style={{fontWeight: "bold"}}>Mfg. Date:</Text>
-                <Text>{` ${item.mfgdte || "No Date"} `}</Text>
+                <Text>{` ${
+                  formatDateStringMMDDYYYY(item.mfgdte as string) || "No Date"
+                } `}</Text>
               </View>
               <View style={format.twoRowText}>
                 <Text style={{fontWeight: "bold"}}>Exp. Date:</Text>
-                <Text>{` ${item.expdte || "No Date"}`}</Text>
+                <Text>{` ${
+                  formatDateStringMMDDYYYY(item.expdte as string) || "No Date"
+                }`}</Text>
               </View>
             </View>
             {!options?.removeEdit && (
-              <TouchableOpacity onPress={() => handleEditBatchModal(item)}>
+              <TouchableOpacity
+                onPress={() => handleEditBatchModal(item, "update")}
+              >
                 <FontAwesome name="edit" size={24} color="black" />
               </TouchableOpacity>
             )}
@@ -137,6 +100,8 @@ const PTOItems = React.memo((props: Items) => {
           />
         </View>
       </View>
+
+      {/* ilipat to */}
       {isScanItemModal && (
         <ItemScanModal
           visible={isScanItemModal}

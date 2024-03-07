@@ -66,6 +66,29 @@ interface ConnectToPHPParams {
   soconum?: string;
 }
 
+interface BatchUpdate {
+  document: {
+    field: {
+      docnum: string;
+    };
+    data: {
+      pdtopen: "Y";
+      doclock: "Y";
+    };
+  };
+  item: {
+    field: {
+      lpnnum: string;
+    };
+    data: {
+      mdgdte: string;
+      expdte: string;
+      batchnum: string;
+    };
+  };
+  onSuccess: () => void;
+}
+
 export const getDocument = createAsyncThunk(
   "general/getDocument",
   async (
@@ -434,6 +457,8 @@ export const connectToPHP = createAsyncThunk(
     const url = `${traccDomain}${traccDirectory}/${targerPPHP}`;
     console.log("post url:", url);
 
+    console.log("pinasa", formData);
+
     try {
       const response = await fetch(url, {
         method: "POST",
@@ -441,8 +466,15 @@ export const connectToPHP = createAsyncThunk(
         headers: {},
       });
       const formattedResult = await response.json();
-      onSuccess();
-      return formattedResult;
+      console.log("sukli", formattedResult);
+
+      if (formattedResult.bool) {
+        onSuccess();
+        return formattedResult;
+      } else {
+        onFailure(formattedResult.pdtmsg["1"]);
+        return rejectWithValue("Missing Domain and Directory");
+      }
     } catch (error: any) {
       console.log(error);
       onFailure(error);
@@ -463,11 +495,77 @@ export const getBatch = createAsyncThunk(
 
       const url = `${protocol}://${ipAddress}:${port}/api/lst_tracc/batchfile?itmcde=${itmcde}&_limit=${limit}&_offset=${offset}`;
 
+      console.log("daan", url);
+
       const response = await axios.get(url);
 
       return {
         data: response.data,
         paginating: paginating,
+      };
+    } catch (error: any) {
+      console.log("mali:", error);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const updateBatch = createAsyncThunk(
+  "general/updateBatch",
+  async (
+    {document, item, onSuccess}: BatchUpdate,
+    {rejectWithValue, getState}
+  ) => {
+    try {
+      const state = getState() as RootState;
+      const {ipAddress, port, protocol} = state.auth.server;
+
+      const url1 = `${protocol}://${ipAddress}:${port}/api/lst_tracc/purchasetofile1`;
+      const url2 = `${protocol}://${ipAddress}:${port}/api/lst_tracc/purchasetofile2`;
+
+      const responseDocument = await axios.patch(url1, document);
+      const responseItem = await axios.patch(url2, item);
+
+      onSuccess();
+
+      console.log(responseDocument);
+      console.log(responseItem);
+
+      return {
+        item: responseItem.data,
+        document: responseDocument.data,
+      };
+    } catch (error: any) {
+      console.log("mali:", error);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const deleteScanQuantity = createAsyncThunk(
+  "general/deleteScanQuantity",
+  async (
+    {document, item, onSuccess}: BatchUpdate,
+    {rejectWithValue, getState}
+  ) => {
+    try {
+      const state = getState() as RootState;
+      const {ipAddress, port, protocol} = state.auth.server;
+
+      const url1 = `${protocol}://${ipAddress}:${port}/api/lst_tracc/purchasetofile1`;
+      const url2 = `${protocol}://${ipAddress}:${port}/api/lst_tracc/purchasetofile2`;
+
+      const responseDocument = await axios.patch(url1, document);
+      const responseItem = await axios.patch(url2, item);
+
+      onSuccess();
+
+      console.log(responseDocument);
+      console.log(responseItem);
+
+      return {
+        item: responseItem.data,
+        document: responseDocument.data,
       };
     } catch (error: any) {
       console.log("mali:", error);

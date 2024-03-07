@@ -7,10 +7,13 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import {FontAwesome5} from "@expo/vector-icons";
 import {shadows} from "../../styles/styles";
 import LoadingSpinner from "../load-spinner/LoadingSpinner";
+import {useAppSelector} from "../../store/store";
+import MessageToast from "../message-toast/MessageToast";
 
 interface SelectModalProps {
   visible: boolean;
@@ -32,14 +35,24 @@ const SelectModal = React.memo((props: SelectModalProps) => {
     customContent,
     loadingStatus,
   } = props;
+  const {status} = useAppSelector((state) => state.status);
 
-  if (loadingStatus) {
-    return <LoadingSpinner />;
-  }
+  // if (loadingStatus) {
+  //   return <LoadingSpinner />;
+  // }
+  console.log(status);
 
   if (selectedItem) {
     return (
       <Modal visible={visible} onRequestClose={onClose} transparent>
+        {status === "success" && (
+          <MessageToast
+            status="success"
+            text={"Batch Details Successfully Updated."}
+            speed={2000}
+            customPosition={[-150, -10]}
+          />
+        )}
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
             <View style={styles.headerContainer}>
@@ -58,9 +71,13 @@ const SelectModal = React.memo((props: SelectModalProps) => {
               ))}
             </View>
 
-            <ScrollView style={styles.customContainer}>
-              {customContent}
-            </ScrollView>
+            {loadingStatus ? (
+              <ActivityIndicator size="large" color="#0000ff" />
+            ) : (
+              <ScrollView style={styles.customContainer}>
+                {customContent}
+              </ScrollView>
+            )}
           </View>
         </View>
       </Modal>

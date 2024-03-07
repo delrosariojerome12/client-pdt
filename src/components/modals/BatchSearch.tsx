@@ -5,12 +5,15 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  RefreshControl,
+  ActivityIndicator,
 } from "react-native";
 import React, {useState} from "react";
 import {FontAwesome5, FontAwesome} from "@expo/vector-icons";
 import CustomInputs from "../forms/inputs/CustomInputs";
 import CustomTable from "../forms/table/CustomTable";
 import {useAppSelector} from "../../store/store";
+import {usePaginateRefreshHooks} from "../../hooks/paginateRefreshHook";
 
 interface BatchSearchProps {
   visible: boolean;
@@ -23,6 +26,12 @@ const tableVisibleProps = ["batchnum", "mfgdte", "expdte"];
 const BatchSearch = React.memo((props: BatchSearchProps) => {
   const {batch} = useAppSelector((state) => state.general);
   const {onClose, onSaveBatch, visible} = props;
+
+  const {handleScroll, isPaginating, onRefresh, refreshing} =
+    usePaginateRefreshHooks({
+      uses: "batchSearch",
+    });
+
   const [searchBatchNo, setSearchBatchNo] = useState("");
 
   const handleOnChange = (key: string, value: string | number) => {
@@ -34,6 +43,8 @@ const BatchSearch = React.memo((props: BatchSearchProps) => {
 
   console.log("batch search");
 
+  console.log(batch.data.length);
+
   return (
     <Modal visible={visible} onRequestClose={onClose}>
       <View style={styles.centeredView}>
@@ -42,7 +53,7 @@ const BatchSearch = React.memo((props: BatchSearchProps) => {
             <FontAwesome5 name="arrow-left" size={24} color="black" />
           </TouchableOpacity>
           <View style={{flexDirection: "row", gap: 10}}>
-            <Text style={styles.headerText}>Batch Details</Text>
+            <Text style={styles.headerText}>Batch Search</Text>
           </View>
         </View>
         <View style={styles.searchContainer}>
@@ -68,7 +79,16 @@ const BatchSearch = React.memo((props: BatchSearchProps) => {
           </TouchableOpacity>
         </View>
 
-        <ScrollView contentContainerStyle={styles.scrollViewContent}>
+        {/* <ScrollView contentContainerStyle={styles.scrollViewContent}> */}
+        <ScrollView
+          style={styles.scrollViewContent}
+          contentContainerStyle={{flexGrow: 1}}
+          refreshControl={
+            <RefreshControl refreshing={false} onRefresh={onRefresh} />
+          }
+          onScroll={handleScroll}
+          scrollEventThrottle={150}
+        >
           <View style={styles.modalView}>
             <CustomTable
               tableHeaders={tableHeaders}
@@ -80,6 +100,21 @@ const BatchSearch = React.memo((props: BatchSearchProps) => {
             />
           </View>
         </ScrollView>
+
+        {isPaginating && (
+          <View
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              paddingVertical: 10,
+              height: 100,
+              gap: 10,
+            }}
+          >
+            <ActivityIndicator size="large" color="#0000ff" />
+            <Text>Loading more data...</Text>
+          </View>
+        )}
       </View>
     </Modal>
   );
@@ -91,7 +126,7 @@ const styles = StyleSheet.create({
   },
   scrollViewContent: {
     flexGrow: 1,
-    justifyContent: "center",
+    // justifyContent: "center",
   },
   searchContainer: {
     paddingHorizontal: 20,
