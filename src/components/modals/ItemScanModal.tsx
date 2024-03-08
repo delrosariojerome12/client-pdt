@@ -8,26 +8,24 @@ import {useDocumentHooks} from "../../hooks/documentHooks";
 import {format} from "../../styles/styles";
 import {ScanCategory} from "../../models/generic/ScanCategory";
 import MessageToast from "../message-toast/MessageToast";
+import {ScanValidate} from "../../hooks/documentHooks";
+import CustomLoadingText from "../load-spinner/CustomLoadingText";
 
 interface ScanModalProps {
   visible: boolean;
-  onClose: () => void;
-  scanParams: ScanCategory;
+  scanType: ScanValidate;
 }
-
-// fix item modal layout!
 
 const ItemScanModal = React.memo((props: ScanModalProps) => {
   const {selectedItem} = useAppSelector((state) => state.document);
-  const {handleScan} = useDocumentHooks();
-  // item propeties varies
+  const {closeItemScanModal, handleScanItem} = useDocumentHooks();
   const item: any = selectedItem;
+  const {status} = useAppSelector((state) => state.status);
 
   const [scanfield, setScanfield] = useState<string>("");
   const [quantityField, setQuantityField] = useState<number>(1);
 
-  const {visible, onClose, scanParams} = props;
-
+  const {visible, scanType} = props;
   const handleOnChange = (key: string, value: string | number) => {
     setScanfield(String(value));
   };
@@ -36,15 +34,27 @@ const ItemScanModal = React.memo((props: ScanModalProps) => {
     setQuantityField(parseInt(value as any));
   };
 
-  console.log(item);
+  console.log("item scan modal");
 
   if (item) {
     return (
-      <Modal visible={visible} onRequestClose={onClose} transparent>
+      <Modal visible={visible} onRequestClose={closeItemScanModal} transparent>
+        {status === "success" && (
+          <MessageToast
+            status="success"
+            text="Item Successfully Scanned."
+            speed={2000}
+            customPosition={[-150, -10]}
+          />
+        )}
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
+            {status === "loading" && (
+              <CustomLoadingText text="Processing..." visible={true} />
+            )}
+
             <View style={styles.headerContainer}>
-              <TouchableOpacity onPress={onClose}>
+              <TouchableOpacity onPress={closeItemScanModal}>
                 <FontAwesome5 name="arrow-left" size={24} color="black" />
               </TouchableOpacity>
               <View style={{flexDirection: "row", gap: 10}}>
@@ -60,6 +70,14 @@ const ItemScanModal = React.memo((props: ScanModalProps) => {
               placeHolder="Waiting to Scan Barcode..."
               inputKey="scan"
               isFocus={true}
+              onSubmit={() => {
+                setQuantityField(1);
+                setScanfield("");
+                handleScanItem(
+                  {barcode: scanfield, receiveQty: quantityField},
+                  scanType
+                );
+              }}
             />
 
             <View style={styles.quantityContainer}>
@@ -87,7 +105,7 @@ const ItemScanModal = React.memo((props: ScanModalProps) => {
               </Text>
               <View style={format.twoRowText}>
                 <Text style={{fontWeight: "bold"}}>Line No: </Text>
-                <Text>{item.copyline}</Text>
+                <Text>{item.linenum}</Text>
               </View>
               <View style={format.twoRowText}>
                 <Text style={{fontWeight: "bold"}}>Item Code: </Text>
@@ -99,11 +117,11 @@ const ItemScanModal = React.memo((props: ScanModalProps) => {
               </View>
               <View style={format.twoRowText}>
                 <Text style={{fontWeight: "bold"}}>Int Quantity: </Text>
-                <Text> {`${item.intqty} PCS`}</Text>
+                <Text> {`${item.intqty || ""} PCS`}</Text>
               </View>
 
               <View style={format.twoRowText}>
-                <Text style={{fontWeight: "bold"}}>Receieved Quantity: </Text>
+                <Text style={{fontWeight: "bold"}}>Received Quantity: </Text>
                 <Text> {`${item.itmqty} PCS`}</Text>
               </View>
             </View>
@@ -111,10 +129,12 @@ const ItemScanModal = React.memo((props: ScanModalProps) => {
             <View style={styles.buttonContainer}>
               <CustomButton
                 onPress={() => {
-                  handleScan({
-                    barcode: scanfield,
-                    category: scanParams.category,
-                  });
+                  setQuantityField(1);
+                  setScanfield("");
+                  handleScanItem(
+                    {barcode: scanfield, receiveQty: quantityField},
+                    scanType
+                  );
                 }}
                 title="NEXT"
                 type="regular"
@@ -122,7 +142,7 @@ const ItemScanModal = React.memo((props: ScanModalProps) => {
                 useFlex={true}
               />
               <CustomButton
-                onPress={onClose}
+                onPress={closeItemScanModal}
                 title="CLOSE"
                 type="delete"
                 isWidthNotFull={true}

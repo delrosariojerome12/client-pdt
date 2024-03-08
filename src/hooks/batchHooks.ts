@@ -1,6 +1,9 @@
 import {useAppSelector, useAppDispatch} from "../store/store";
 import {Alert} from "react-native";
-import {getPTODetails} from "../store/actions/warehouse/warehouseActions";
+import {
+  getPTODetails,
+  getPTO,
+} from "../store/actions/warehouse/warehouseActions";
 import {
   handleToggleAddBatchModal,
   handleToggleEditBatchModal,
@@ -24,6 +27,8 @@ import {useDocumentHooks} from "./documentHooks";
 import {formatDateYYYYMMDD} from "../helper/Date";
 import {setStatusText} from "../reducers/statusReducer";
 import {useAPIHooks} from "./apiHooks";
+import {TypeSelect} from "./documentHooks";
+
 type Uses = "update" | "create";
 
 export const useBatchHooks = () => {
@@ -36,6 +41,19 @@ export const useBatchHooks = () => {
   const dispatch = useAppDispatch();
   const {handlePost} = useDocumentHooks();
   const {connectToPHPNotDispatch} = useAPIHooks();
+
+  const checkDetailsToReload = (detailsToLoad: TypeSelect) => {
+    switch (detailsToLoad) {
+      case "pto":
+        dispatch(getPTODetails({docnum: selectedDocument.docnum}));
+        dispatch(getPTO({limit: 10, offset: 0}));
+
+        break;
+
+      default:
+        break;
+    }
+  };
 
   const handleMfgDate = (newDate: any) => {
     dispatch(setMfgDate(newDate));
@@ -119,7 +137,7 @@ export const useBatchHooks = () => {
     );
   };
 
-  const removeScannedQuantity = (item: any) => {
+  const removeScannedQuantity = (item: any, detailsToLoad: TypeSelect) => {
     // clear scanned items
     Alert.alert(
       "Remove Scanned Quantity",
@@ -140,10 +158,10 @@ export const useBatchHooks = () => {
                 },
                 lpnnum: item.lpnnum,
                 onSuccess: () => {
+                  checkDetailsToReload(detailsToLoad);
                   dispatch(
                     setStatusText(`Scanned Quantity Removed: '${item.lpnnum}'`)
                   );
-                  dispatch(getPTODetails({docnum: selectedDocument.docnum}));
                   connectToPHPNotDispatch({
                     recid: item.recid,
                     docnum: selectedDocument.docnum,
@@ -178,6 +196,7 @@ export const useBatchHooks = () => {
     dispatch(handleToggleAddBatchModal());
     dispatch(clearBatchDetails());
   };
+
   const handleEditBatchModal = (item: any, uses: Uses) => {
     switch (uses) {
       case "create":

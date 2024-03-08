@@ -5,7 +5,7 @@ import {
   RefreshControl,
   ActivityIndicator,
 } from "react-native";
-import React from "react";
+import React, {useEffect} from "react";
 import CustomButton from "../../../../src/components/forms/buttons/CustomButton";
 import CustomTable from "../../../../src/components/forms/table/CustomTable";
 import ScanModal from "../../../../src/components/modals/ScanModal";
@@ -29,6 +29,7 @@ const PTO = () => {
     pto,
     ptoDetails,
     isScanModal,
+    isScanItemModal,
     isSelectModal,
     selectedDocument,
     status,
@@ -52,13 +53,16 @@ const PTO = () => {
 
   return (
     <>
-      {status === "success" && !isSelectModal && !isScanModal && (
-        <MessageToast
-          status="success"
-          text="Document Successfully Posted"
-          speed={2000}
-        />
-      )}
+      {status === "success" &&
+        !isSelectModal &&
+        !isScanModal &&
+        !isScanItemModal && (
+          <MessageToast
+            status="success"
+            text="Document Successfully Posted"
+            speed={2000}
+          />
+        )}
 
       <View style={generalStyles.outerContainer}>
         <CustomButton
@@ -95,7 +99,7 @@ const PTO = () => {
               visible={isScanModal}
               onClose={handleScanModal}
               placeholder="Waiting to Scan WRR Barcode"
-              scanParams={{category: "wrr"}}
+              scanParams={"wrr"}
               typeForFetching="pto"
             />
           )}

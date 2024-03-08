@@ -13,7 +13,7 @@ import CustomButton from "../forms/buttons/CustomButton";
 import {useDocumentHooks} from "../../hooks/documentHooks";
 import {FontAwesome5} from "@expo/vector-icons";
 import {ScanCategory} from "../../models/generic/ScanCategory";
-import {TypeSelect} from "../../hooks/documentHooks";
+import {ScanValidate} from "../../hooks/documentHooks";
 import CustomLoadingText from "../load-spinner/CustomLoadingText";
 import {useAppSelector} from "../../store/store";
 
@@ -23,12 +23,12 @@ interface ScanModalProps {
   placeholder: string;
   isNextBtn?: boolean;
   scanParams: ScanCategory;
-  typeForFetching: TypeSelect;
+  typeForFetching: ScanValidate;
 }
 
 const ScanModal = React.memo((props: ScanModalProps) => {
   const {status} = useAppSelector((state) => state.status);
-  const {handleScan, validateBin} = useDocumentHooks();
+  const {handleScanDocument, validateBin} = useDocumentHooks();
   const {
     visible,
     onClose,
@@ -55,8 +55,8 @@ const ScanModal = React.memo((props: ScanModalProps) => {
       return (
         <CustomButton
           onPress={() =>
-            handleScan(
-              {barcode: scanfield, category: scanParams.category},
+            handleScanDocument(
+              {barcode: scanfield, category: scanParams},
               typeForFetching
             )
           }
@@ -71,8 +71,8 @@ const ScanModal = React.memo((props: ScanModalProps) => {
       <View style={styles.buttonContainer}>
         <CustomButton
           onPress={() =>
-            handleScan(
-              {barcode: scanfield, category: scanParams.category},
+            handleScanDocument(
+              {barcode: scanfield, category: scanParams},
               typeForFetching
             )
           }
@@ -113,8 +113,8 @@ const ScanModal = React.memo((props: ScanModalProps) => {
             {/* <View> */}
             <CustomInputs
               onSubmit={() => {
-                handleScan(
-                  {barcode: scanfield, category: scanParams.category},
+                handleScanDocument(
+                  {barcode: scanfield, category: scanParams},
                   typeForFetching
                 );
               }}

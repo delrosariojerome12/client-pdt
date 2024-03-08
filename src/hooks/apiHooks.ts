@@ -367,15 +367,62 @@ export const useAPIHooks = () => {
     }
   };
 
-  const scanBarcode = async ({barcode, category}: ScanDocumentParams) => {
+  //   const scanBarcode = async ({barcode, category}: ScanDocumentParams) => {
+  //     dispatch(setStatus("loading"));
+  //     try {
+  //       const url = `${protocol}://${ipAddress}:${port}/api/scanBarcode/?barcode=${barcode}&category=${category}`;
+  //       const response = await axios.get(url);
+  //       if (response.data.bool) {
+  //         dispatch(setStatus("success"));
+  //         return response.data;
+  //       } else {
+  //         dispatch(setStatus("failed"));
+  //         Alert.alert("Something Went Wrong", response.data.message, [
+  //           {
+  //             text: "OK",
+  //           },
+  //         ]);
+  //       }
+  //     } catch (error: any) {
+  //       dispatch(setStatus("failed"));
+  //       console.log(error);
+  //     }
+  //   };
+  //   return {connectToPHPNotDispatch, scanBarcode};
+  // };
+
+  const scanBarcode = async (queryParams: ScanDocumentParams) => {
     dispatch(setStatus("loading"));
     try {
-      const url = `${protocol}://${ipAddress}:${port}/api/scanBarcode/?barcode=${barcode}&category=${category}`;
+      const {barcode, category, ...restParams} = queryParams;
+      const baseUrl = `${protocol}://${ipAddress}:${port}/api/scanbarcode/`;
+      const searchParams = new URLSearchParams();
+      searchParams.append("barcode", barcode);
+      searchParams.append("category", category);
+      // Append other query parameters
+      for (const key in restParams) {
+        if (Object.prototype.hasOwnProperty.call(restParams, key)) {
+          const value = restParams[key];
+          if (value !== undefined) {
+            searchParams.append(
+              key,
+              typeof value === "number" ? String(value) : value
+            );
+          }
+        }
+      }
+      const url = `${baseUrl}?${searchParams.toString()}`;
+
+      console.log("daan", url);
+
       const response = await axios.get(url);
       if (response.data.bool) {
         dispatch(setStatus("success"));
+        console.log("tae", response.data);
+
         return response.data;
       } else {
+        console.log(response.data);
         dispatch(setStatus("failed"));
         Alert.alert("Something Went Wrong", response.data.message, [
           {
@@ -388,5 +435,6 @@ export const useAPIHooks = () => {
       console.log(error);
     }
   };
-  return {connectToPHPNotDispatch, scanBarcode};
+
+  return {scanBarcode, connectToPHPNotDispatch};
 };

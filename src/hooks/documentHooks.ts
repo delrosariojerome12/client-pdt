@@ -7,8 +7,6 @@ import {
   handleToggleSearchModal,
   handleSetSearchModalContent,
   handleToggleAddBatchModal,
-  handleToggleEditBatchModal,
-  handleToggleSearchBatchModal,
 } from "../reducers/modalReducer";
 import {
   getPTODetails,
@@ -19,22 +17,25 @@ import {
   getPTO,
   getPUR,
 } from "../store/actions/warehouse/warehouseActions";
-import {
-  handleSetDocument,
-  handleSetItem,
-  handleSetBatchItem,
-} from "../reducers/documentReducer";
-import {getDocument, updateBatch} from "../store/actions/generalActions";
+import {handleSetDocument, handleSetItem} from "../reducers/documentReducer";
 import {ScanDocumentParams} from "../store/actions/generalActions";
 import {connectToPHP} from "../store/actions/generalActions";
 import {resetStatus} from "../reducers/statusReducer";
 import {formatDateYYYYMMDD} from "../helper/Date";
 import {clearBatchDetails} from "../reducers/generalReducer";
 import {useAPIHooks} from "./apiHooks";
+import {setStatusText} from "../reducers/statusReducer";
+
 interface SearchContent {
   content: "warehouse" | "bin" | "item";
 }
 export type TypePost = "pto" | "pur" | "pto-add-batch";
+export type ScanValidate =
+  | "pto"
+  | "srto"
+  | "wto-outbound"
+  | "wavepick"
+  | "stg-validate";
 
 export type TypeSelect =
   | "pto"
@@ -59,7 +60,12 @@ export interface PostProps {
 }
 
 export const useDocumentHooks = () => {
-  const {selectedDocument} = useAppSelector((state) => state.document);
+  const {
+    user: {userDetails},
+  } = useAppSelector((state) => state.auth);
+  const {selectedDocument, selectedItem} = useAppSelector(
+    (state) => state.document
+  );
   const {
     batchDetails: {batchNo, expDate, mfgDate},
   } = useAppSelector((state) => state.general);
@@ -67,7 +73,6 @@ export const useDocumentHooks = () => {
   const dispatch = useAppDispatch();
   const {scanBarcode} = useAPIHooks();
 
-  // checking uses
   const checkSelectType = ({item, type}: SelectProps) => {
     console.log(type);
 
@@ -170,6 +175,56 @@ export const useDocumentHooks = () => {
     }
   };
 
+  const checkScanType = async (
+    {barcode, receiveQty}: {barcode: string; receiveQty: number},
+    scanUsage: ScanValidate
+  ) => {
+    if (selectedItem) {
+      switch (scanUsage) {
+        case "pto":
+          try {
+            const response = await scanBarcode({
+              barcode,
+              category: "lpnnum",
+              recid: selectedItem?.recid.toString(),
+              docnum: selectedDocument.docnum,
+              itmcde: selectedItem.itmcde,
+              untmea: selectedItem.untmea,
+              lpnnum: selectedItem.lpnnum,
+              itmqty: selectedItem.itmqty,
+              intqty: selectedItem.intqty,
+              linklpnnum: selectedItem.linklpnnum || "null",
+              addbatch: selectedItem.addbatch.toString(),
+              copyline: selectedItem.copyline.toString(),
+              pdtmanualqtyinbound: receiveQty.toString(),
+              linenum: selectedItem.linenum.toString(),
+              usrnam: userDetails?.usrcde,
+            });
+            if (response.data.pto2_data[0]) {
+              dispatch(handleSetItem(response.data.pto2_data[0]));
+            }
+            console.log(response.data.pto2_data[0].intqty);
+            console.log(response.data.pto2_data[0].itmqty);
+
+            if (response.data.pto2_data[0].itmqty === 0 && receiveQty > 1) {
+              dispatch(setStatusText(`Item Successfully Scanned.`));
+              dispatch(handleToggleItemScanModal());
+              dispatch(getPTODetails({docnum: selectedDocument.docnum}));
+              dispatch(getPTO({limit: 10, offset: 0}));
+            }
+          } catch (error) {
+            console.log("incorrect barcode");
+          }
+          break;
+        case "srto":
+          break;
+
+        default:
+          break;
+      }
+    }
+  };
+
   const handleSelectModal = ({item, type}: SelectProps) => {
     console.log(type, item);
     // FETCH-DOCNUM-DETAILS-ONSELECT
@@ -204,7 +259,6 @@ export const useDocumentHooks = () => {
   };
 
   const handlePost = ({item, type, customMessage}: PostProps) => {
-    // checkPostType(item, type);
     if (customMessage) {
       Alert.alert(`${customMessage.header}`, `${customMessage.body}`, [
         {
@@ -234,20 +288,16 @@ export const useDocumentHooks = () => {
     }
   };
 
-  const handleScan = async (
+  const handleScanDocument = async (
     {barcode, category}: ScanDocumentParams,
-    typeForFetching: TypeSelect
+    typeForFetching: ScanValidate
   ) => {
     if (!barcode) {
-      Alert.alert(
-        "Empty Barcode",
-        "Please make sure barcode field is filled.",
-        [
-          {
-            text: "OK",
-          },
-        ]
-      );
+      Alert.alert("Empty Barcode", "Please make sure barcode is filled.", [
+        {
+          text: "OK",
+        },
+      ]);
       return;
     }
     try {
@@ -258,25 +308,28 @@ export const useDocumentHooks = () => {
       console.log("incorrect barcode");
     }
   };
+
+  const handleScanItem = (
+    {barcode, receiveQty}: {barcode: string; receiveQty: number},
+    scanUsage: ScanValidate
+  ) => {
+    if (!barcode || receiveQty === 0) {
+      Alert.alert(
+        "Empty Fields",
+        "Please make sure barcode and quantity is filled.",
+        [
+          {
+            text: "OK",
+          },
+        ]
+      );
+      return;
+    }
+    checkScanType({barcode, receiveQty}, scanUsage);
+  };
   const validateBin = () => {
     alert("No api yet");
   };
-
-  // const removeScannedQuantity = (item: any) => {
-  //   // clear scanned items
-  //   Alert.alert(
-  //     "Remove Scanned Items",
-  //     `Are you sure you want to remove the scanned quantity of item line no. 1`,
-  //     [
-  //       {
-  //         text: "Yes",
-  //         onPress: () => alert("No api yet."),
-  //         style: "destructive",
-  //       },
-  //       {text: "No", style: "cancel"},
-  //     ]
-  //   );
-  // };
 
   const validateCycleCount = (item: any) => {
     alert("No api yet");
@@ -301,9 +354,9 @@ export const useDocumentHooks = () => {
     handleItemScanModal,
     closeItemScanModal,
     handlePost,
-    handleScan,
+    handleScanDocument,
+    handleScanItem,
     validateBin,
-    // removeScannedQuantity,
     validateCycleCount,
     validatePhysicalRecord,
   };

@@ -1,39 +1,37 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
 import axios from "axios";
 import {RootState} from "../store";
+import {ScanCategory} from "../../models/generic/ScanCategory";
 
 export interface ScanDocumentParams {
   barcode: string;
-  category:
-    | "wrr"
-    | "lpnum"
-    | "lpnnum_wto"
-    | "lpnnum_srto"
-    | "wrr_wto"
-    | "lpnnum_srto"
-    | "wrr_wto_outbound"
-    | "lpnnum_wto_outbound"
-    | "wpto"
-    | "wpto_item"
-    | "cc"
-    | "cc_item"
-    | "sloc"
-    | "sloc_item"
-    | "sloc_bin"
-    | "pir"
-    | "pir_item"
-    | "whrepto"
-    | "whrepto_item"
-    | "whrepto_bin"
-    | "bnt"
-    | "bnt_item"
-    | "bnt_bin"
-    | "spl"
-    | "spl_item"
-    | "dts"
-    | "dts_item"
-    | "tms_shop_doc"
-    | "tms_SO_item";
+  category: ScanCategory;
+  itmcde?: string;
+  untmea?: string;
+  copyline?: string;
+  intnum?: string;
+  linklpnnum?: string;
+  addbatch?: string;
+  docnum?: string;
+  lpnnum?: string;
+  pdtmanualqtyinbound?: string;
+  pdtmanualqtyoutbound?: string;
+  display_linenum?: number;
+  intqty?: number;
+  itmqty?: number;
+  srtqty?: number;
+  recid?: string;
+  scanlevel?: string;
+  barcodelvl2?: string;
+  refnum?: string;
+  usrnam?: string;
+  tms_docnum?: string;
+  spl_docnum?: string;
+  fromspl?: string;
+  tms_category?: string;
+  scanneditem?: string;
+  linenum?: string;
+  [key: string]: string | number | undefined;
 }
 interface BatchPayload {
   limit: number;

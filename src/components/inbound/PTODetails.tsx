@@ -1,13 +1,11 @@
-import {View, Text, StyleSheet, TouchableOpacity, Modal} from "react-native";
+import {View, Text, StyleSheet, TouchableOpacity} from "react-native";
 import React from "react";
 import {FontAwesome} from "@expo/vector-icons";
 import CustomButton from "../forms/buttons/CustomButton";
 import {bgColors} from "../../styles/styles";
 import {useDocumentHooks} from "../../hooks/documentHooks";
-import {useAppSelector} from "../../store/store";
 import {format} from "../../styles/styles";
 import {ProductData} from "../../models/generic/ProductData";
-import ItemScanModal from "../modals/ItemScanModal";
 import {useBatchHooks} from "../../hooks/batchHooks";
 import {formatDateStringMMDDYYYY} from "../../helper/Date";
 
@@ -20,13 +18,10 @@ interface Items {
   };
 }
 const PTOItems = React.memo((props: Items) => {
-  const {isScanItemModal} = useAppSelector((state) => state.modal);
-  const {handleItemScanModal, closeItemScanModal} = useDocumentHooks();
+  const {handleItemScanModal} = useDocumentHooks();
   const {handleAddBatchModal, handleEditBatchModal, removeScannedQuantity} =
     useBatchHooks();
   const {item, options} = props;
-
-  console.log(item.recid);
 
   return (
     <>
@@ -40,7 +35,7 @@ const PTOItems = React.memo((props: Items) => {
             {!options?.removeDelete && (
               <TouchableOpacity
                 onPress={() => {
-                  removeScannedQuantity(item);
+                  removeScannedQuantity(item, "pto");
                 }}
               >
                 <FontAwesome name="remove" size={24} color="black" />
@@ -48,6 +43,7 @@ const PTOItems = React.memo((props: Items) => {
             )}
           </View>
           <CustomButton
+            isDisable={item.itmqty === item.intqty}
             onPress={() => handleItemScanModal(item)}
             title="SCAN ITEM"
             type="regular"
@@ -94,6 +90,7 @@ const PTOItems = React.memo((props: Items) => {
           </View>
 
           <CustomButton
+            isDisable={item.itmqty === item.intqty}
             onPress={() => handleAddBatchModal(item)}
             title="ADD ANOTHER BATCHING"
             type="regular"
@@ -102,15 +99,6 @@ const PTOItems = React.memo((props: Items) => {
           />
         </View>
       </View>
-
-      {/* ilipat to */}
-      {isScanItemModal && (
-        <ItemScanModal
-          visible={isScanItemModal}
-          onClose={closeItemScanModal}
-          scanParams={{category: "bnt_item"}}
-        />
-      )}
     </>
   );
 });

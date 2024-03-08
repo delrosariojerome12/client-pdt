@@ -30,8 +30,6 @@ const AddBatchModal = React.memo(() => {
     handleCloseAddBatchModal,
   } = useBatchHooks();
 
-  console.log(item);
-
   if (item) {
     console.log("add batch modal");
     return (

@@ -9,7 +9,8 @@ import PhysicalInventoryDetails from "../physical-inventory/physicalInventoryDet
 import STGDetails from "../outbound/stgDetails";
 import AddBatchModal from "../modals/AddBatchModal";
 import EditBatchModal from "../modals/EditBatchModal";
-import {useBatchHooks} from "../../hooks/batchHooks";
+import ItemScanModal from "../modals/ItemScanModal";
+import {ScanCategory} from "../../models/generic/ScanCategory";
 
 interface Props {
   uses:
@@ -19,7 +20,7 @@ interface Props {
     | "stockTransfer"
     | "physicalInventory"
     | "stgDetails";
-  subcategory?: "srto" | "pto" | "wto-outbound" | "wavepick" | "stg-validate";
+  subcategory: "srto" | "pto" | "wto-outbound" | "wavepick" | "stg-validate";
   options?: {
     removeEdit?: boolean;
     removeDelete?: boolean;
@@ -92,7 +93,9 @@ const ItemsList = React.memo((props: Props) => {
       <>
         {isAddBatchModal && <AddBatchModal />}
         {isEditBatchModal && <EditBatchModal />}
-
+        {isScanItemModal && (
+          <ItemScanModal visible={isScanItemModal} scanType={subcategory} />
+        )}
         <View style={styles.container}>{renderView()}</View>
       </>
     );

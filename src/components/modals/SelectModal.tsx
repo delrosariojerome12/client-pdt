@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {
   Modal,
   View,
@@ -37,10 +37,9 @@ const SelectModal = React.memo((props: SelectModalProps) => {
   } = props;
   const {status, statusText} = useAppSelector((state) => state.status);
 
-  // if (loadingStatus) {
-  //   return <LoadingSpinner />;
-  // }
-  console.log(statusText);
+  useEffect(() => {
+    console.log("select modal fetch");
+  }, []);
 
   if (selectedItem) {
     return (
