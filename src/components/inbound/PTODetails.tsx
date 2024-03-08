@@ -26,13 +26,15 @@ const PTOItems = React.memo((props: Items) => {
     useBatchHooks();
   const {item, options} = props;
 
+  console.log(item.recid);
+
   return (
     <>
       <View style={[styles.container, bgColors.mediumGrayishBG]}>
         <View style={styles.leftContainer}>
           <Text>{item.itmcde}</Text>
           <Text>{item.itmdsc}</Text>
-          <Text>{`${item.intqty} PCS`}</Text>
+          <Text>{`${item.intqty || ""} PCS`}</Text>
           <View style={styles.remove}>
             <Text>{`Received Qty: ${item.itmqty}`}</Text>
             {!options?.removeDelete && (

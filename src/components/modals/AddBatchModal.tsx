@@ -11,7 +11,6 @@ import CustomButton from "../forms/buttons/CustomButton";
 import {FontAwesome5, FontAwesome} from "@expo/vector-icons";
 import {format} from "../../styles/styles";
 import {useAppSelector} from "../../store/store";
-import {useDocumentHooks} from "../../hooks/documentHooks";
 import {formatDateDDMMYYYY} from "../../helper/Date";
 import {useBatchHooks} from "../../hooks/batchHooks";
 import CustomLoadingText from "../load-spinner/CustomLoadingText";
@@ -30,6 +29,8 @@ const AddBatchModal = React.memo(() => {
     handlePostAnotherBatch,
     handleCloseAddBatchModal,
   } = useBatchHooks();
+
+  console.log(item);
 
   if (item) {
     console.log("add batch modal");
@@ -67,7 +68,7 @@ const AddBatchModal = React.memo(() => {
                 </Text>
                 <View style={format.twoRowText}>
                   <Text style={{fontWeight: "bold"}}>Line No: </Text>
-                  <Text>{item.copyline}</Text>
+                  <Text>{item.linenum}</Text>
                 </View>
                 <View style={format.twoRowText}>
                   <Text style={{fontWeight: "bold"}}>Item Code: </Text>

@@ -7,7 +7,11 @@ import {
   handleToggleSearchBatchModal,
 } from "../reducers/modalReducer";
 import {handleSetBatchItem} from "../reducers/documentReducer";
-import {getBatch, updateBatch} from "../store/actions/generalActions";
+import {
+  getBatch,
+  updateBatch,
+  deleteScanQuantity,
+} from "../store/actions/generalActions";
 import {
   setMfgDate,
   setBatchNo,
@@ -18,6 +22,8 @@ import {
 } from "../reducers/generalReducer";
 import {useDocumentHooks} from "./documentHooks";
 import {formatDateYYYYMMDD} from "../helper/Date";
+import {setStatusText} from "../reducers/statusReducer";
+import {useAPIHooks} from "./apiHooks";
 type Uses = "update" | "create";
 
 export const useBatchHooks = () => {
@@ -29,6 +35,7 @@ export const useBatchHooks = () => {
   } = useAppSelector((state) => state.general);
   const dispatch = useAppDispatch();
   const {handlePost} = useDocumentHooks();
+  const {connectToPHPNotDispatch} = useAPIHooks();
 
   const handleMfgDate = (newDate: any) => {
     dispatch(setMfgDate(newDate));
@@ -57,6 +64,7 @@ export const useBatchHooks = () => {
         },
       ]);
     } else {
+      dispatch(setStatusText(`New Batch Added Successfully.`));
       handlePost({
         item: selectedBatchItem,
         type: "pto-add-batch",
@@ -76,6 +84,7 @@ export const useBatchHooks = () => {
           text: "Yes",
           onPress: () => {
             dispatch(setBatchedSaved(true));
+
             dispatch(
               updateBatch({
                 document: {
@@ -93,6 +102,11 @@ export const useBatchHooks = () => {
                   },
                 },
                 onSuccess: () => {
+                  dispatch(
+                    setStatusText(
+                      ` '${selectedBatchItem.lpnnum}': Batch Details Successfully Updated.`
+                    )
+                  );
                   handleCloseEditBatchModal();
                   dispatch(getPTODetails({docnum: selectedDocument.docnum}));
                 },
@@ -109,18 +123,41 @@ export const useBatchHooks = () => {
     // clear scanned items
     Alert.alert(
       "Remove Scanned Quantity",
-      `Are you sure you want to remove the scanned quantity of item: '${selectedBatchItem.itmdsc}'`,
+      `Are you sure you want to remove the scanned quantity of item: '${item.itmdsc}'`,
       [
         {
           text: "Yes",
-          onPress: () => alert("No api yet."),
+          onPress: () => {
+            dispatch(
+              deleteScanQuantity({
+                document: {
+                  data: {doclock: "Y", pdtopen: "Y"},
+                  field: {docnum: selectedDocument.docnum},
+                },
+                item: {
+                  data: {itmqty: 0},
+                  field: {recid: item.recid},
+                },
+                lpnnum: item.lpnnum,
+                onSuccess: () => {
+                  dispatch(
+                    setStatusText(`Scanned Quantity Removed: '${item.lpnnum}'`)
+                  );
+                  dispatch(getPTODetails({docnum: selectedDocument.docnum}));
+                  connectToPHPNotDispatch({
+                    recid: item.recid,
+                    docnum: selectedDocument.docnum,
+                    type: "rearrangelinennum",
+                  });
+                },
+              })
+            );
+          },
           style: "destructive",
         },
         {text: "No", style: "cancel"},
       ]
     );
-    console.log("remove", item);
-    console.log("parent", selectedDocument);
   };
 
   // const handleClose = () => {

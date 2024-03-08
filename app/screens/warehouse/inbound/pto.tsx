@@ -39,7 +39,12 @@ const PTO = () => {
   const {handleScanModal, handleSelectModal, closeSelectModal, handlePost} =
     useDocumentHooks();
 
-  // if (pto.status === "loading" && !refreshing && !isPaginating) {
+  // if (
+  //   pto.status === "loading" &&
+  //   !refreshing &&
+  //   !isPaginating &&
+  //   status === "idle"
+  // ) {
   //   return <LoadingSpinner />;
   // }
 
@@ -91,6 +96,7 @@ const PTO = () => {
               onClose={handleScanModal}
               placeholder="Waiting to Scan WRR Barcode"
               scanParams={{category: "wrr"}}
+              typeForFetching="pto"
             />
           )}
 

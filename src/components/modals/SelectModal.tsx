@@ -35,12 +35,12 @@ const SelectModal = React.memo((props: SelectModalProps) => {
     customContent,
     loadingStatus,
   } = props;
-  const {status} = useAppSelector((state) => state.status);
+  const {status, statusText} = useAppSelector((state) => state.status);
 
   // if (loadingStatus) {
   //   return <LoadingSpinner />;
   // }
-  console.log(status);
+  console.log(statusText);
 
   if (selectedItem) {
     return (
@@ -48,8 +48,8 @@ const SelectModal = React.memo((props: SelectModalProps) => {
         {status === "success" && (
           <MessageToast
             status="success"
-            text={"Batch Details Successfully Updated."}
-            speed={2000}
+            text={statusText}
+            speed={2500}
             customPosition={[-150, -10]}
           />
         )}

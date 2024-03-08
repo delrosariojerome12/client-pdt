@@ -1,6 +1,10 @@
 import {createSlice} from "@reduxjs/toolkit";
-import {connectToPHP} from "../store/actions/generalActions";
-import {updateBatch} from "../store/actions/generalActions";
+import {
+  connectToPHP,
+  updateBatch,
+  deleteScanQuantity,
+} from "../store/actions/generalActions";
+
 interface Status {
   status: "idle" | "loading" | "success" | "failed";
   statusText: string; // custom message for statuses
@@ -21,6 +25,9 @@ const statusReducer = createSlice({
     },
     setStatusText: (state, action) => {
       state.statusText = action.payload;
+    },
+    setStatus: (state, action) => {
+      state.status = action.payload;
     },
   },
   extraReducers(builder) {
@@ -49,9 +56,21 @@ const statusReducer = createSlice({
       .addCase(updateBatch.rejected, (state) => {
         state.status = "failed";
       });
+
+    builder
+      .addCase(deleteScanQuantity.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(deleteScanQuantity.fulfilled, (state, action) => {
+        console.log(action.payload);
+        state.status = "success";
+      })
+      .addCase(deleteScanQuantity.rejected, (state) => {
+        state.status = "failed";
+      });
   },
 });
 
-export const {resetStatus, setStatusText} = statusReducer.actions;
+export const {resetStatus, setStatusText, setStatus} = statusReducer.actions;
 
 export default statusReducer.reducer;

@@ -13,6 +13,9 @@ import CustomButton from "../forms/buttons/CustomButton";
 import {useDocumentHooks} from "../../hooks/documentHooks";
 import {FontAwesome5} from "@expo/vector-icons";
 import {ScanCategory} from "../../models/generic/ScanCategory";
+import {TypeSelect} from "../../hooks/documentHooks";
+import CustomLoadingText from "../load-spinner/CustomLoadingText";
+import {useAppSelector} from "../../store/store";
 
 interface ScanModalProps {
   visible: boolean;
@@ -20,67 +23,74 @@ interface ScanModalProps {
   placeholder: string;
   isNextBtn?: boolean;
   scanParams: ScanCategory;
+  typeForFetching: TypeSelect;
 }
 
 const ScanModal = React.memo((props: ScanModalProps) => {
+  const {status} = useAppSelector((state) => state.status);
   const {handleScan, validateBin} = useDocumentHooks();
-  const {visible, onClose, placeholder, isNextBtn, scanParams} = props;
+  const {
+    visible,
+    onClose,
+    placeholder,
+    isNextBtn,
+    scanParams,
+    typeForFetching,
+  } = props;
   const [scanfield, setScanfield] = useState<string>("");
-  const [binfield, setBinfield] = useState<string>("");
-  const [itemDetails, setItemDetails] = useState<any | null>(null);
-
-  // const [itemDetails, setItemDetails] = useState<any | null>({
-  //   itemCode: "ABC123",
-  //   itemName: "Item 1",
-  //   pieces: 5,
-  //   receiveQty: 5,
-  //   LPNNumber: "LPN123",
-  //   batchNumber: "BATCH001",
-  //   mfgDate: "2023-01-01",
-  //   expDate: "2024-12-31",
-  // });
+  // const [binfield, setBinfield] = useState<string>("");
+  // const [itemDetails, setItemDetails] = useState<any | null>(null);
 
   const handleOnChange = (key: string, value: string | number) => {
     setScanfield(String(value));
   };
 
-  const handleBinChange = (key: string, value: string | number) => {
-    setBinfield(String(value));
-  };
+  // const handleBinChange = (key: string, value: string | number) => {
+  // setBinfield(String(value));
+  // };
 
   const renderButtons = () => {
-    if (!itemDetails) {
-      if (isNextBtn) {
-        return (
-          <CustomButton
-            onPress={() =>
-              handleScan({barcode: scanfield, category: scanParams.category})
-            }
-            title="Next"
-            type="regular"
-            isWidthNotFull={true}
-          />
-        );
-      }
+    // if (!itemDetails) {
+    if (isNextBtn) {
       return (
-        <View style={styles.buttonContainer}>
-          <CustomButton
-            onPress={() =>
-              handleScan({barcode: scanfield, category: scanParams.category})
-            }
-            title="Continue"
-            type="regular"
-            isWidthNotFull={true}
-          />
-          <CustomButton
-            onPress={onClose}
-            title="Close"
-            type="delete"
-            isWidthNotFull={true}
-          />
-        </View>
+        <CustomButton
+          onPress={() =>
+            handleScan(
+              {barcode: scanfield, category: scanParams.category},
+              typeForFetching
+            )
+          }
+          title="Next"
+          type="regular"
+          isWidthNotFull={true}
+          useFlex={true}
+        />
       );
     }
+    return (
+      <View style={styles.buttonContainer}>
+        <CustomButton
+          onPress={() =>
+            handleScan(
+              {barcode: scanfield, category: scanParams.category},
+              typeForFetching
+            )
+          }
+          title="Continue"
+          type="regular"
+          isWidthNotFull={true}
+          useFlex={true}
+        />
+        <CustomButton
+          onPress={onClose}
+          title="Close"
+          type="delete"
+          isWidthNotFull={true}
+          useFlex={true}
+        />
+      </View>
+    );
+    // }
   };
 
   console.log("scan modal");
@@ -88,6 +98,9 @@ const ScanModal = React.memo((props: ScanModalProps) => {
   return (
     <Modal visible={visible} onRequestClose={onClose} transparent>
       <View style={styles.centeredView}>
+        {status === "loading" && (
+          <CustomLoadingText text="Searching..." visible={true} />
+        )}
         <ScrollView contentContainerStyle={styles.scrollViewContent}>
           <View style={styles.modalView}>
             <View style={styles.headerContainer}>
@@ -97,19 +110,25 @@ const ScanModal = React.memo((props: ScanModalProps) => {
               <Text style={styles.headerText}>Scan Barcode</Text>
             </View>
 
-            <View>
-              <CustomInputs
-                onInputChange={handleOnChange}
-                inputValue={scanfield}
-                type="text"
-                placeHolder={placeholder}
-                inputKey="scan"
-              />
-            </View>
+            {/* <View> */}
+            <CustomInputs
+              onSubmit={() => {
+                handleScan(
+                  {barcode: scanfield, category: scanParams.category},
+                  typeForFetching
+                );
+              }}
+              onInputChange={handleOnChange}
+              inputValue={scanfield}
+              type="text"
+              placeHolder={placeholder}
+              inputKey="scan"
+            />
+            {/* </View> */}
 
             {renderButtons()}
 
-            {itemDetails && (
+            {/* {itemDetails && (
               <>
                 <View style={styles.itemContainer}>
                   <Text style={styles.floatingText}>Item Details</Text>
@@ -137,7 +156,7 @@ const ScanModal = React.memo((props: ScanModalProps) => {
                   isWidthNotFull={true}
                 />
               </>
-            )}
+            )} */}
           </View>
         </ScrollView>
       </View>

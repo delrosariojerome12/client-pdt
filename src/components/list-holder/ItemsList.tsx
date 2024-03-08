@@ -10,6 +10,7 @@ import STGDetails from "../outbound/stgDetails";
 import AddBatchModal from "../modals/AddBatchModal";
 import EditBatchModal from "../modals/EditBatchModal";
 import {useBatchHooks} from "../../hooks/batchHooks";
+
 interface Props {
   uses:
     | "inbound"
@@ -36,7 +37,6 @@ const ItemsList = React.memo((props: Props) => {
   const {wtoOutboundDetails, wavepickDetails, stgDetails} = useAppSelector(
     (state) => state.outbound
   );
-  const {handleCloseAddBatchModal, handleCloseEditBatchModal} = useBatchHooks();
   const renderItems = (item: any, index: number) => {
     switch (uses) {
       case "inbound":

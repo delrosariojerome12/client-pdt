@@ -1,59 +1,12 @@
-import {createAsyncThunk} from "@reduxjs/toolkit";
+import {useAppSelector, useAppDispatch} from "../store/store";
+import {ScanDocumentParams} from "../store/actions/generalActions";
 import axios from "axios";
-import {RootState} from "../store";
-
-export interface ScanDocumentParams {
-  barcode: string;
-  category:
-    | "wrr"
-    | "lpnum"
-    | "lpnnum_wto"
-    | "lpnnum_srto"
-    | "wrr_wto"
-    | "lpnnum_srto"
-    | "wrr_wto_outbound"
-    | "lpnnum_wto_outbound"
-    | "wpto"
-    | "wpto_item"
-    | "cc"
-    | "cc_item"
-    | "sloc"
-    | "sloc_item"
-    | "sloc_bin"
-    | "pir"
-    | "pir_item"
-    | "whrepto"
-    | "whrepto_item"
-    | "whrepto_bin"
-    | "bnt"
-    | "bnt_item"
-    | "bnt_bin"
-    | "spl"
-    | "spl_item"
-    | "dts"
-    | "dts_item"
-    | "tms_shop_doc"
-    | "tms_SO_item";
-}
-interface BatchPayload {
-  limit: number;
-  offset: number;
-  itmcde: string;
-  paginating?: boolean;
-}
-
-interface PutawayDetails {
-  limit: number;
-  offset: number;
-  category: "PUR" | "WHS" | "SRTO";
-}
-
+import {Alert} from "react-native";
+import {setStatus} from "../reducers/statusReducer";
 interface ConnectToPHPParams {
   recid: any;
   docnum: string;
   type: string;
-  onSuccess: () => void;
-  onFailure: (e: any) => void;
   refnum?: string;
   lpnnum?: string;
   itmcde?: string;
@@ -66,104 +19,16 @@ interface ConnectToPHPParams {
   soconum?: string;
 }
 
-interface BatchUpdate {
-  document: {
-    field: {
-      docnum: string;
-    };
-    data: {
-      pdtopen: "Y";
-      doclock: "Y";
-    };
-  };
-  item: {
-    field: {
-      lpnnum: string;
-    };
-    data: {
-      mdgdte: string;
-      expdte: string;
-      batchnum: string;
-    };
-  };
-  onSuccess: () => void;
-}
-interface RemoveQuantity {
-  document: {
-    field: {
-      docnum: string;
-    };
-    data: {
-      pdtopen: "Y";
-      doclock: "Y";
-    };
-  };
-  item: {
-    field: {
-      recid: number;
-    };
-    data: {
-      itmqty: 0;
-    };
-  };
-  lpnnum: string;
-  onSuccess: () => void;
-}
+// uses: mostly for not requiring to monitor statuses
+export const useAPIHooks = () => {
+  const {
+    user: {userDetails, sesid},
+    phpServer: {traccDomain, traccDirectory},
+    server: {ipAddress, port, protocol},
+  } = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
 
-export const getDocument = createAsyncThunk(
-  "general/getDocument",
-  async (
-    {barcode, category}: ScanDocumentParams,
-    {rejectWithValue, getState}
-  ) => {
-    try {
-      const state = getState() as RootState;
-      const {ipAddress, port, protocol} = state.auth.server;
-
-      const url = `${protocol}://${ipAddress}:${port}/api/scanBarcode/?barcode=${barcode}&category=${category}`;
-
-      const response = await axios.get(url);
-      console.log("eto");
-
-      console.log(response.data);
-
-      return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-export const getPutaway = createAsyncThunk(
-  "general/getPutaway",
-  async (
-    {category, limit, offset}: PutawayDetails,
-    {rejectWithValue, getState}
-  ) => {
-    try {
-      const state = getState() as RootState;
-      const {ipAddress, port, protocol} = state.auth.server;
-
-      const url = `${protocol}://${ipAddress}:${port}/api/getPutawayTO/?category=${category}&limit=${limit}&offset=${offset}}`;
-
-      const response = await axios.get(url);
-
-      return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-export const connectToPHP = createAsyncThunk(
-  "general/connectToPHP",
-  async (props: ConnectToPHPParams, {rejectWithValue, getState}) => {
-    const state = getState() as RootState;
-    const {
-      user: {userDetails, sesid},
-      phpServer: {traccDomain, traccDirectory},
-    } = state.auth;
-
+  const connectToPHPNotDispatch = async (props: ConnectToPHPParams) => {
     const {
       docnum,
       recid,
@@ -178,24 +43,22 @@ export const connectToPHP = createAsyncThunk(
       refnum = "",
       soconum = "",
       spldocnum = "",
-      onFailure,
-      onSuccess,
     } = props;
 
-    if (!userDetails || !sesid) {
-      console.log("sesid missing and userdetails");
-      onFailure("User details or sesid missing");
-      return rejectWithValue("User details or sesid missing");
+    console.log(userDetails, sesid);
+
+    if (!userDetails?.usrcde) {
+      throw new Error("Missing Usercode");
+    }
+    if (!sesid) {
+      throw new Error("Missing Session ID");
     }
     if (!traccDirectory || !traccDomain) {
-      console.log("domain and dir are missing");
-      onFailure("Missing Domain and Directory");
-      return rejectWithValue("Missing Domain and Directory");
+      throw new Error("Missing TRACC Domain or Directory");
     }
-
     const formData = new FormData();
     formData.append("asdfglmiwms", sesid);
-    formData.append("pdt_usrcde", userDetails.usrcde);
+    formData.append("pdt_usrcde", userDetails?.usrcde);
     formData.append("from_pdt", "true");
 
     let targerPPHP = "",
@@ -492,117 +355,38 @@ export const connectToPHP = createAsyncThunk(
       console.log("sukli", formattedResult);
 
       if (formattedResult.bool) {
-        onSuccess();
+        console.log("connect php success");
         return formattedResult;
       } else {
-        onFailure(formattedResult.pdtmsg["1"]);
-        return rejectWithValue("Missing Domain and Directory");
+        console.log("connect php error");
+        throw new Error(formattedResult.pdtmsg["1"] || formattedResult.msg);
       }
     } catch (error: any) {
       console.log(error);
-      onFailure(error);
-      return rejectWithValue(error.message);
+      throw new Error(error);
     }
-  }
-);
+  };
 
-export const getBatch = createAsyncThunk(
-  "general/getBatch",
-  async (
-    {limit, offset, paginating, itmcde}: BatchPayload,
-    {rejectWithValue, getState}
-  ) => {
+  const scanBarcode = async ({barcode, category}: ScanDocumentParams) => {
+    dispatch(setStatus("loading"));
     try {
-      const state = getState() as RootState;
-      const {ipAddress, port, protocol} = state.auth.server;
-
-      const url = `${protocol}://${ipAddress}:${port}/api/lst_tracc/batchfile?itmcde=${itmcde}&_limit=${limit}&_offset=${offset}`;
-
-      console.log("daan", url);
-
+      const url = `${protocol}://${ipAddress}:${port}/api/scanBarcode/?barcode=${barcode}&category=${category}`;
       const response = await axios.get(url);
-
-      return {
-        data: response.data,
-        paginating: paginating,
-      };
+      if (response.data.bool) {
+        dispatch(setStatus("success"));
+        return response.data;
+      } else {
+        dispatch(setStatus("failed"));
+        Alert.alert("Something Went Wrong", response.data.message, [
+          {
+            text: "OK",
+          },
+        ]);
+      }
     } catch (error: any) {
-      console.log("mali:", error);
-      return rejectWithValue(error.message);
+      dispatch(setStatus("failed"));
+      console.log(error);
     }
-  }
-);
-
-export const updateBatch = createAsyncThunk(
-  "general/updateBatch",
-  async (
-    {document, item, onSuccess}: BatchUpdate,
-    {rejectWithValue, getState}
-  ) => {
-    try {
-      const state = getState() as RootState;
-      const {ipAddress, port, protocol} = state.auth.server;
-
-      const url1 = `${protocol}://${ipAddress}:${port}/api/lst_tracc/purchasetofile1`;
-      const url2 = `${protocol}://${ipAddress}:${port}/api/lst_tracc/purchasetofile2`;
-
-      const responseDocument = await axios.patch(url1, document);
-      const responseItem = await axios.patch(url2, item);
-
-      onSuccess();
-
-      console.log(responseDocument);
-      console.log(responseItem);
-
-      return {
-        item: responseItem.data,
-        document: responseDocument.data,
-      };
-    } catch (error: any) {
-      console.log("mali:", error);
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-// delete gagawin natin bukas at search
-export const deleteScanQuantity = createAsyncThunk(
-  "general/deleteScanQuantity",
-  async (
-    {document, item, onSuccess, lpnnum}: RemoveQuantity,
-    {rejectWithValue, getState}
-  ) => {
-    try {
-      const state = getState() as RootState;
-      const {ipAddress, port, protocol} = state.auth.server;
-
-      const url1 = `${protocol}://${ipAddress}:${port}/api/lst_tracc/purchasetofile1`;
-      const url2 = `${protocol}://${ipAddress}:${port}/api/lst_tracc/purchasetofile2`;
-      const url3 = `${protocol}://${ipAddress}:${port}/api/lst_tracc/purchasetofile2?linklpnnum=${lpnnum}`;
-
-      const responseDocument = await axios.patch(url1, document);
-      const responseItem = await axios.patch(url2, item);
-      const responseDeleteLPN = await axios.delete(url3);
-
-      console.log("payload");
-      console.log(document);
-      console.log(item);
-      console.log(url3);
-
-      onSuccess();
-
-      console.log("response");
-      console.log(responseDocument);
-      console.log(responseItem);
-      console.log(responseDeleteLPN);
-
-      return {
-        item: responseItem.data,
-        document: responseDocument.data,
-      };
-    } catch (error: any) {
-      console.log("mali:", error);
-      return rejectWithValue(error.message);
-    }
-  }
-);
+  };
+  return {connectToPHPNotDispatch, scanBarcode};
+};

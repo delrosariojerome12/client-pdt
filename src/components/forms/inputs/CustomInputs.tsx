@@ -3,6 +3,7 @@ import React from "react";
 
 interface CustomInputsProps {
   onInputChange: (key: string, value: number | string) => void;
+  onSubmit?: () => void;
   type: "text" | "numeric";
   inputValue: number | string;
   placeHolder: string;
@@ -22,6 +23,7 @@ const CustomInputs = (props: CustomInputsProps) => {
     customWidth,
     useFlex,
     isFocus,
+    onSubmit,
   } = props;
 
   const handleChange = (value: string) => {
@@ -46,6 +48,7 @@ const CustomInputs = (props: CustomInputsProps) => {
       }}
     >
       <TextInput
+        onSubmitEditing={onSubmit}
         autoFocus={isFocus ? true : false}
         style={styles.input}
         placeholder={placeHolder}

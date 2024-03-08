@@ -30,7 +30,7 @@ import {connectToPHP} from "../store/actions/generalActions";
 import {resetStatus} from "../reducers/statusReducer";
 import {formatDateYYYYMMDD} from "../helper/Date";
 import {clearBatchDetails} from "../reducers/generalReducer";
-
+import {useAPIHooks} from "./apiHooks";
 interface SearchContent {
   content: "warehouse" | "bin" | "item";
 }
@@ -59,15 +59,13 @@ export interface PostProps {
 }
 
 export const useDocumentHooks = () => {
-  const {selectedDocument, selectedBatchItem} = useAppSelector(
-    (state) => state.document
-  );
+  const {selectedDocument} = useAppSelector((state) => state.document);
   const {
     batchDetails: {batchNo, expDate, mfgDate},
   } = useAppSelector((state) => state.general);
 
   const dispatch = useAppDispatch();
-  // const {connectToPHP} = useConnectPHPHook();
+  const {scanBarcode} = useAPIHooks();
 
   // checking uses
   const checkSelectType = ({item, type}: SelectProps) => {
@@ -236,35 +234,49 @@ export const useDocumentHooks = () => {
     }
   };
 
-  const handleScan = ({barcode, category}: ScanDocumentParams) => {
+  const handleScan = async (
+    {barcode, category}: ScanDocumentParams,
+    typeForFetching: TypeSelect
+  ) => {
     if (!barcode) {
-      alert("Please make sure barcode field is filled.");
-    } else {
-      console.log("shet");
-      dispatch(getDocument({barcode, category}));
+      Alert.alert(
+        "Empty Barcode",
+        "Please make sure barcode field is filled.",
+        [
+          {
+            text: "OK",
+          },
+        ]
+      );
+      return;
+    }
+    try {
+      const response = await scanBarcode({barcode, category});
+      handleSelectModal({item: response.data, type: typeForFetching});
+      handleScanModal();
+    } catch (error) {
+      console.log("incorrect barcode");
     }
   };
   const validateBin = () => {
     alert("No api yet");
   };
 
-  const removeScannedQuantity = (item: any) => {
-    // clear scanned items
-    Alert.alert(
-      "Remove Scanned Items",
-      `Are you sure you want to remove the scanned quantity of item line no. 1`,
-      [
-        {
-          text: "Yes",
-          onPress: () => alert("No api yet."),
-          style: "destructive",
-        },
-        {text: "No", style: "cancel"},
-      ]
-    );
-    console.log("remove", item);
-    console.log("parent", selectedDocument);
-  };
+  // const removeScannedQuantity = (item: any) => {
+  //   // clear scanned items
+  //   Alert.alert(
+  //     "Remove Scanned Items",
+  //     `Are you sure you want to remove the scanned quantity of item line no. 1`,
+  //     [
+  //       {
+  //         text: "Yes",
+  //         onPress: () => alert("No api yet."),
+  //         style: "destructive",
+  //       },
+  //       {text: "No", style: "cancel"},
+  //     ]
+  //   );
+  // };
 
   const validateCycleCount = (item: any) => {
     alert("No api yet");
@@ -291,7 +303,7 @@ export const useDocumentHooks = () => {
     handlePost,
     handleScan,
     validateBin,
-    removeScannedQuantity,
+    // removeScannedQuantity,
     validateCycleCount,
     validatePhysicalRecord,
   };
