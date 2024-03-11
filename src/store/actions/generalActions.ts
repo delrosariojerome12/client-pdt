@@ -182,7 +182,7 @@ export const connectToPHP = createAsyncThunk(
 
     if (!userDetails || !sesid) {
       console.log("sesid missing and userdetails");
-      onFailure("User details or sesid missing");
+      onFailure("User details or sesid missing. Try re-logging in.");
       return rejectWithValue("User details or sesid missing");
     }
     if (!traccDirectory || !traccDomain) {
@@ -231,6 +231,15 @@ export const connectToPHP = createAsyncThunk(
         formData.append("event_action", event_action);
         formData.append("recid", recid);
         formData.append("docnum", docnum);
+        break;
+
+      case "PTAPUR":
+        targerPPHP = "trn_putawayto_ajax.php";
+        event_action = "postputawayto";
+
+        formData.append("event_action", event_action);
+        formData.append("recid", recid);
+        formData.append("intnum", docnum);
         break;
 
       case "chk_binbatch_onhand":
@@ -298,15 +307,6 @@ export const connectToPHP = createAsyncThunk(
         formData.append("event_action", event_action);
         formData.append("recid", recid);
         formData.append("docnum", docnum);
-        break;
-
-      case "PTAPUR":
-        targerPPHP = "trn_putawayto_ajax.php";
-        event_action = "postputawayto";
-
-        formData.append("event_action", event_action);
-        formData.append("recid", recid);
-        formData.append("intnum", docnum);
         break;
 
       case "PTAWHS":
@@ -493,8 +493,31 @@ export const connectToPHP = createAsyncThunk(
         onSuccess();
         return formattedResult;
       } else {
-        onFailure(formattedResult.pdtmsg["1"]);
-        return rejectWithValue("Missing Domain and Directory");
+        if (formattedResult.msg) {
+          const listItemRegex = /<li>(.*?)<\/li>/g;
+          const listItems = [];
+          let match;
+          while ((match = listItemRegex.exec(formattedResult.msg)) !== null) {
+            listItems.push(match[1]);
+          }
+
+          const formattedList = listItems
+            .map((item, index) => `• Item Line ${index + 1}: ${item}`)
+            .join("\n");
+
+          onFailure(formattedList);
+          return rejectWithValue(formattedList);
+        }
+        if (formattedResult.pdtmsg) {
+          let errorMessage = "Something Went Wrong";
+          const errorKeys = Object.keys(formattedResult.pdtmsg);
+          errorKeys.forEach((key) => {
+            const errorMessages = formattedResult.pdtmsg[key];
+            errorMessage += `\n${errorMessages.join(", ")}`;
+          });
+          onFailure(errorMessage || formattedResult.msg);
+          return rejectWithValue(errorMessage);
+        }
       }
     } catch (error: any) {
       console.log(error);
@@ -563,7 +586,6 @@ export const updateBatch = createAsyncThunk(
   }
 );
 
-// delete gagawin natin bukas at search
 export const deleteScanQuantity = createAsyncThunk(
   "general/deleteScanQuantity",
   async (

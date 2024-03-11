@@ -9,7 +9,7 @@ import {
 import {Table, Row, Rows} from "react-native-reanimated-table";
 import {generalStyles} from "../../../styles/styles";
 import {SelectProps, PostProps} from "../../../hooks/documentHooks";
-import {TypeSelect, TypePost} from "../../../hooks/documentHooks";
+import {TypeSelect, TypePost, ButtonUses} from "../../../hooks/documentHooks";
 
 interface TableProps {
   tableHeaders: string[];
@@ -22,6 +22,11 @@ interface TableProps {
   onBatchSelect?: (batchItem: any) => void;
   selectType?: TypeSelect;
   postType?: TypePost;
+  // attributeChecker: {
+  // select: string;
+  // post: string;
+  // };
+  buttonUses: ButtonUses;
 }
 
 const CustomTable = (props: TableProps) => {
@@ -36,7 +41,28 @@ const CustomTable = (props: TableProps) => {
     onBatchSelect,
     selectType,
     postType,
+    // attributeChecker,
+    buttonUses,
   } = props;
+
+  const correctButtonStatus = (rowData: any, buttonType: "post" | "select") => {
+    switch (buttonUses) {
+      case "pto":
+        switch (buttonType) {
+          case "post":
+            return rowData.posted ? true : false;
+          case "select":
+            return rowData.validated ? true : false;
+        }
+      case "pur":
+        if (rowData.for_posting === false) {
+          return true;
+        }
+        return false;
+      default:
+        break;
+    }
+  };
 
   const renderButtons = (rowData: any) => {
     return (
@@ -56,9 +82,11 @@ const CustomTable = (props: TableProps) => {
           <TouchableOpacity
             style={[
               styles.buttons,
-              rowData.validated ? {opacity: 0.7, backgroundColor: "gray"} : {},
+              correctButtonStatus(rowData, "select")
+                ? {opacity: 0.7, backgroundColor: "gray"}
+                : {},
             ]}
-            disabled={rowData.validated}
+            disabled={correctButtonStatus(rowData, "select")}
             onPress={() =>
               onSelect &&
               selectType &&
@@ -73,9 +101,11 @@ const CustomTable = (props: TableProps) => {
           <TouchableOpacity
             style={[
               styles.postbutton,
-              rowData.posted ? {opacity: 0.7, backgroundColor: "gray"} : {},
+              correctButtonStatus(rowData, "post")
+                ? {opacity: 0.7, backgroundColor: "gray"}
+                : {},
             ]}
-            disabled={rowData.posted}
+            disabled={correctButtonStatus(rowData, "post")}
             onPress={() =>
               onPost && postType && onPost({item: rowData, type: postType})
             }

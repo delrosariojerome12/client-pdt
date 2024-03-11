@@ -26,12 +26,23 @@ import {clearBatchDetails} from "../reducers/generalReducer";
 import {useAPIHooks} from "./apiHooks";
 import {setStatusText} from "../reducers/statusReducer";
 
+export type ButtonUses =
+  | "pto"
+  | "pur"
+  | "wto"
+  | "whs"
+  | "srto"
+  | "wto-outbound"
+  | "wavepick";
+
 interface SearchContent {
   content: "warehouse" | "bin" | "item";
 }
 export type TypePost = "pto" | "pur" | "pto-add-batch";
+
 export type ScanValidate =
   | "pto"
+  | "pur"
   | "srto"
   | "wto-outbound"
   | "wavepick"
@@ -71,7 +82,9 @@ export const useDocumentHooks = () => {
   } = useAppSelector((state) => state.general);
 
   const dispatch = useAppDispatch();
-  const {scanBarcode} = useAPIHooks();
+  const {scanBarcode, getLPN} = useAPIHooks();
+
+  // start check categories and uses functions
 
   const checkSelectType = ({item, type}: SelectProps) => {
     console.log(type);
@@ -98,6 +111,8 @@ export const useDocumentHooks = () => {
   };
 
   const checkPostType = (item: any, type: TypePost) => {
+    console.log("tingin", item);
+
     switch (type) {
       case "pto":
         dispatch(
@@ -110,7 +125,7 @@ export const useDocumentHooks = () => {
             },
             onFailure: (e) => {
               dispatch(resetStatus());
-              Alert.alert("Transaction Posting", `Something Went Wrong: ${e}`, [
+              Alert.alert("Transaction Posting Fail", `${e}`, [
                 {
                   text: "Ok",
                   onPress: () => {},
@@ -125,13 +140,22 @@ export const useDocumentHooks = () => {
         dispatch(
           connectToPHP({
             recid: item.recid,
-            docnum: item.docnum,
+            docnum: item.intnum,
             type: "PTAPUR",
             onSuccess: () => {
               dispatch(getPUR({limit: 10, offset: 0}));
               dispatch(resetStatus());
             },
-            onFailure: () => {},
+            onFailure: (e) => {
+              dispatch(resetStatus());
+              Alert.alert("Transaction Posting", ` ${e}`, [
+                {
+                  text: "Ok",
+                  onPress: () => {},
+                  style: "destructive",
+                },
+              ]);
+            },
           })
         );
         break;
@@ -156,13 +180,17 @@ export const useDocumentHooks = () => {
               dispatch(handleToggleAddBatchModal());
             },
             onFailure: (e) => {
-              Alert.alert("Batch Details Posting", `Something Went Wrong`, [
-                {
-                  text: "Ok",
-                  onPress: () => {},
-                  style: "destructive",
-                },
-              ]);
+              Alert.alert(
+                "Batch Details Posting",
+                `${e || "Something Went wrong"}`,
+                [
+                  {
+                    text: "Ok",
+                    onPress: () => {},
+                    style: "destructive",
+                  },
+                ]
+              );
               console.log(e);
             },
           })
@@ -175,6 +203,7 @@ export const useDocumentHooks = () => {
     }
   };
 
+  // scanning item
   const checkScanType = async (
     {barcode, receiveQty}: {barcode: string; receiveQty: number},
     scanUsage: ScanValidate
@@ -200,23 +229,27 @@ export const useDocumentHooks = () => {
               linenum: selectedItem.linenum.toString(),
               usrnam: userDetails?.usrcde,
             });
-            if (response.data.pto2_data[0]) {
-              dispatch(handleSetItem(response.data.pto2_data[0]));
-            }
-            console.log(response.data.pto2_data[0].intqty);
-            console.log(response.data.pto2_data[0].itmqty);
 
-            if (response.data.pto2_data[0].itmqty === 0 && receiveQty > 1) {
-              dispatch(setStatusText(`Item Successfully Scanned.`));
-              dispatch(handleToggleItemScanModal());
+            if (response.data.pto2_data) {
               dispatch(getPTODetails({docnum: selectedDocument.docnum}));
               dispatch(getPTO({limit: 10, offset: 0}));
+
+              // closing conditions
+              if (response.data.pto2_data[0]) {
+                dispatch(handleSetItem(response.data.pto2_data[0]));
+                if (response.data.pto2_data[0].itmqty === 0 && receiveQty > 1) {
+                  dispatch(setStatusText(`Item Successfully Scanned.`));
+                  dispatch(handleToggleItemScanModal());
+                }
+              }
+              if (response.data.pto2_data.length === 0) {
+                dispatch(setStatusText(`Item Successfully Scanned.`));
+                dispatch(handleToggleItemScanModal());
+              }
             }
           } catch (error) {
-            console.log("incorrect barcode");
+            console.log(error);
           }
-          break;
-        case "srto":
           break;
 
         default:
@@ -224,6 +257,36 @@ export const useDocumentHooks = () => {
       }
     }
   };
+
+  const checkScanBarcode = async (
+    uses: ScanValidate,
+    {barcode, category}: ScanDocumentParams
+  ) => {
+    switch (uses) {
+      case "pto":
+        try {
+          const response = await scanBarcode({barcode, category});
+          handleSelectModal({item: response.data, type: uses});
+          handleScanModal();
+        } catch (error) {
+          console.log("incorrect barcode");
+        }
+        break;
+      case "pur":
+        const response: any = await getLPN({lpnnum: barcode});
+
+        if (response) {
+          console.log("kuha", response[0]);
+          dispatch(handleSetDocument(response[0]));
+        }
+
+        break;
+      default:
+        break;
+    }
+  };
+
+  // end check categories and uses functions
 
   const handleSelectModal = ({item, type}: SelectProps) => {
     console.log(type, item);
@@ -235,6 +298,8 @@ export const useDocumentHooks = () => {
   };
 
   const handleScanModal = () => {
+    dispatch(handleSetDocument(null));
+    dispatch(resetStatus());
     dispatch(handleToggleScanModal());
   };
 
@@ -259,6 +324,7 @@ export const useDocumentHooks = () => {
   };
 
   const handlePost = ({item, type, customMessage}: PostProps) => {
+    // checkPostType(item, type);
     if (customMessage) {
       Alert.alert(`${customMessage.header}`, `${customMessage.body}`, [
         {
@@ -300,13 +366,7 @@ export const useDocumentHooks = () => {
       ]);
       return;
     }
-    try {
-      const response = await scanBarcode({barcode, category});
-      handleSelectModal({item: response.data, type: typeForFetching});
-      handleScanModal();
-    } catch (error) {
-      console.log("incorrect barcode");
-    }
+    checkScanBarcode(typeForFetching, {barcode, category});
   };
 
   const handleScanItem = (

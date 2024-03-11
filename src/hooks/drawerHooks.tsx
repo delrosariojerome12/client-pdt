@@ -11,6 +11,7 @@ import {
   handlePreviousRoute,
   handleClearRoutes,
 } from "../reducers/routerReducer";
+import {resetStatus} from "../reducers/statusReducer";
 
 interface customDrawers {
   title: string;
@@ -83,6 +84,7 @@ export const useDrawerHooks = () => {
                     borderRadius: 50 / 3,
                   }}
                   onPress={() => {
+                    dispatch(resetStatus());
                     console.log(previousRoutes);
                     console.log(previousRoutes.length);
 

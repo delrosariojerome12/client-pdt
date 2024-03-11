@@ -28,6 +28,7 @@ interface ScanModalProps {
 
 const ScanModal = React.memo((props: ScanModalProps) => {
   const {status} = useAppSelector((state) => state.status);
+  const {selectedDocument} = useAppSelector((state) => state.document);
   const {handleScanDocument, validateBin} = useDocumentHooks();
   const {
     visible,
@@ -38,32 +39,33 @@ const ScanModal = React.memo((props: ScanModalProps) => {
     typeForFetching,
   } = props;
   const [scanfield, setScanfield] = useState<string>("");
-  // const [binfield, setBinfield] = useState<string>("");
+
+  //
+  const [binfield, setBinfield] = useState<string>("");
   // const [itemDetails, setItemDetails] = useState<any | null>(null);
 
   const handleOnChange = (key: string, value: string | number) => {
     setScanfield(String(value));
   };
 
-  // const handleBinChange = (key: string, value: string | number) => {
-  // setBinfield(String(value));
-  // };
+  const handleBinChange = (key: string, value: string | number) => {
+    setBinfield(String(value));
+  };
 
   const renderButtons = () => {
-    // if (!itemDetails) {
     if (isNextBtn) {
       return (
         <CustomButton
-          onPress={() =>
+          onPress={() => {
             handleScanDocument(
               {barcode: scanfield, category: scanParams},
               typeForFetching
-            )
-          }
+            );
+          }}
+          isDisable={selectedDocument ? true : false}
           title="Next"
           type="regular"
           isWidthNotFull={true}
-          useFlex={true}
         />
       );
     }
@@ -90,7 +92,6 @@ const ScanModal = React.memo((props: ScanModalProps) => {
         />
       </View>
     );
-    // }
   };
 
   console.log("scan modal");
@@ -101,6 +102,7 @@ const ScanModal = React.memo((props: ScanModalProps) => {
         {status === "loading" && (
           <CustomLoadingText text="Searching..." visible={true} />
         )}
+
         <ScrollView contentContainerStyle={styles.scrollViewContent}>
           <View style={styles.modalView}>
             <View style={styles.headerContainer}>
@@ -110,8 +112,8 @@ const ScanModal = React.memo((props: ScanModalProps) => {
               <Text style={styles.headerText}>Scan Barcode</Text>
             </View>
 
-            {/* <View> */}
             <CustomInputs
+              isEditable={selectedDocument ? false : true}
               onSubmit={() => {
                 handleScanDocument(
                   {barcode: scanfield, category: scanParams},
@@ -124,21 +126,24 @@ const ScanModal = React.memo((props: ScanModalProps) => {
               placeHolder={placeholder}
               inputKey="scan"
             />
-            {/* </View> */}
 
             {renderButtons()}
 
-            {/* {itemDetails && (
+            {selectedDocument && (
               <>
                 <View style={styles.itemContainer}>
                   <Text style={styles.floatingText}>Item Details</Text>
-                  <Text>{`Item No: ${itemDetails.itemCode}`}</Text>
-                  <Text>{`Item No: ${itemDetails.itemCode}`}</Text>
-                  <Text>{`Item name: ${itemDetails.itemName}`}</Text>
-                  <Text>{`PCS: ${itemDetails.pieces}`}</Text>
-                  <Text>{`Batch No.: ${itemDetails.batchNumber}`}</Text>
-                  <Text>{`Mfg. Date: ${itemDetails.expDate}`}</Text>
-                  <Text>{`Exp. Date: ${itemDetails.mfgDate}`}</Text>
+                  <Text>{`Int No.: ${selectedDocument.intnum}`}</Text>
+                  <Text>{`TO No.: ${selectedDocument.docnum}`}</Text>
+                  <Text>{`Item Code: ${selectedDocument.itmcde}`}</Text>
+                  <Text>{`Description: ${selectedDocument.itmdsc}`}</Text>
+                  <Text>{`Qty: ${selectedDocument.itmqty}`}</Text>
+                  <Text>{`UOM: ${selectedDocument.untmea}`}</Text>
+                  <Text>{`Batch No.: ${selectedDocument.batchnum}`}</Text>
+                  <Text>{`Mfg. Date: ${selectedDocument.mfgdte}`}</Text>
+                  <Text>{`Exp. Date: ${selectedDocument.expdte}`}</Text>
+                  <Text>{`Batch No.: ${selectedDocument.binnum}`}</Text>
+                  <Text>{`LPN: ${selectedDocument.lpnnum}`}</Text>
                 </View>
 
                 <CustomInputs
@@ -156,7 +161,7 @@ const ScanModal = React.memo((props: ScanModalProps) => {
                   isWidthNotFull={true}
                 />
               </>
-            )} */}
+            )}
           </View>
         </ScrollView>
       </View>

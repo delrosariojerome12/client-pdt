@@ -60,7 +60,7 @@ const PTO = () => {
           <MessageToast
             status="success"
             text="Document Successfully Posted"
-            speed={2000}
+            speed={2500}
           />
         )}
 
@@ -92,6 +92,7 @@ const PTO = () => {
             onPost={handlePost}
             selectType="pto"
             postType="pto"
+            buttonUses="pto"
           />
 
           {isScanModal && (

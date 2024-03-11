@@ -11,6 +11,7 @@ interface CustomInputsProps {
   customWidth?: number;
   useFlex?: boolean; // for row automatic width
   isFocus?: boolean;
+  isEditable?: boolean;
 }
 
 const CustomInputs = (props: CustomInputsProps) => {
@@ -24,6 +25,7 @@ const CustomInputs = (props: CustomInputsProps) => {
     useFlex,
     isFocus,
     onSubmit,
+    isEditable,
   } = props;
 
   const handleChange = (value: string) => {
@@ -48,6 +50,7 @@ const CustomInputs = (props: CustomInputsProps) => {
       }}
     >
       <TextInput
+        editable={isEditable}
         onSubmitEditing={onSubmit}
         autoFocus={isFocus ? true : false}
         style={styles.input}

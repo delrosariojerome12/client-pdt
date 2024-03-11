@@ -13,73 +13,100 @@ import {useDocumentHooks} from "../../../../src/hooks/documentHooks";
 import {generalStyles} from "../../../../src/styles/styles";
 import {useInboundHooks} from "../../../../src/hooks/inboundHooks";
 import LoadingSpinner from "../../../../src/components/load-spinner/LoadingSpinner";
+import MessageToast from "../../../../src/components/message-toast/MessageToast";
+import CustomLoadingText from "../../../../src/components/load-spinner/CustomLoadingText";
 
 const tableHeaders = ["Date", "Document No.", "Intransit No.", ""];
 const tableVisibleProps = ["trndte", "docnum", "intnum"];
 
 const PUR = () => {
-  const {handleScroll, isPaginating, onRefresh, refreshing, pur, isScanModal} =
-    useInboundHooks({
-      page: "pur",
-    });
+  const {
+    handleScroll,
+    isPaginating,
+    onRefresh,
+    refreshing,
+    pur,
+    isScanModal,
+    status,
+  } = useInboundHooks({
+    page: "pur",
+  });
 
   const {handleScanModal, handlePost} = useDocumentHooks();
 
-  if (pur.status === "loading" && !refreshing && !isPaginating) {
-    return <LoadingSpinner />;
-  }
+  // if (pur.status === "loading" && !refreshing && !isPaginating) {
+  //   return <LoadingSpinner />;
+  // }
 
   console.log("PUR");
 
   return (
-    <View style={generalStyles.outerContainer}>
-      <CustomButton
-        title="SCAN LPN NO."
-        onPress={handleScanModal}
-        type="regular"
-      />
-      <ScrollView
-        style={generalStyles.innerContainer}
-        contentContainerStyle={{flexGrow: 1}}
-        refreshControl={
-          <RefreshControl refreshing={false} onRefresh={onRefresh} />
-        }
-        onScroll={handleScroll}
-        scrollEventThrottle={150}
-      >
-        <CustomTable
-          tableHeaders={tableHeaders}
-          tableData={pur.data}
-          visibleProperties={tableVisibleProps}
-          onPost={handlePost}
-          isSelectDisable={true}
+    <>
+      {status === "success" && !isScanModal && (
+        <MessageToast
+          status="success"
+          text="Document Successfully Posted Putway TO"
+          speed={2500}
+        />
+      )}
+
+      <View style={generalStyles.outerContainer}>
+        <CustomButton
+          title="SCAN LPN NO."
+          onPress={handleScanModal}
+          type="regular"
         />
 
-        {isScanModal && (
-          <ScanModal
-            visible={isScanModal}
-            onClose={handleScanModal}
-            placeholder="Waiting to Scan LPN No."
-            isNextBtn={true}
-            scanParams={{category: "lpnum"}}
-          />
+        {status === "loading" && !isScanModal && (
+          <CustomLoadingText text="Posting..." visible={true} />
         )}
-      </ScrollView>
 
-      {isPaginating && (
-        <View
-          style={{
-            justifyContent: "center",
-            alignItems: "center",
-            paddingVertical: 10,
-            height: 100,
-          }}
+        <ScrollView
+          style={generalStyles.innerContainer}
+          contentContainerStyle={{flexGrow: 1}}
+          refreshControl={
+            <RefreshControl refreshing={false} onRefresh={onRefresh} />
+          }
+          onScroll={handleScroll}
+          scrollEventThrottle={150}
         >
-          <ActivityIndicator size="large" color="#0000ff" />
-          <Text>Loading more data...</Text>
-        </View>
-      )}
-    </View>
+          <CustomTable
+            tableHeaders={tableHeaders}
+            tableData={pur.data}
+            visibleProperties={tableVisibleProps}
+            onPost={handlePost}
+            isSelectDisable={true}
+            postType="pur"
+            buttonUses="pur"
+          />
+
+          {isScanModal && (
+            <ScanModal
+              visible={isScanModal}
+              onClose={handleScanModal}
+              placeholder="Waiting to Scan LPN No."
+              isNextBtn={true}
+              scanParams={"lpnnum"}
+              typeForFetching="pur"
+            />
+          )}
+        </ScrollView>
+
+        {isPaginating && (
+          <View
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              paddingVertical: 10,
+              height: 100,
+            }}
+          >
+            <ActivityIndicator size="large" color="#0000ff" />
+            <Text>Loading more data...</Text>
+          </View>
+        )}
+      </View>
+    </>
   );
 };
 

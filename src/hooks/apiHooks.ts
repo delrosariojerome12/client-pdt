@@ -3,6 +3,7 @@ import {ScanDocumentParams} from "../store/actions/generalActions";
 import axios from "axios";
 import {Alert} from "react-native";
 import {setStatus} from "../reducers/statusReducer";
+
 interface ConnectToPHPParams {
   recid: any;
   docnum: string;
@@ -18,6 +19,9 @@ interface ConnectToPHPParams {
   spldocnum?: string;
   soconum?: string;
 }
+interface GetLPN {
+  lpnnum: string;
+}
 
 // uses: mostly for not requiring to monitor statuses
 export const useAPIHooks = () => {
@@ -27,6 +31,7 @@ export const useAPIHooks = () => {
     server: {ipAddress, port, protocol},
   } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
+  const baseUrl = `${protocol}://${ipAddress}:${port}`;
 
   const connectToPHPNotDispatch = async (props: ConnectToPHPParams) => {
     const {
@@ -367,39 +372,15 @@ export const useAPIHooks = () => {
     }
   };
 
-  //   const scanBarcode = async ({barcode, category}: ScanDocumentParams) => {
-  //     dispatch(setStatus("loading"));
-  //     try {
-  //       const url = `${protocol}://${ipAddress}:${port}/api/scanBarcode/?barcode=${barcode}&category=${category}`;
-  //       const response = await axios.get(url);
-  //       if (response.data.bool) {
-  //         dispatch(setStatus("success"));
-  //         return response.data;
-  //       } else {
-  //         dispatch(setStatus("failed"));
-  //         Alert.alert("Something Went Wrong", response.data.message, [
-  //           {
-  //             text: "OK",
-  //           },
-  //         ]);
-  //       }
-  //     } catch (error: any) {
-  //       dispatch(setStatus("failed"));
-  //       console.log(error);
-  //     }
-  //   };
-  //   return {connectToPHPNotDispatch, scanBarcode};
-  // };
-
   const scanBarcode = async (queryParams: ScanDocumentParams) => {
     dispatch(setStatus("loading"));
     try {
       const {barcode, category, ...restParams} = queryParams;
-      const baseUrl = `${protocol}://${ipAddress}:${port}/api/scanbarcode/`;
+      // const baseUrl = `${protocol}://${ipAddress}:${port}/api/scanbarcode/`;
       const searchParams = new URLSearchParams();
       searchParams.append("barcode", barcode);
       searchParams.append("category", category);
-      // Append other query parameters
+
       for (const key in restParams) {
         if (Object.prototype.hasOwnProperty.call(restParams, key)) {
           const value = restParams[key];
@@ -411,7 +392,7 @@ export const useAPIHooks = () => {
           }
         }
       }
-      const url = `${baseUrl}?${searchParams.toString()}`;
+      const url = `${baseUrl}/api/scanbarcode/?${searchParams.toString()}`;
 
       console.log("daan", url);
 
@@ -419,10 +400,9 @@ export const useAPIHooks = () => {
       if (response.data.bool) {
         dispatch(setStatus("success"));
         console.log("tae", response.data);
-
         return response.data;
       } else {
-        console.log(response.data);
+        console.log("mali", response.data);
         dispatch(setStatus("failed"));
         Alert.alert("Something Went Wrong", response.data.message, [
           {
@@ -436,5 +416,36 @@ export const useAPIHooks = () => {
     }
   };
 
-  return {scanBarcode, connectToPHPNotDispatch};
+  const getLPN = async ({lpnnum}: GetLPN) => {
+    try {
+      const url = `${baseUrl}/api/lst_tracc/purchasetofile2?lpnnum=${lpnnum}&ptostat=TO%20-%20POSTED`;
+      const response = await axios.get(url);
+      console.log("daan", url);
+      return response.data;
+    } catch (error) {
+      Alert.alert("Something Went Wrong", "Server error", [
+        {
+          text: "OK",
+        },
+      ]);
+    }
+  };
+
+  const validateBin = async ({lpnnum}: GetLPN) => {
+    try {
+      const url = `${baseUrl}/api/lst_tracc/purchasetofile2?lpnnum=${lpnnum}&ptostat=TO%20-%20POSTED`;
+      const response = await axios.get(url);
+      console.log("daan", url);
+
+      // console.log(response.data);
+      return response.data;
+    } catch (error) {
+      Alert.alert("Something Went Wrong", "Server error", [
+        {
+          text: "OK",
+        },
+      ]);
+    }
+  };
+  return {scanBarcode, connectToPHPNotDispatch, getLPN, validateBin};
 };
