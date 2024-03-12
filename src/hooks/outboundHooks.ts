@@ -53,7 +53,10 @@ export const useOutboundHooks = ({page}: OutboundUse) => {
           // valid
           case 0:
           case null:
-            const wtoValidOffset = wto.validation.data.length + 10;
+            const wtoValidOffset =
+              wto.validation.data.length - 10 === 0
+                ? 10
+                : wto.validation.data.length - 10;
             dispatch(
               getWTOOutboundValid({
                 limit: 10,
@@ -67,7 +70,11 @@ export const useOutboundHooks = ({page}: OutboundUse) => {
             break;
           case 1:
             // posting
-            const wtoPostOffset = wto.forPosting.data.length + 10;
+            const wtoPostOffset =
+              wto.forPosting.data.length - 10 === 0
+                ? 10
+                : wto.forPosting.data.length - 10;
+            // wto.forPosting.data.length + 10;
             dispatch(
               getWTOOutboundPost({
                 limit: 10,
@@ -86,7 +93,11 @@ export const useOutboundHooks = ({page}: OutboundUse) => {
           // valid
           case 0:
           case null:
-            const wptoValidOffset = wavepick.validation.data.length + 10;
+            const wptoValidOffset =
+              wavepick.validation.data.length - 10 === 0
+                ? 10
+                : wavepick.validation.data.length - 10;
+            // wavepick.validation.data.length + 10;
             dispatch(
               getWPTOValid({
                 limit: 10,
@@ -101,7 +112,10 @@ export const useOutboundHooks = ({page}: OutboundUse) => {
             break;
           // posting
           case 1:
-            const wptoPostOffset = wavepick.forPosting.data.length + 10;
+            const wptoPostOffset =
+              wavepick.forPosting.data.length - 10 === 0
+                ? 10
+                : wavepick.forPosting.data.length - 10;
             dispatch(
               getWPTOPost({
                 limit: 10,
@@ -121,7 +135,12 @@ export const useOutboundHooks = ({page}: OutboundUse) => {
         switch (activeIndex) {
           case 0:
           case null:
-            const pkOffset = singlepick.pkValidate.data.length + 10;
+            const pkOffset =
+              singlepick.pkValidate.data.length - 10 === 0
+                ? 10
+                : singlepick.pkValidate.data.length - 10;
+
+            // singlepick.pkValidate.data.length + 10;
             dispatch(
               getPKValidate({
                 limit: 10,
@@ -134,7 +153,11 @@ export const useOutboundHooks = ({page}: OutboundUse) => {
             });
             break;
           case 1:
-            const invOffset = singlepick.invPosting.data.length + 10;
+            const invOffset =
+              singlepick.invPosting.data.length - 10 === 0
+                ? 10
+                : singlepick.invPosting.data.length - 10;
+            // singlepick.invPosting.data.length + 10;
             dispatch(
               getINVPosting({
                 limit: 10,
@@ -147,7 +170,11 @@ export const useOutboundHooks = ({page}: OutboundUse) => {
             });
             break;
           case 2:
-            const stgOffset = singlepick.stgValidate.data.length + 10;
+            const stgOffset =
+              singlepick.stgValidate.data.length - 10 === 0
+                ? 10
+                : singlepick.stgValidate.data.length - 10;
+            // singlepick.stgValidate.data.length + 10;
             dispatch(
               getSTGValidate({
                 limit: 10,
@@ -160,7 +187,12 @@ export const useOutboundHooks = ({page}: OutboundUse) => {
             });
             break;
           case 3:
-            const splOffset = singlepick.splPosting.data.length + 10;
+            const splOffset =
+              singlepick.splPosting.data.length - 10 === 0
+                ? 10
+                : singlepick.splPosting.data.length - 10;
+
+            // singlepick.splPosting.data.length + 10;
             dispatch(
               getSTGValidate({
                 limit: 10,

@@ -55,7 +55,8 @@ export const getPUR = createAsyncThunk(
       const state = getState() as RootState;
       const {ipAddress, port, protocol} = state.auth.server;
 
-      const url = `${protocol}://${ipAddress}:${port}/api/getPutawayTO/?category=PUR&limit=${limit}&offset=${offset}}`;
+      const url = `${protocol}://${ipAddress}:${port}/api/getPutawayTO/?category=PUR&limit=${limit}&offset=${offset}`;
+      console.log(url);
 
       const response = await axios.get(url);
 
@@ -79,7 +80,7 @@ export const getWHS = createAsyncThunk(
       const state = getState() as RootState;
       const {ipAddress, port, protocol} = state.auth.server;
 
-      const url = `${protocol}://${ipAddress}:${port}/api/getPutawayTO/?category=WHS&limit=${limit}&offset=${offset}}`;
+      const url = `${protocol}://${ipAddress}:${port}/api/getPutawayTO/?category=WHS&limit=${limit}&offset=${offset}`;
 
       const response = await axios.get(url);
 
@@ -103,7 +104,7 @@ export const getSRTO = createAsyncThunk(
       const state = getState() as RootState;
       const {ipAddress, port, protocol} = state.auth.server;
 
-      const url = `${protocol}://${ipAddress}:${port}/api/getPutawayTO/?category=SRTO&limit=${limit}&offset=${offset}}`;
+      const url = `${protocol}://${ipAddress}:${port}/api/getPutawayTO/?category=SRTO&limit=${limit}&offset=${offset}`;
 
       const response = await axios.get(url);
 
@@ -127,7 +128,7 @@ export const getWTO = createAsyncThunk(
       const state = getState() as RootState;
       const {ipAddress, port, protocol} = state.auth.server;
 
-      const url = `${protocol}://${ipAddress}:${port}/api/getPutawayTO/?category=SRTO&limit=${limit}&offset=${offset}}`;
+      const url = `${protocol}://${ipAddress}:${port}/api/getPutawayTO/?category=SRTO&limit=${limit}&offset=${offset}`;
 
       const response = await axios.get(url);
 

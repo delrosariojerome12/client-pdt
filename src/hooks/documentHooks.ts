@@ -82,7 +82,7 @@ export const useDocumentHooks = () => {
   } = useAppSelector((state) => state.general);
 
   const dispatch = useAppDispatch();
-  const {scanBarcode, getLPN} = useAPIHooks();
+  const {scanBarcode, getLPN, getBinAndValidate} = useAPIHooks();
 
   // start check categories and uses functions
 
@@ -274,12 +274,10 @@ export const useDocumentHooks = () => {
         break;
       case "pur":
         const response: any = await getLPN({lpnnum: barcode});
-
+        console.log("ansabe", response);
         if (response) {
-          console.log("kuha", response[0]);
           dispatch(handleSetDocument(response[0]));
         }
-
         break;
       default:
         break;
@@ -387,8 +385,39 @@ export const useDocumentHooks = () => {
     }
     checkScanType({barcode, receiveQty}, scanUsage);
   };
-  const validateBin = () => {
-    alert("No api yet");
+
+  // subject to change
+  const validateBin = async (binnum: string) => {
+    if (!binnum) {
+      Alert.alert(
+        "Empty Bin Number",
+        "Please make sure bin number is filled.",
+        [
+          {
+            text: "OK",
+          },
+        ]
+      );
+      return;
+    }
+    const binDetails = await getBinAndValidate({
+      binnum: binnum,
+      lpnnum: selectedDocument.lpnnum,
+    });
+
+    if (binDetails) {
+      dispatch(handleToggleScanModal());
+      dispatch(getPUR({limit: 10, offset: 0}));
+      Alert.alert(
+        "Validation Success",
+        "Bin Number Matched. You May procceed to Manual Putaway Procedure.",
+        [
+          {
+            text: "OK",
+          },
+        ]
+      );
+    }
   };
 
   const validateCycleCount = (item: any) => {

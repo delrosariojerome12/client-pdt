@@ -28,6 +28,7 @@ const PUR = () => {
     pur,
     isScanModal,
     status,
+    statusText,
   } = useInboundHooks({
     page: "pur",
   });
@@ -45,7 +46,7 @@ const PUR = () => {
       {status === "success" && !isScanModal && (
         <MessageToast
           status="success"
-          text="Document Successfully Posted Putway TO"
+          text={"Document Successfully Posted Putway TO"}
           speed={2500}
         />
       )}

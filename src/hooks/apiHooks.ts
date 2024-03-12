@@ -3,6 +3,7 @@ import {ScanDocumentParams} from "../store/actions/generalActions";
 import axios from "axios";
 import {Alert} from "react-native";
 import {setStatus} from "../reducers/statusReducer";
+import {useServiceHooks} from "./serviceHooks";
 
 interface ConnectToPHPParams {
   recid: any;
@@ -22,15 +23,22 @@ interface ConnectToPHPParams {
 interface GetLPN {
   lpnnum: string;
 }
+interface ValidateBin {
+  binnum: string;
+  lpnnum: string;
+}
 
-// uses: mostly for not requiring to monitor statuses
 export const useAPIHooks = () => {
   const {
     user: {userDetails, sesid},
     phpServer: {traccDomain, traccDirectory},
     server: {ipAddress, port, protocol},
   } = useAppSelector((state) => state.auth);
+  const {selectedDocument} = useAppSelector((state) => state.document);
+
   const dispatch = useAppDispatch();
+  const {handleGet, handlePost, handlePatch} = useServiceHooks();
+
   const baseUrl = `${protocol}://${ipAddress}:${port}`;
 
   const connectToPHPNotDispatch = async (props: ConnectToPHPParams) => {
@@ -418,10 +426,38 @@ export const useAPIHooks = () => {
 
   const getLPN = async ({lpnnum}: GetLPN) => {
     try {
-      const url = `${baseUrl}/api/lst_tracc/purchasetofile2?lpnnum=${lpnnum}&ptostat=TO%20-%20POSTED`;
-      const response = await axios.get(url);
-      console.log("daan", url);
-      return response.data;
+      dispatch(setStatus("loading"));
+      const response = await handleGet({
+        url: `lst_tracc/purchasetofile2?lpnnum=${lpnnum}&ptostat=TO%20-%20POSTED`,
+        disableToast: true,
+      });
+      if (response.length === 0) {
+        dispatch(setStatus("idle"));
+        Alert.alert(
+          "LPN Not Ready",
+          "LPN Number is not ready for Putway TO Validation",
+          [
+            {
+              text: "OK",
+            },
+          ]
+        );
+        return;
+      }
+      if (response) {
+        if (response[0].ptaval === 1) {
+          dispatch(setStatus("idle"));
+          Alert.alert("Search Error", "LPN already Validated", [
+            {
+              text: "OK",
+            },
+          ]);
+        } else {
+          dispatch(setStatus("idle"));
+          return response;
+        }
+      }
+      return null;
     } catch (error) {
       Alert.alert("Something Went Wrong", "Server error", [
         {
@@ -431,14 +467,44 @@ export const useAPIHooks = () => {
     }
   };
 
-  const validateBin = async ({lpnnum}: GetLPN) => {
+  const getBinAndValidate = async ({binnum, lpnnum}: ValidateBin) => {
     try {
-      const url = `${baseUrl}/api/lst_tracc/purchasetofile2?lpnnum=${lpnnum}&ptostat=TO%20-%20POSTED`;
-      const response = await axios.get(url);
-      console.log("daan", url);
+      const binDetails = await handleGet({
+        url: `lst_tracc/binfile1?binnum=${binnum}`,
+        disableToast: true,
+      });
 
-      // console.log(response.data);
-      return response.data;
+      if (binDetails) {
+        if (binDetails.length === 0) {
+          Alert.alert("Bin Error", "Bin Number Not Found", [
+            {
+              text: "OK",
+            },
+          ]);
+        } else if (binnum !== selectedDocument.binnum2) {
+          Alert.alert("Invalid Bin Number", "Bin Number did not matched.", [
+            {
+              text: "OK",
+            },
+          ]);
+        } else {
+          const patchDocument = {
+            field: {
+              lpnnum: lpnnum,
+            },
+            data: {
+              ptaval: 1,
+              putawayvalidby: userDetails?.usrcde,
+            },
+          };
+          handlePatch({
+            url: "lst_tracc/purchasetofile2",
+            requestData: patchDocument,
+            disableToast: true,
+          });
+          return binDetails;
+        }
+      }
     } catch (error) {
       Alert.alert("Something Went Wrong", "Server error", [
         {
@@ -447,5 +513,6 @@ export const useAPIHooks = () => {
       ]);
     }
   };
-  return {scanBarcode, connectToPHPNotDispatch, getLPN, validateBin};
+
+  return {scanBarcode, connectToPHPNotDispatch, getLPN, getBinAndValidate};
 };

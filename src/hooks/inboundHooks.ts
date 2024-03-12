@@ -16,7 +16,7 @@ export const useInboundHooks = ({page}: InboundUse) => {
   const {pto, pur, srto, whs, ptoDetails} = useAppSelector(
     (state) => state.inbound
   );
-  const {status} = useAppSelector((state) => state.status);
+  const {status, statusText} = useAppSelector((state) => state.status);
 
   const {isScanModal, isSelectModal, isScanItemModal} = useAppSelector(
     (state) => state.modal
@@ -55,7 +55,8 @@ export const useInboundHooks = ({page}: InboundUse) => {
     setPaginating(true);
     switch (page) {
       case "pto":
-        const ptoOffset = pto.data.length + 10;
+        const ptoOffset =
+          pto.data.length - 10 === 0 ? 10 : pto.data.length - 10;
         dispatch(getPTO({limit: 10, offset: ptoOffset, paginating: true})).then(
           () => {
             ToastMessage("Table updated.", 1000);
@@ -64,7 +65,8 @@ export const useInboundHooks = ({page}: InboundUse) => {
         );
         break;
       case "pur":
-        const purOffset = pur.data.length + 10;
+        const purOffset =
+          pur.data.length - 10 === 0 ? 10 : pur.data.length - 10;
         dispatch(getPUR({limit: 10, offset: purOffset, paginating: true})).then(
           () => {
             ToastMessage("Table updated.", 1000);
@@ -75,7 +77,8 @@ export const useInboundHooks = ({page}: InboundUse) => {
       case "wto":
         break;
       case "whs":
-        const whsOffset = whs.data.length + 10;
+        const whsOffset =
+          whs.data.length - 10 === 0 ? 10 : whs.data.length - 10;
         dispatch(getWHS({limit: 10, offset: whsOffset, paginating: true})).then(
           () => {
             ToastMessage("Table updated.", 1000);
@@ -84,7 +87,8 @@ export const useInboundHooks = ({page}: InboundUse) => {
         );
         break;
       case "srto":
-        const srtoOffset = srto.data.length + 10;
+        const srtoOffset =
+          srto.data.length - 10 === 0 ? 10 : srto.data.length - 10;
         dispatch(
           getSRTO({limit: 10, offset: srtoOffset, paginating: true})
         ).then(() => {
@@ -169,5 +173,6 @@ export const useInboundHooks = ({page}: InboundUse) => {
     isSelectModal,
     isScanItemModal,
     status,
+    statusText,
   };
 };

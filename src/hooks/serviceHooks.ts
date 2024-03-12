@@ -12,7 +12,7 @@ interface ToastMessage {
 interface GetProps {
   url: string;
   toastMessage?: ToastMessage;
-  onSuccess?: (data: any) => void; // Callback function for success
+  onSuccess?: (data: any) => void;
   disableToast?: boolean;
 }
 

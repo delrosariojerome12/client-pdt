@@ -63,7 +63,7 @@ const ScanModal = React.memo((props: ScanModalProps) => {
             );
           }}
           isDisable={selectedDocument ? true : false}
-          title="Next"
+          title="NEXT"
           type="regular"
           isWidthNotFull={true}
         />
@@ -142,7 +142,7 @@ const ScanModal = React.memo((props: ScanModalProps) => {
                   <Text>{`Batch No.: ${selectedDocument.batchnum}`}</Text>
                   <Text>{`Mfg. Date: ${selectedDocument.mfgdte}`}</Text>
                   <Text>{`Exp. Date: ${selectedDocument.expdte}`}</Text>
-                  <Text>{`Batch No.: ${selectedDocument.binnum}`}</Text>
+                  <Text>{`Bin No.: ${selectedDocument.binnum2}`}</Text>
                   <Text>{`LPN: ${selectedDocument.lpnnum}`}</Text>
                 </View>
 
@@ -152,10 +152,11 @@ const ScanModal = React.memo((props: ScanModalProps) => {
                   type="text"
                   placeHolder={"Scan Bin No."}
                   inputKey="bin"
+                  onSubmit={() => validateBin(binfield)}
                 />
 
                 <CustomButton
-                  onPress={validateBin}
+                  onPress={() => validateBin(binfield)}
                   title="VALIDATE"
                   type="save"
                   isWidthNotFull={true}
