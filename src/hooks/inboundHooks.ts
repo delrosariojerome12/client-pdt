@@ -4,6 +4,7 @@ import {ToastMessage} from "../helper/Toast";
 import {
   getPTO,
   getPUR,
+  getWTO,
   getWHS,
   getSRTO,
 } from "../store/actions/warehouse/warehouseActions";
@@ -13,7 +14,7 @@ interface InboundUse {
 }
 
 export const useInboundHooks = ({page}: InboundUse) => {
-  const {pto, pur, srto, whs, ptoDetails} = useAppSelector(
+  const {pto, pur, wto, srto, whs, ptoDetails} = useAppSelector(
     (state) => state.inbound
   );
   const {status, statusText} = useAppSelector((state) => state.status);
@@ -38,6 +39,7 @@ export const useInboundHooks = ({page}: InboundUse) => {
         dispatch(getPUR({limit: 10, offset: 0}));
         break;
       case "wto":
+        dispatch(getWTO({limit: 10, offset: 0}));
         break;
       case "whs":
         dispatch(getWHS({limit: 10, offset: 0}));
@@ -75,6 +77,14 @@ export const useInboundHooks = ({page}: InboundUse) => {
         );
         break;
       case "wto":
+        const wtoOffset =
+          wto.data.length - 10 === 0 ? 10 : wto.data.length - 10;
+        dispatch(getWTO({limit: 10, offset: wtoOffset, paginating: true})).then(
+          () => {
+            ToastMessage("Table updated.", 1000);
+            setPaginating(false);
+          }
+        );
         break;
       case "whs":
         const whsOffset =
@@ -119,6 +129,10 @@ export const useInboundHooks = ({page}: InboundUse) => {
         });
         break;
       case "wto":
+        dispatch(getWTO({limit: 10, offset: 0})).then(() => {
+          setRefreshing(false);
+          ToastMessage("Refresh Success", 1000);
+        });
         break;
       case "whs":
         dispatch(getWHS({limit: 10, offset: 0})).then(() => {
@@ -165,6 +179,7 @@ export const useInboundHooks = ({page}: InboundUse) => {
     handleScroll,
     pto,
     pur,
+    wto,
     srto,
     whs,
     ptoDetails,

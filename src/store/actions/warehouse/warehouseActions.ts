@@ -69,7 +69,7 @@ export const getPUR = createAsyncThunk(
     }
   }
 );
-// WHS - needed to change the api
+// WHS
 export const getWHS = createAsyncThunk(
   "wto/getWHS",
   async (
@@ -117,7 +117,8 @@ export const getSRTO = createAsyncThunk(
     }
   }
 );
-// WHS
+
+// WTO - needed to change the api
 export const getWTO = createAsyncThunk(
   "inbound/getWTO",
   async (
@@ -128,7 +129,7 @@ export const getWTO = createAsyncThunk(
       const state = getState() as RootState;
       const {ipAddress, port, protocol} = state.auth.server;
 
-      const url = `${protocol}://${ipAddress}:${port}/api/getPutawayTO/?category=SRTO&limit=${limit}&offset=${offset}`;
+      const url = `${protocol}://${ipAddress}:${port}/api/lst_tracc/warehousetransferorderfile1?trntypcde=WHSTOIN&posted=0&canceldoc=0&trndte=nev2:null&_limit=${limit}&_sortby=trndte:DESC,docnum:DESC&_offset=${offset}`;
 
       const response = await axios.get(url);
 
@@ -242,8 +243,6 @@ export const getWTOOutboundDetails = createAsyncThunk(
       const url = `${protocol}://${ipAddress}:${port}/api/getWTOOutboundDetails?docnum=${docnum}`;
 
       const response = await axios.get(url);
-
-      console.log("xxx", response);
 
       return response.data;
     } catch (error: any) {

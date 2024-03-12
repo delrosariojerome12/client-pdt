@@ -22,10 +22,6 @@ interface TableProps {
   onBatchSelect?: (batchItem: any) => void;
   selectType?: TypeSelect;
   postType?: TypePost;
-  // attributeChecker: {
-  // select: string;
-  // post: string;
-  // };
   buttonUses: ButtonUses;
 }
 
@@ -41,7 +37,6 @@ const CustomTable = (props: TableProps) => {
     onBatchSelect,
     selectType,
     postType,
-    // attributeChecker,
     buttonUses,
   } = props;
 
@@ -59,6 +54,11 @@ const CustomTable = (props: TableProps) => {
           return true;
         }
         return false;
+      case "whs":
+        if (rowData.for_posting === false) {
+          return true;
+        }
+        return;
       default:
         break;
     }
@@ -133,18 +133,21 @@ const CustomTable = (props: TableProps) => {
   };
 
   const renderTable = () => {
-    if (tableData.length > 0) {
-      return (
-        <Table borderStyle={{borderWidth: 1, borderColor: "#C1C0B9"}}>
-          <Row
-            data={tableHeaders}
-            style={styles.row}
-            textStyle={styles.headText}
-          />
-          {renderDataRows()}
-        </Table>
-      );
+    if (tableData) {
+      if (tableData.length > 0) {
+        return (
+          <Table borderStyle={{borderWidth: 1, borderColor: "#C1C0B9"}}>
+            <Row
+              data={tableHeaders}
+              style={styles.row}
+              textStyle={styles.headText}
+            />
+            {renderDataRows()}
+          </Table>
+        );
+      }
     }
+
     return (
       <View style={styles.placeholderContainer}>
         <Text style={styles.placeholderText}>No data available</Text>

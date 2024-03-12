@@ -10,7 +10,7 @@ import STGDetails from "../outbound/stgDetails";
 import AddBatchModal from "../modals/AddBatchModal";
 import EditBatchModal from "../modals/EditBatchModal";
 import ItemScanModal from "../modals/ItemScanModal";
-import {ScanCategory} from "../../models/generic/ScanCategory";
+import OutboundItemScanModal from "../modals/outbound/OutboundItemScanModal";
 
 interface Props {
   uses:
@@ -29,9 +29,12 @@ interface Props {
 }
 
 const ItemsList = React.memo((props: Props) => {
-  const {isScanItemModal, isAddBatchModal, isEditBatchModal} = useAppSelector(
-    (state) => state.modal
-  );
+  const {
+    isScanItemModal,
+    isAddBatchModal,
+    isEditBatchModal,
+    isOutboundItemScan,
+  } = useAppSelector((state) => state.modal);
   const {uses, subcategory, options} = props;
   const {selectedDocument} = useAppSelector((state) => state.document);
   const {ptoDetails, srtoDetails} = useAppSelector((state) => state.inbound);
@@ -88,7 +91,7 @@ const ItemsList = React.memo((props: Props) => {
     }
   };
 
-  if (selectedDocument) {
+  const renderModals = () => {
     return (
       <>
         {isAddBatchModal && <AddBatchModal />}
@@ -96,6 +99,20 @@ const ItemsList = React.memo((props: Props) => {
         {isScanItemModal && (
           <ItemScanModal visible={isScanItemModal} scanType={subcategory} />
         )}
+        {isOutboundItemScan && (
+          <OutboundItemScanModal
+            visible={isOutboundItemScan}
+            scanType={subcategory}
+          />
+        )}
+      </>
+    );
+  };
+
+  if (selectedDocument) {
+    return (
+      <>
+        {renderModals()}
         <View style={styles.container}>{renderView()}</View>
       </>
     );

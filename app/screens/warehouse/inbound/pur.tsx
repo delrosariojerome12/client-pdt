@@ -83,6 +83,7 @@ const PUR = () => {
 
           {isScanModal && (
             <ScanModal
+              usage="scanning"
               visible={isScanModal}
               onClose={handleScanModal}
               placeholder="Waiting to Scan LPN No."

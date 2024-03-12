@@ -53,6 +53,8 @@ const WHS = () => {
           visibleProperties={tableVisibleProps}
           onPost={handlePost}
           isSelectDisable={true}
+          buttonUses="whs"
+          postType="whs"
         />
 
         {isScanModal && (
@@ -61,7 +63,8 @@ const WHS = () => {
             onClose={handleScanModal}
             placeholder="Waiting to Scan LPN No."
             isNextBtn={true}
-            scanParams={{category: "lpnum"}}
+            scanParams={"lpnnum"}
+            typeForFetching="whs"
           />
         )}
       </ScrollView>

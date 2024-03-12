@@ -5,7 +5,7 @@ import {
   RefreshControl,
   ActivityIndicator,
 } from "react-native";
-import React from "react";
+import React, {useEffect} from "react";
 import CustomButton from "../../../../src/components/forms/buttons/CustomButton";
 import CustomTable from "../../../../src/components/forms/table/CustomTable";
 import ScanModal from "../../../../src/components/modals/ScanModal";
@@ -15,6 +15,8 @@ import SelectModal from "../../../../src/components/modals/SelectModal";
 import ItemsList from "../../../../src/components/list-holder/ItemsList";
 import {useInboundHooks} from "../../../../src/hooks/inboundHooks";
 import LoadingSpinner from "../../../../src/components/load-spinner/LoadingSpinner";
+import CustomLoadingText from "../../../../src/components/load-spinner/CustomLoadingText";
+import MessageToast from "../../../../src/components/message-toast/MessageToast";
 
 const tableHeaders = ["Date", "Document No.", "SRT No.", ""];
 const tableVisibleProps = ["trndte", "docnum", "srtdocnum"];
@@ -41,6 +43,7 @@ const SRTO = () => {
   }
 
   console.log("SRTO");
+  console.log(srto.data);
 
   return (
     <View style={generalStyles.outerContainer}>
@@ -61,6 +64,7 @@ const SRTO = () => {
           isPostDisable={true}
           onSelect={handleSelectModal}
           selectType="srto"
+          buttonUses="srto"
         />
 
         {isScanModal && (
@@ -68,7 +72,8 @@ const SRTO = () => {
             visible={isScanModal}
             onClose={handleScanModal}
             placeholder="Waiting to Scan SRT Barcode..."
-            scanParams={{category: "lpnnum_srto"}}
+            scanParams={"wrr_srto"}
+            typeForFetching="srto"
           />
         )}
 

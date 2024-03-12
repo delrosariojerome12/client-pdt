@@ -8,13 +8,15 @@ import ItemScanModal from "../modals/ItemScanModal";
 import {useAppSelector} from "../../store/store";
 import {format} from "../../styles/styles";
 import {OutboundItem} from "../../models/warehouse/outbound/wto-outbound-item";
+import {useBatchHooks} from "../../hooks/batchHooks";
+import {useModalHooks} from "../../hooks/modalHooks";
+
 interface Items {
   item: OutboundItem;
 }
-const WTODetails = (props: Items) => {
-  const {isScanItemModal} = useAppSelector((state) => state.modal);
-  const {handleItemScanModal, closeItemScanModal, removeScannedQuantity} =
-    useDocumentHooks();
+const WTODetails = React.memo((props: Items) => {
+  const {toggleOutboundItemScan} = useModalHooks();
+  const {removeScannedQuantity} = useBatchHooks();
   const {item} = props;
 
   return (
@@ -48,7 +50,7 @@ const WTODetails = (props: Items) => {
             </View>
             <TouchableOpacity
               onPress={() => {
-                removeScannedQuantity(item);
+                removeScannedQuantity(item, "wto-outbound");
               }}
             >
               <FontAwesome name="remove" size={24} color="black" />
@@ -56,17 +58,11 @@ const WTODetails = (props: Items) => {
           </View>
         </View>
         <View style={styles.rightContainer}>
-          {/* if validated */}
-          {/* <Text style={{fontWeight: "bold"}}>**VALIDATED**</Text> */}
-          {/* <View style={{flexDirection: "row", gap: 5}}>
-            <Text style={{fontWeight: "bold"}}>LPN: </Text>
-            <Text>{`${item.lpnnum}`}</Text>
-          </View> */}
           <View style={styles.datesContainer}>
             <View>
               <View style={format.twoRowText}>
                 <Text style={{fontWeight: "bold"}}>Bin No.:</Text>
-                <Text>{` ${item.binnum2 || item.binnum} `}</Text>
+                <Text>{` ${item.binnum2} `}</Text>
               </View>
               <View style={format.twoRowText}>
                 <Text style={{fontWeight: "bold"}}>Batch No.:</Text>
@@ -83,23 +79,17 @@ const WTODetails = (props: Items) => {
             </View>
           </View>
           <CustomButton
-            onPress={() => handleItemScanModal(item)}
+            // onPress={() => handleItemScanModal(item)}
+            onPress={() => toggleOutboundItemScan(item)}
             title="SCAN ITEM"
             type="regular"
             isWidthNotFull={true}
           />
         </View>
       </View>
-      {isScanItemModal && (
-        <ItemScanModal
-          visible={isScanItemModal}
-          onClose={closeItemScanModal}
-          scanParams={{category: "wrr_wto_outbound"}}
-        />
-      )}
     </>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {

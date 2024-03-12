@@ -38,11 +38,12 @@ export type ButtonUses =
 interface SearchContent {
   content: "warehouse" | "bin" | "item";
 }
-export type TypePost = "pto" | "pur" | "pto-add-batch";
+export type TypePost = "pto" | "pur" | "whs" | "pto-add-batch" | "wto-outbound";
 
 export type ScanValidate =
   | "pto"
   | "pur"
+  | "whs"
   | "srto"
   | "wto-outbound"
   | "wavepick"
@@ -209,6 +210,8 @@ export const useDocumentHooks = () => {
     scanUsage: ScanValidate
   ) => {
     if (selectedItem) {
+      console.log("eyy", scanUsage);
+
       switch (scanUsage) {
         case "pto":
           try {
@@ -251,7 +254,26 @@ export const useDocumentHooks = () => {
             console.log(error);
           }
           break;
+        case "wto-outbound":
+          try {
+            const response = await scanBarcode({
+              barcode,
+              category: "lpnnum_wto_outbound",
+              recid: selectedItem?.recid.toString(),
+              docnum: selectedDocument.docnum,
+              scanlevel: "1",
+              pdtmanualqtyoutbound: "1",
+              fromspl: undefined,
+              spl_docnum: undefined,
+              usrnam: userDetails?.usrcde,
+              barcodelvl2: "",
+            });
 
+            console.log(response);
+          } catch (error) {
+            console.log(error);
+          }
+          break;
         default:
           break;
       }
@@ -267,9 +289,9 @@ export const useDocumentHooks = () => {
         try {
           const response = await scanBarcode({barcode, category});
           handleSelectModal({item: response.data, type: uses});
-          handleScanModal();
+          dispatch(handleToggleScanModal());
         } catch (error) {
-          console.log("incorrect barcode");
+          console.log(error);
         }
         break;
       case "pur":
@@ -279,6 +301,15 @@ export const useDocumentHooks = () => {
           dispatch(handleSetDocument(response[0]));
         }
         break;
+      case "wto-outbound":
+        try {
+          const response = await scanBarcode({barcode, category});
+          handleSelectModal({item: response.data, type: uses});
+          dispatch(handleToggleScanModal());
+        } catch (error) {
+          console.log(error);
+        }
+        break;
       default:
         break;
     }
@@ -286,7 +317,9 @@ export const useDocumentHooks = () => {
 
   // end check categories and uses functions
 
+  // start of  modals
   const handleSelectModal = ({item, type}: SelectProps) => {
+    console.log("mga pinasa");
     console.log(type, item);
     // FETCH-DOCNUM-DETAILS-ONSELECT
     checkSelectType({item, type});
@@ -320,6 +353,8 @@ export const useDocumentHooks = () => {
     dispatch(handleToggleItemScanModal());
     dispatch(resetStatus());
   };
+
+  // end of  modals
 
   const handlePost = ({item, type, customMessage}: PostProps) => {
     // checkPostType(item, type);

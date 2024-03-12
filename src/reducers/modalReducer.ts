@@ -9,17 +9,21 @@ interface Modal {
   isAddBatchModal: boolean;
   isSearchBatchModal: boolean;
   isEditBatchModal: boolean;
+  isOutboundItemScan: boolean;
 }
 
 const initialState: Modal = {
   isScanModal: false,
   isSelectModal: false,
   isScanItemModal: false,
-  isSearchModal: false,
-  searchModalContent: null,
+  isOutboundItemScan: false,
+
   isAddBatchModal: false,
   isSearchBatchModal: false,
   isEditBatchModal: false,
+
+  isSearchModal: false,
+  searchModalContent: null,
 };
 
 const modalReducer = createSlice({
@@ -34,6 +38,10 @@ const modalReducer = createSlice({
     },
     handleToggleItemScanModal: (state) => {
       state.isScanItemModal = !state.isScanItemModal;
+    },
+
+    handleToggleOutboundItemScan: (state) => {
+      state.isOutboundItemScan = !state.isOutboundItemScan;
     },
 
     handleToggleSearchModal: (state) => {
@@ -68,6 +76,7 @@ export const {
   handleToggleAddBatchModal,
   handleToggleEditBatchModal,
   handleToggleSearchBatchModal,
+  handleToggleOutboundItemScan,
 } = modalReducer.actions;
 
 export default modalReducer.reducer;

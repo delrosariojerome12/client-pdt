@@ -16,9 +16,10 @@ import ItemsList from "../../../../src/components/list-holder/ItemsList";
 import {useInboundHooks} from "../../../../src/hooks/inboundHooks";
 import LoadingSpinner from "../../../../src/components/load-spinner/LoadingSpinner";
 import CustomLoadingText from "../../../../src/components/load-spinner/CustomLoadingText";
+import MessageToast from "../../../../src/components/message-toast/MessageToast";
+
 const tableHeaders = ["Date", "Document No.", "Intransit No.", ""];
 const tableVisibleProps = ["trndte", "docnum", "intnum"];
-import MessageToast from "../../../../src/components/message-toast/MessageToast";
 
 const PTO = () => {
   const {
@@ -97,6 +98,7 @@ const PTO = () => {
 
           {isScanModal && (
             <ScanModal
+              usage="searching"
               visible={isScanModal}
               onClose={handleScanModal}
               placeholder="Waiting to Scan WRR Barcode"

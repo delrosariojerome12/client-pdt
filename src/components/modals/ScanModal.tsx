@@ -22,6 +22,7 @@ interface ScanModalProps {
   onClose: () => void;
   placeholder: string;
   isNextBtn?: boolean;
+  usage: "scanning" | "searching";
   scanParams: ScanCategory;
   typeForFetching: ScanValidate;
 }
@@ -37,12 +38,11 @@ const ScanModal = React.memo((props: ScanModalProps) => {
     isNextBtn,
     scanParams,
     typeForFetching,
+    usage,
   } = props;
   const [scanfield, setScanfield] = useState<string>("");
 
-  //
   const [binfield, setBinfield] = useState<string>("");
-  // const [itemDetails, setItemDetails] = useState<any | null>(null);
 
   const handleOnChange = (key: string, value: string | number) => {
     setScanfield(String(value));
@@ -129,7 +129,7 @@ const ScanModal = React.memo((props: ScanModalProps) => {
 
             {renderButtons()}
 
-            {selectedDocument && (
+            {usage === "scanning" && selectedDocument && (
               <>
                 <View style={styles.itemContainer}>
                   <Text style={styles.floatingText}>Item Details</Text>

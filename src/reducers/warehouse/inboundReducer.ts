@@ -6,6 +6,7 @@ import {
   getWHS,
   getSRTO,
   getSRTODetails,
+  getWTO,
 } from "../../store/actions/warehouse/warehouseActions";
 import {PTOData} from "../../models/warehouse/inbound/PTO";
 import {PURData} from "../../models/warehouse/inbound/PUR";
@@ -23,6 +24,10 @@ interface Inbound {
   };
   pur: {
     data: PURData[] | [];
+    status: "idle" | "loading" | "success" | "failed";
+  };
+  wto: {
+    data: any[] | [];
     status: "idle" | "loading" | "success" | "failed";
   };
   whs: {
@@ -49,6 +54,10 @@ const initialState: Inbound = {
     status: "idle",
   },
   pur: {
+    data: [],
+    status: "idle",
+  },
+  wto: {
     data: [],
     status: "idle",
   },
@@ -118,6 +127,25 @@ const inboundReducer = createSlice({
       })
       .addCase(getPUR.rejected, (state, action) => {
         state.pur.status = "failed";
+      });
+
+    builder
+      .addCase(getWTO.pending, (state, action) => {
+        state.wto.status = "loading";
+      })
+      .addCase(getWTO.fulfilled, (state, action) => {
+        const {data, paginating} = action.payload;
+        if (paginating) {
+          console.log("paginating");
+          state.wto.data = [...state.wto.data, ...data.data];
+        } else {
+          console.log("normal fetch");
+          state.wto.data = data.data;
+        }
+        state.wto.status = "success";
+      })
+      .addCase(getWTO.rejected, (state, action) => {
+        state.wto.status = "failed";
       });
 
     builder

@@ -1,5 +1,6 @@
 export type ScanCategory =
   | "wrr"
+  | "wrr_srto"
   | "lpnnum"
   | "lpnnum_wto"
   | "lpnnum_srto"
