@@ -1,6 +1,6 @@
 import {useAppSelector, useAppDispatch} from "../store/store";
 import {ScanDocumentParams} from "../store/actions/generalActions";
-import axios from "axios";
+import axios, {AxiosResponse} from "axios";
 import {Alert} from "react-native";
 import {setStatus} from "../reducers/statusReducer";
 import {useServiceHooks} from "./serviceHooks";
@@ -26,6 +26,18 @@ interface GetLPN {
 interface ValidateBin {
   binnum: string;
   lpnnum: string;
+}
+
+interface Endpoint {
+  url: string;
+  method: "GET" | "POST" | "PATCH" | "DELETE";
+  payload?: any;
+}
+
+interface Result {
+  success: boolean;
+  data?: any;
+  error?: string;
 }
 
 export const useAPIHooks = () => {
@@ -514,5 +526,54 @@ export const useAPIHooks = () => {
     }
   };
 
-  return {scanBarcode, connectToPHPNotDispatch, getLPN, getBinAndValidate};
+  const removeScannedQuantityService = async (
+    endpoints: Endpoint[],
+    onSucces: () => void
+  ): Promise<Result[]> => {
+    const results: Result[] = [];
+    dispatch(setStatus("loading"));
+
+    const promises = endpoints.map(async (endpoint) => {
+      const {url, method, payload} = endpoint;
+
+      const completeUrl = `${baseUrl}/api/${url}`;
+
+      try {
+        let response: AxiosResponse;
+        switch (method) {
+          case "GET":
+            response = await axios.get(completeUrl);
+            break;
+          case "POST":
+            response = await axios.post(completeUrl, payload);
+            break;
+          case "PATCH":
+            response = await axios.patch(completeUrl, payload);
+            break;
+          case "DELETE":
+            response = await axios.delete(completeUrl);
+            break;
+
+          default:
+            throw new Error(`Unsupported method: ${method}`);
+        }
+        results.push({success: true, data: response.data});
+      } catch (error: any) {
+        results.push({success: false, error: error.message});
+      }
+    });
+
+    await Promise.all(promises);
+    dispatch(setStatus("success"));
+    onSucces();
+    return results;
+  };
+
+  return {
+    scanBarcode,
+    connectToPHPNotDispatch,
+    getLPN,
+    getBinAndValidate,
+    removeScannedQuantityService,
+  };
 };

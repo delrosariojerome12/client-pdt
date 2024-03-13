@@ -8,11 +8,13 @@ import {
 interface Status {
   status: "idle" | "loading" | "success" | "failed";
   statusText: string; // custom message for statuses
+  isQuantityFieldShown: boolean;
 }
 
 const initialState: Status = {
   status: "idle",
   statusText: "",
+  isQuantityFieldShown: false,
 };
 
 const statusReducer = createSlice({
@@ -28,6 +30,9 @@ const statusReducer = createSlice({
     },
     setStatus: (state, action) => {
       state.status = action.payload;
+    },
+    showQuantityField: (state, action) => {
+      state.isQuantityFieldShown = action.payload;
     },
   },
   extraReducers(builder) {
@@ -71,6 +76,7 @@ const statusReducer = createSlice({
   },
 });
 
-export const {resetStatus, setStatusText, setStatus} = statusReducer.actions;
+export const {resetStatus, setStatusText, setStatus, showQuantityField} =
+  statusReducer.actions;
 
 export default statusReducer.reducer;

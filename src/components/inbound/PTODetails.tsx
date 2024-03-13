@@ -52,8 +52,6 @@ const PTOItems = React.memo((props: Items) => {
           />
         </View>
         <View style={styles.rightContainer}>
-          {/* if validated */}
-          {/* <Text style={{fontWeight: "bold"}}>**VALIDATED**</Text> */}
           {!options?.removeLpn && (
             <View style={{flexDirection: "row", gap: 5}}>
               <Text style={{fontWeight: "bold"}}>LPN: </Text>

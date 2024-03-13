@@ -10,6 +10,7 @@ import {format} from "../../styles/styles";
 import {OutboundItem} from "../../models/warehouse/outbound/wto-outbound-item";
 import {useBatchHooks} from "../../hooks/batchHooks";
 import {useModalHooks} from "../../hooks/modalHooks";
+import {formatDateStringMMDDYYYY} from "../../helper/Date";
 
 interface Items {
   item: OutboundItem;
@@ -19,6 +20,7 @@ const WTODetails = React.memo((props: Items) => {
   const {removeScannedQuantity} = useBatchHooks();
   const {item} = props;
 
+  console.log(item.itmqty, item.scanqty);
   return (
     <>
       <View style={[styles.container, bgColors.mediumGrayishBG]}>
@@ -29,11 +31,11 @@ const WTODetails = React.memo((props: Items) => {
           </View>
           <View style={format.twoRowText}>
             <Text style={{fontWeight: "bold"}}>Item Code:</Text>
-            <Text>{` ${item.itmcde}`}</Text>
+            <Text>{`${item.itmcde}`}</Text>
           </View>
           <View style={format.twoRowText}>
             <Text style={{fontWeight: "bold"}}>Description:</Text>
-            <Text>{` ${item.itmdsc}`}</Text>
+            <Text>{`${item.itmdsc}`}</Text>
           </View>
           <View style={format.twoRowText}>
             <Text style={{fontWeight: "bold"}}>UOM:</Text>
@@ -41,14 +43,16 @@ const WTODetails = React.memo((props: Items) => {
           </View>
           <View style={format.twoRowText}>
             <Text style={{fontWeight: "bold"}}>Qty:</Text>
-            <Text>{` ${item.itmqty}`}</Text>
+            <Text>{`${item.itmqty}`}</Text>
           </View>
           <View style={styles.remove}>
             <View style={format.twoRowText}>
               <Text style={{fontWeight: "bold"}}>Scanned Qty:</Text>
-              <Text>{` ${item.scanqty}`}</Text>
+              <Text>{`${item.scanqty}`}</Text>
             </View>
             <TouchableOpacity
+              style={item.itmqty === item.scanqty && {opacity: 0.5}}
+              disabled={item.itmqty === item.scanqty ? true : false}
               onPress={() => {
                 removeScannedQuantity(item, "wto-outbound");
               }}
@@ -60,26 +64,35 @@ const WTODetails = React.memo((props: Items) => {
         <View style={styles.rightContainer}>
           <View style={styles.datesContainer}>
             <View>
+              {item.itmqty === item.scanqty && (
+                <Text style={{color: "green", fontWeight: "bold"}}>
+                  **Validated**
+                </Text>
+              )}
               <View style={format.twoRowText}>
                 <Text style={{fontWeight: "bold"}}>Bin No.:</Text>
-                <Text>{` ${item.binnum2} `}</Text>
+                <Text>{`${item.binnum2} `}</Text>
               </View>
               <View style={format.twoRowText}>
                 <Text style={{fontWeight: "bold"}}>Batch No.:</Text>
-                <Text>{` ${item.batchnum}`}</Text>
+                <Text>{`${item.batchnum}`}</Text>
               </View>
               <View style={format.twoRowText}>
                 <Text style={{fontWeight: "bold"}}>Mfg. Date:</Text>
-                <Text>{` ${item.mfgdte}`}</Text>
+                <Text>{`${
+                  formatDateStringMMDDYYYY(item.mfgdte as string) || "No Date"
+                }`}</Text>
               </View>
               <View style={format.twoRowText}>
                 <Text style={{fontWeight: "bold"}}>Exp. Date:</Text>
-                <Text>{` ${item.expdte}`}</Text>
+                <Text>{`${
+                  formatDateStringMMDDYYYY(item.expdte as string) || "No Date"
+                }`}</Text>
               </View>
             </View>
           </View>
           <CustomButton
-            // onPress={() => handleItemScanModal(item)}
+            isDisable={item.itmqty === item.scanqty ? true : false}
             onPress={() => toggleOutboundItemScan(item)}
             title="SCAN ITEM"
             type="regular"

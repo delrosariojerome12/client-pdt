@@ -112,7 +112,7 @@ const PTO = () => {
               visible={isSelectModal}
               onClose={closeSelectModal}
               selectedItem={selectedDocument}
-              loadingStatus={ptoDetails.status === "loading"}
+              loadingStatus={ptoDetails.status === "loading" && true}
               title="Purchase Transfer Order Details"
               propertiesToShow={[
                 {name: "docnum", label: "Document Number"},

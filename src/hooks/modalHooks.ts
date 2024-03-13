@@ -8,6 +8,7 @@ import {
   handleToggleOutboundItemScan,
 } from "../reducers/modalReducer";
 import {handleSetItem} from "../reducers/documentReducer";
+import {showQuantityField, setStatus} from "../reducers/statusReducer";
 
 import {useAppDispatch, useAppSelector} from "../store/store";
 
@@ -19,6 +20,8 @@ export const useModalHooks = () => {
     if (item) {
       dispatch(handleSetItem(item));
     }
+    dispatch(setStatus("idle"));
+    dispatch(showQuantityField(false));
     dispatch(handleToggleOutboundItemScan());
   };
 

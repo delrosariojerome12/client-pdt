@@ -1,11 +1,19 @@
 import React, {useState} from "react";
-import {Modal, View, Text, StyleSheet, TouchableOpacity} from "react-native";
+import {
+  Modal,
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+} from "react-native";
 import CustomInputs from "../../forms/inputs/CustomInputs";
 import {FontAwesome5, Ionicons} from "@expo/vector-icons";
 import {useAppSelector} from "../../../store/store";
 import CustomButton from "../../forms/buttons/CustomButton";
 import {useDocumentHooks} from "../../../hooks/documentHooks";
-import {format} from "../../../styles/styles";
+import {format, generalStyles} from "../../../styles/styles";
 import MessageToast from "../../message-toast/MessageToast";
 import {ScanValidate} from "../../../hooks/documentHooks";
 import CustomLoadingText from "../../load-spinner/CustomLoadingText";
@@ -22,18 +30,42 @@ const OutboundItemScanModal = React.memo((props: ScanModalProps) => {
   const {toggleOutboundItemScan} = useModalHooks();
   const {handleScanItem} = useDocumentHooks();
   const item: any = selectedItem;
-  const {status} = useAppSelector((state) => state.status);
+  const {status, isQuantityFieldShown, statusText} = useAppSelector(
+    (state) => state.status
+  );
 
   const [scanfield, setScanfield] = useState<string>("");
+  const [itemBarcode, setItemBarcode] = useState<string>("");
   const [quantityField, setQuantityField] = useState<number>(1);
 
   const {visible, scanType} = props;
+
   const handleOnChange = (key: string, value: string | number) => {
     setScanfield(String(value));
   };
 
   const handleOnQuantityChange = (key: string, value: number | string) => {
     setQuantityField(parseInt(value as any));
+  };
+
+  const handleSubmit = () => {
+    if (isQuantityFieldShown && !itemBarcode) {
+      return Alert.alert("Empty Field", "Invalid Item Barcode", [
+        {
+          text: "OK",
+        },
+      ]);
+    }
+    setQuantityField(1);
+    setItemBarcode("");
+    handleScanItem(
+      {
+        barcode: scanfield,
+        receiveQty: quantityField,
+        barcodelvl2: itemBarcode,
+      },
+      scanType
+    );
   };
 
   if (item) {
@@ -46,7 +78,7 @@ const OutboundItemScanModal = React.memo((props: ScanModalProps) => {
         {status === "success" && (
           <MessageToast
             status="success"
-            text="Item Successfully Scanned."
+            text={statusText || "Item Successfully Scanned."}
             speed={2000}
             customPosition={[-150, -10]}
           />
@@ -57,117 +89,141 @@ const OutboundItemScanModal = React.memo((props: ScanModalProps) => {
               <CustomLoadingText text="Processing..." visible={true} />
             )}
 
-            <View style={styles.headerContainer}>
-              <TouchableOpacity onPress={toggleOutboundItemScan}>
-                <FontAwesome5 name="arrow-left" size={24} color="black" />
-              </TouchableOpacity>
-              <View style={{flexDirection: "row", gap: 10}}>
-                <Ionicons name="scan" size={24} color="black" />
-                <Text style={styles.headerText}>Scan Barcode</Text>
+            <ScrollView contentContainerStyle={{gap: 12}}>
+              <View style={styles.headerContainer}>
+                <TouchableOpacity onPress={toggleOutboundItemScan}>
+                  <FontAwesome5 name="arrow-left" size={24} color="black" />
+                </TouchableOpacity>
+
+                <View style={{flexDirection: "row", gap: 10}}>
+                  <Ionicons name="scan" size={24} color="black" />
+                  <Text style={styles.headerText}>Scan Barcode</Text>
+                </View>
               </View>
-            </View>
 
-            <CustomInputs
-              onInputChange={handleOnChange}
-              inputValue={scanfield}
-              type="text"
-              placeHolder="Waiting to Scan Barcode..."
-              inputKey="scan"
-              isFocus={true}
-              onSubmit={() => {
-                setQuantityField(1);
-                setScanfield("");
-                handleScanItem(
-                  {barcode: scanfield, receiveQty: quantityField},
-                  scanType
-                );
-              }}
-            />
-
-            <View style={styles.item}>
-              <Text
-                style={{
-                  position: "absolute",
-                  top: -10,
-                  left: 10,
-                  backgroundColor: "#fff",
+              <CustomInputs
+                isEditable={isQuantityFieldShown ? false : true}
+                onInputChange={handleOnChange}
+                inputValue={scanfield}
+                type="text"
+                placeHolder="Waiting to Scan Bin No. Barcode..."
+                inputKey="scan"
+                isFocus={true}
+                onSubmit={() => {
+                  handleSubmit();
                 }}
-              >
-                Item Details
-              </Text>
-              <View style={format.twoRowText}>
-                <Text style={{fontWeight: "bold"}}>Line No: </Text>
-                <Text>{item.linenum}</Text>
-              </View>
-              <View style={format.twoRowText}>
-                <Text style={{fontWeight: "bold"}}>Item Code: </Text>
-                <Text>{item.itmcde}</Text>
-              </View>
-              <View style={format.twoRowText}>
-                <Text style={{fontWeight: "bold"}}>Description: </Text>
-                <Text> {item.itmdsc}</Text>
-              </View>
-              <View style={format.twoRowText}>
-                <Text style={{fontWeight: "bold"}}>Batch No.:</Text>
-                <Text>{` ${item.batchnum || "No BatchNo."}`}</Text>
-              </View>
-
-              <View style={format.twoRowText}>
-                <Text style={{fontWeight: "bold"}}>Mfg. Date:</Text>
-                <Text>{` ${
-                  formatDateStringMMDDYYYY(item.mfgdte as string) || "No Date"
-                } `}</Text>
-              </View>
-              <View style={format.twoRowText}>
-                <Text style={{fontWeight: "bold"}}>Exp. Date:</Text>
-                <Text>{` ${
-                  formatDateStringMMDDYYYY(item.expdte as string) || "No Date"
-                }`}</Text>
-              </View>
-              <View style={format.twoRowText}>
-                <Text style={{fontWeight: "bold"}}>Bin No.:</Text>
-                <Text>{` ${item.binnum} `}</Text>
-              </View>
-
-              <View style={format.twoRowText}>
-                <Text style={{fontWeight: "bold"}}>Qty: </Text>
-                <Text> {`${item.itmqty || ""} `}</Text>
-              </View>
-
-              <View style={format.twoRowText}>
-                <Text style={{fontWeight: "bold"}}>UOM: </Text>
-                <Text> {`${item.untmea || ""}`}</Text>
-              </View>
-
-              <View style={format.twoRowText}>
-                <Text style={{fontWeight: "bold"}}>Scanned Quantity: </Text>
-                <Text> {`${item.scanqty}`}</Text>
-              </View>
-            </View>
-
-            <View style={styles.buttonContainer}>
-              <CustomButton
-                onPress={() => {
-                  setQuantityField(1);
-                  setScanfield("");
-                  handleScanItem(
-                    {barcode: scanfield, receiveQty: quantityField},
-                    scanType
-                  );
-                }}
-                title="NEXT"
-                type="regular"
-                isWidthNotFull={true}
-                useFlex={true}
               />
-              <CustomButton
-                onPress={toggleOutboundItemScan}
-                title="CLOSE"
-                type="delete"
-                isWidthNotFull={true}
-                useFlex={true}
-              />
-            </View>
+
+              <View style={styles.item}>
+                <Text
+                  style={{
+                    position: "absolute",
+                    top: -10,
+                    left: 10,
+                    backgroundColor: "#fff",
+                  }}
+                >
+                  Item Details
+                </Text>
+                <View style={format.twoRowText}>
+                  <Text style={{fontWeight: "bold"}}>Line No: </Text>
+                  <Text>{item.linenum}</Text>
+                </View>
+                <View style={format.twoRowText}>
+                  <Text style={{fontWeight: "bold"}}>Item Code: </Text>
+                  <Text>{item.itmcde}</Text>
+                </View>
+                <View style={format.twoRowText}>
+                  <Text style={{fontWeight: "bold"}}>Description: </Text>
+                  <Text>{item.itmdsc}</Text>
+                </View>
+                <View style={format.twoRowText}>
+                  <Text style={{fontWeight: "bold"}}>Batch No.:</Text>
+                  <Text>{`${item.batchnum || "No BatchNo."}`}</Text>
+                </View>
+
+                <View style={format.twoRowText}>
+                  <Text style={{fontWeight: "bold"}}>Mfg. Date:</Text>
+                  <Text>{`${
+                    formatDateStringMMDDYYYY(item.mfgdte as string) || "No Date"
+                  } `}</Text>
+                </View>
+                <View style={format.twoRowText}>
+                  <Text style={{fontWeight: "bold"}}>Exp. Date:</Text>
+                  <Text>{`${
+                    formatDateStringMMDDYYYY(item.expdte as string) || "No Date"
+                  }`}</Text>
+                </View>
+                <View style={format.twoRowText}>
+                  <Text style={{fontWeight: "bold"}}>Bin No.:</Text>
+                  <Text>{`${item.binnum} `}</Text>
+                </View>
+
+                <View style={format.twoRowText}>
+                  <Text style={{fontWeight: "bold"}}>Qty: </Text>
+                  <Text> {`${item.itmqty || ""} `}</Text>
+                </View>
+
+                <View style={format.twoRowText}>
+                  <Text style={{fontWeight: "bold"}}>UOM: </Text>
+                  <Text> {`${item.untmea || ""}`}</Text>
+                </View>
+
+                <View style={format.twoRowText}>
+                  <Text style={{fontWeight: "bold"}}>Scanned Quantity: </Text>
+                  <Text> {`${item.scanqty}`}</Text>
+                </View>
+              </View>
+
+              {isQuantityFieldShown && (
+                <>
+                  <CustomInputs
+                    onInputChange={(key: string, value: string | number) => {
+                      setItemBarcode(String(value));
+                    }}
+                    inputValue={itemBarcode}
+                    type="text"
+                    placeHolder="Waiting To Scan Item Barcode"
+                    inputKey="itemBarcode"
+                    onSubmit={() => {
+                      handleSubmit();
+                    }}
+                  />
+
+                  <View style={styles.quantityContainer}>
+                    <Text>Quantity: </Text>
+                    <CustomInputs
+                      onInputChange={handleOnQuantityChange}
+                      inputValue={quantityField}
+                      type="numeric"
+                      placeHolder="Quantity"
+                      inputKey="quantity"
+                      customWidth={252}
+                      useFlex={true}
+                    />
+                  </View>
+                </>
+              )}
+
+              <View style={styles.buttonContainer}>
+                <CustomButton
+                  onPress={() => {
+                    handleSubmit();
+                  }}
+                  title="NEXT"
+                  type="regular"
+                  isWidthNotFull={true}
+                  useFlex={true}
+                />
+                <CustomButton
+                  onPress={toggleOutboundItemScan}
+                  title="CLOSE"
+                  type="delete"
+                  isWidthNotFull={true}
+                  useFlex={true}
+                />
+              </View>
+            </ScrollView>
           </View>
         </View>
       </Modal>
@@ -186,8 +242,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 20,
-    // borderWidth: 1,
   },
+
   quantityContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -198,7 +254,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     padding: 20,
     height: "100%",
-    gap: 40,
+    gap: 20,
     width: "100%",
   },
   buttonContainer: {

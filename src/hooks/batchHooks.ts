@@ -3,6 +3,8 @@ import {Alert} from "react-native";
 import {
   getPTODetails,
   getPTO,
+  getWTOOutboundDetails,
+  getWTOOutboundValid,
 } from "../store/actions/warehouse/warehouseActions";
 import {
   handleToggleAddBatchModal,
@@ -40,14 +42,131 @@ export const useBatchHooks = () => {
   } = useAppSelector((state) => state.general);
   const dispatch = useAppDispatch();
   const {handlePost} = useDocumentHooks();
-  const {connectToPHPNotDispatch} = useAPIHooks();
+  const {connectToPHPNotDispatch, removeScannedQuantityService} = useAPIHooks();
 
+  // on remove then load
   const checkDetailsToReload = (detailsToLoad: TypeSelect) => {
     switch (detailsToLoad) {
       case "pto":
         dispatch(getPTODetails({docnum: selectedDocument.docnum}));
         dispatch(getPTO({limit: 10, offset: 0}));
+        break;
+      case "wto-outbound":
+        dispatch(getWTOOutboundDetails({docnum: selectedDocument.docnum}));
+        dispatch(getWTOOutboundValid({limit: 10, offset: 0}));
+        break;
 
+      default:
+        break;
+    }
+  };
+
+  interface Endpoint {
+    url: string;
+    method: "GET" | "POST" | "PATCH" | "DELETE";
+    payload?: any;
+  }
+
+  const checkRemove = async (uses: TypeSelect, item: any) => {
+    switch (uses) {
+      case "pto":
+        const ptoEndpoints: Endpoint[] = [
+          {
+            method: "PATCH",
+            url: `lst_tracc/purchasetofile1`,
+            payload: {
+              data: {doclock: "Y", pdtopen: "Y"},
+              field: {docnum: selectedDocument.docnum},
+            },
+          },
+          {
+            method: "PATCH",
+            url: `lst_tracc/purchasetofile2`,
+            payload: {
+              data: {itmqty: 0},
+              field: {recid: item.recid},
+            },
+          },
+          {
+            method: "DELETE",
+            url: `/lst_tracc/purchasetofile2?linklpnnum=${item.lpnnum}`,
+          },
+        ];
+        // dispatch(
+        //   deleteScanQuantity({
+        //     document: {
+        //       data: {doclock: "Y", pdtopen: "Y"},
+        //       field: {docnum: selectedDocument.docnum},
+        //     },
+        //     item: {
+        //       data: {itmqty: 0},
+        //       field: {recid: item.recid},
+        //     },
+        //     lpnnum: item.lpnnum,
+        //     onSuccess: () => {
+        //       checkDetailsToReload(uses);
+        //       dispatch(setStatusText(`Scanned Quantity Removed Successfully.`));
+        //       connectToPHPNotDispatch({
+        //         recid: item.recid,
+        //         docnum: selectedDocument.docnum,
+        //         type: "rearrangelinennum",
+        //       });
+        //     },
+        //   })
+        // );
+        const ptoResponse = await removeScannedQuantityService(
+          ptoEndpoints,
+          () => {
+            checkDetailsToReload(uses);
+            dispatch(setStatusText(`Scanned Quantity Removed Successfully.`));
+            connectToPHPNotDispatch({
+              recid: item.recid,
+              docnum: selectedDocument.docnum,
+              type: "rearrangelinennum",
+            });
+          }
+        );
+        console.log("wat da hel", ptoResponse);
+        break;
+      case "wto-outbound":
+        const wtoEndpoints: Endpoint[] = [
+          {
+            method: "GET",
+            url: `lst_tracc/warehousetransferorderfile2?recid=${item.recid}&_includes=docnum,validate`,
+          },
+          {
+            method: "PATCH",
+            url: `lst_tracc/warehousetransferorderfile2`,
+            payload: {
+              field: {
+                recid: item.recid,
+              },
+              data: {
+                scanqty: 0,
+              },
+            },
+          },
+          {
+            method: "PATCH",
+            url: `lst_tracc/warehousetransferorderfile1`,
+            payload: {
+              field: {
+                docnum: selectedDocument.docnum,
+              },
+              data: {
+                doclock: "Y",
+              },
+            },
+          },
+        ];
+        const wtoResponse = await removeScannedQuantityService(
+          wtoEndpoints,
+          () => {
+            checkDetailsToReload(uses);
+            dispatch(setStatusText(`Scanned Quantity Removed Successfully.`));
+          }
+        );
+        console.log("wat da hel", wtoResponse);
         break;
 
       default:
@@ -138,7 +257,6 @@ export const useBatchHooks = () => {
   };
 
   const removeScannedQuantity = (item: any, detailsToLoad: TypeSelect) => {
-    // clear scanned items
     Alert.alert(
       "Remove Scanned Quantity",
       `Are you sure you want to remove the scanned quantity of item: '${item.itmdsc}'`,
@@ -146,30 +264,7 @@ export const useBatchHooks = () => {
         {
           text: "Yes",
           onPress: () => {
-            dispatch(
-              deleteScanQuantity({
-                document: {
-                  data: {doclock: "Y", pdtopen: "Y"},
-                  field: {docnum: selectedDocument.docnum},
-                },
-                item: {
-                  data: {itmqty: 0},
-                  field: {recid: item.recid},
-                },
-                lpnnum: item.lpnnum,
-                onSuccess: () => {
-                  checkDetailsToReload(detailsToLoad);
-                  dispatch(
-                    setStatusText(`Scanned Quantity Removed: '${item.lpnnum}'`)
-                  );
-                  connectToPHPNotDispatch({
-                    recid: item.recid,
-                    docnum: selectedDocument.docnum,
-                    type: "rearrangelinennum",
-                  });
-                },
-              })
-            );
+            checkRemove(detailsToLoad, item);
           },
           style: "destructive",
         },
@@ -177,13 +272,6 @@ export const useBatchHooks = () => {
       ]
     );
   };
-
-  // const handleClose = () => {
-  //   handleCloseEditBatchModal();
-  //   // setSaved(false);
-  //   dispatch(setBatchedSaved(false));
-  //   dispatch(clearBatchDetails());
-  // };
 
   // modals
   const handleAddBatchModal = (item: any) => {

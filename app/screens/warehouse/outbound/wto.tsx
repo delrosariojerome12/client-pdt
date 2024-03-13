@@ -117,7 +117,7 @@ const WTO = () => {
 
           {isSelectModal && (
             <SelectModal
-              loadingStatus={wtoOutboundDetails.status === "loading"}
+              loadingStatus={wtoOutboundDetails.status === "loading" && true}
               visible={isSelectModal}
               onClose={closeSelectModal}
               selectedItem={selectedDocument}

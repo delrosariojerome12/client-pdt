@@ -7,6 +7,7 @@ import {
   handleToggleSearchModal,
   handleSetSearchModalContent,
   handleToggleAddBatchModal,
+  handleToggleOutboundItemScan,
 } from "../reducers/modalReducer";
 import {
   getPTODetails,
@@ -16,6 +17,8 @@ import {
   getSTGValidateDetails,
   getPTO,
   getPUR,
+  getWTOOutboundValid,
+  getWTOOutboundPost,
 } from "../store/actions/warehouse/warehouseActions";
 import {handleSetDocument, handleSetItem} from "../reducers/documentReducer";
 import {ScanDocumentParams} from "../store/actions/generalActions";
@@ -24,7 +27,7 @@ import {resetStatus} from "../reducers/statusReducer";
 import {formatDateYYYYMMDD} from "../helper/Date";
 import {clearBatchDetails} from "../reducers/generalReducer";
 import {useAPIHooks} from "./apiHooks";
-import {setStatusText} from "../reducers/statusReducer";
+import {setStatusText, showQuantityField} from "../reducers/statusReducer";
 
 export type ButtonUses =
   | "pto"
@@ -78,12 +81,14 @@ export const useDocumentHooks = () => {
   const {selectedDocument, selectedItem} = useAppSelector(
     (state) => state.document
   );
+  const {isQuantityFieldShown} = useAppSelector((state) => state.status);
   const {
     batchDetails: {batchNo, expDate, mfgDate},
   } = useAppSelector((state) => state.general);
 
   const dispatch = useAppDispatch();
-  const {scanBarcode, getLPN, getBinAndValidate} = useAPIHooks();
+  const {scanBarcode, getLPN, getBinAndValidate, connectToPHPNotDispatch} =
+    useAPIHooks();
 
   // start check categories and uses functions
 
@@ -111,9 +116,8 @@ export const useDocumentHooks = () => {
     }
   };
 
-  const checkPostType = (item: any, type: TypePost) => {
-    console.log("tingin", item);
-
+  const checkPostType = async (item: any, type: TypePost, docnum?: string) => {
+    console.log("tingin", docnum);
     switch (type) {
       case "pto":
         dispatch(
@@ -197,6 +201,45 @@ export const useDocumentHooks = () => {
           })
         );
         break;
+      case "wto-outbound":
+        console.log(item.recid);
+        console.log(selectedDocument);
+
+        if (docnum) {
+          dispatch(
+            connectToPHP({
+              recid: item.recid,
+              docnum: item.docnum,
+              type: "WTO_SOFTVAL",
+              onSuccess: () => {
+                connectToPHPNotDispatch({
+                  recid: item.recid,
+                  docnum: item.docnum,
+                  type: "WTO_POST",
+                });
+
+                dispatch(
+                  getWTOOutboundPost({
+                    limit: 10,
+                    offset: 0,
+                  })
+                );
+              },
+              onFailure: (e) => {
+                dispatch(resetStatus());
+                Alert.alert("Transaction Posting Fail", `${e}`, [
+                  {
+                    text: "Ok",
+                    onPress: () => {},
+                    style: "destructive",
+                  },
+                ]);
+              },
+            })
+          );
+        }
+
+        break;
 
       default:
         alert("No api yet.");
@@ -206,12 +249,14 @@ export const useDocumentHooks = () => {
 
   // scanning item
   const checkScanType = async (
-    {barcode, receiveQty}: {barcode: string; receiveQty: number},
+    {
+      barcode,
+      receiveQty,
+      barcodelvl2,
+    }: {barcode: string; receiveQty: number; barcodelvl2?: string},
     scanUsage: ScanValidate
   ) => {
     if (selectedItem) {
-      console.log("eyy", scanUsage);
-
       switch (scanUsage) {
         case "pto":
           try {
@@ -236,7 +281,6 @@ export const useDocumentHooks = () => {
             if (response.data.pto2_data) {
               dispatch(getPTODetails({docnum: selectedDocument.docnum}));
               dispatch(getPTO({limit: 10, offset: 0}));
-
               // closing conditions
               if (response.data.pto2_data[0]) {
                 dispatch(handleSetItem(response.data.pto2_data[0]));
@@ -261,15 +305,41 @@ export const useDocumentHooks = () => {
               category: "lpnnum_wto_outbound",
               recid: selectedItem?.recid.toString(),
               docnum: selectedDocument.docnum,
-              scanlevel: "1",
-              pdtmanualqtyoutbound: "1",
+              scanlevel: barcodelvl2 ? "2" : "1",
+              pdtmanualqtyoutbound: receiveQty.toString(),
               fromspl: undefined,
               spl_docnum: undefined,
               usrnam: userDetails?.usrcde,
-              barcodelvl2: "",
+              barcodelvl2: barcodelvl2,
             });
 
-            console.log(response);
+            console.log("bato", response);
+
+            if (response && response.data.wto2_data) {
+              dispatch(showQuantityField(true));
+              !isQuantityFieldShown &&
+                dispatch(setStatusText(`Bin No. Successfully Scanned.`));
+              if (isQuantityFieldShown) {
+                console.log("wat", selectedDocument.docnum);
+                dispatch(
+                  getWTOOutboundDetails({docnum: selectedDocument.docnum})
+                );
+                dispatch(getWTOOutboundValid({limit: 10, offset: 0}));
+                dispatch(setStatusText(`Item Successfully Scanned.`));
+                if (response.data.wto2_data[0]) {
+                  dispatch(handleSetItem(response.data.wto2_data[0]));
+                  if (
+                    response.data.wto2_data[0].itmqty === 0 &&
+                    receiveQty > 1
+                  ) {
+                    dispatch(handleToggleOutboundItemScan());
+                  }
+                }
+                if (response.data.wto2_data.length === 0) {
+                  dispatch(handleToggleOutboundItemScan());
+                }
+              }
+            }
           } catch (error) {
             console.log(error);
           }
@@ -377,7 +447,7 @@ export const useDocumentHooks = () => {
           {
             text: "Yes",
             onPress: () => {
-              checkPostType(item, type);
+              checkPostType(item, type, item.docnum);
             },
             style: "destructive",
           },
@@ -403,12 +473,16 @@ export const useDocumentHooks = () => {
   };
 
   const handleScanItem = (
-    {barcode, receiveQty}: {barcode: string; receiveQty: number},
+    {
+      barcode,
+      receiveQty,
+      barcodelvl2,
+    }: {barcode: string; receiveQty: number; barcodelvl2?: string},
     scanUsage: ScanValidate
   ) => {
     if (!barcode || receiveQty === 0) {
       Alert.alert(
-        "Empty Fields",
+        "Empty Field",
         "Please make sure barcode and quantity is filled.",
         [
           {
@@ -418,7 +492,7 @@ export const useDocumentHooks = () => {
       );
       return;
     }
-    checkScanType({barcode, receiveQty}, scanUsage);
+    checkScanType({barcode, receiveQty, barcodelvl2}, scanUsage);
   };
 
   // subject to change

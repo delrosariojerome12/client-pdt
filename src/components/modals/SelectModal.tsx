@@ -14,6 +14,7 @@ import {shadows} from "../../styles/styles";
 import LoadingSpinner from "../load-spinner/LoadingSpinner";
 import {useAppSelector} from "../../store/store";
 import MessageToast from "../message-toast/MessageToast";
+import CustomLoadingText from "../load-spinner/CustomLoadingText";
 
 interface SelectModalProps {
   visible: boolean;
@@ -37,10 +38,6 @@ const SelectModal = React.memo((props: SelectModalProps) => {
   } = props;
   const {status, statusText} = useAppSelector((state) => state.status);
 
-  useEffect(() => {
-    console.log("select modal fetch");
-  }, []);
-
   if (selectedItem) {
     return (
       <Modal visible={visible} onRequestClose={onClose} transparent>
@@ -61,6 +58,10 @@ const SelectModal = React.memo((props: SelectModalProps) => {
               <Text style={styles.headerText}>{title}</Text>
             </View>
 
+            {status === "loading" && (
+              <CustomLoadingText text="Processing..." visible={true} />
+            )}
+
             <View style={[shadows.boxShadow, styles.propertiesContainer]}>
               {propertiesToShow.map((propertyObj) => (
                 <View key={propertyObj.name} style={styles.properties}>
@@ -70,13 +71,13 @@ const SelectModal = React.memo((props: SelectModalProps) => {
               ))}
             </View>
 
-            {loadingStatus ? (
+            {loadingStatus && (
               <ActivityIndicator size="large" color="#0000ff" />
-            ) : (
-              <ScrollView style={styles.customContainer}>
-                {customContent}
-              </ScrollView>
             )}
+
+            <ScrollView style={styles.customContainer}>
+              {customContent}
+            </ScrollView>
           </View>
         </View>
       </Modal>
