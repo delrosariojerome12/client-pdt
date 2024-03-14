@@ -433,6 +433,11 @@ export const useAPIHooks = () => {
     } catch (error: any) {
       dispatch(setStatus("failed"));
       console.log(error);
+      Alert.alert("Something Went Wrong", "Server Error", [
+        {
+          text: "OK",
+        },
+      ]);
     }
   };
 

@@ -42,6 +42,7 @@ const EditBatchModal = React.memo(() => {
   console.log("edit batch modal");
 
   const handleEditSave = () => {
+    console.log(batchPostMode);
     switch (batchPostMode) {
       case "postUpdateBatch":
         handlePostUpdateBatch();
@@ -53,8 +54,6 @@ const EditBatchModal = React.memo(() => {
         break;
     }
   };
-
-  console.log(status);
 
   return (
     <>

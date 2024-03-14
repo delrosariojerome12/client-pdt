@@ -1,9 +1,5 @@
 import {createSlice} from "@reduxjs/toolkit";
-import {
-  connectToPHP,
-  updateBatch,
-  deleteScanQuantity,
-} from "../store/actions/generalActions";
+import {connectToPHP, updateBatch} from "../store/actions/generalActions";
 
 interface Status {
   status: "idle" | "loading" | "success" | "failed";
@@ -60,18 +56,6 @@ const statusReducer = createSlice({
         state.status = "success";
       })
       .addCase(updateBatch.rejected, (state) => {
-        state.status = "failed";
-      });
-
-    builder
-      .addCase(deleteScanQuantity.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(deleteScanQuantity.fulfilled, (state, action) => {
-        console.log(action.payload);
-        state.status = "success";
-      })
-      .addCase(deleteScanQuantity.rejected, (state) => {
         state.status = "failed";
       });
   },

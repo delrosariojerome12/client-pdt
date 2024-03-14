@@ -6,14 +6,15 @@ import {useAppSelector} from "../../store/store";
 import CustomButton from "../forms/buttons/CustomButton";
 import {useDocumentHooks} from "../../hooks/documentHooks";
 import {format} from "../../styles/styles";
-import {ScanCategory} from "../../models/generic/ScanCategory";
 import MessageToast from "../message-toast/MessageToast";
 import {ScanValidate} from "../../hooks/documentHooks";
 import CustomLoadingText from "../load-spinner/CustomLoadingText";
+import {ScanOptions} from "../list-holder/ItemsList";
 
 interface ScanModalProps {
   visible: boolean;
   scanType: ScanValidate;
+  options?: ScanOptions;
 }
 
 const ItemScanModal = React.memo((props: ScanModalProps) => {
@@ -25,7 +26,7 @@ const ItemScanModal = React.memo((props: ScanModalProps) => {
   const [scanfield, setScanfield] = useState<string>("");
   const [quantityField, setQuantityField] = useState<number>(1);
 
-  const {visible, scanType} = props;
+  const {visible, scanType, options} = props;
   const handleOnChange = (key: string, value: string | number) => {
     setScanfield(String(value));
   };
@@ -35,6 +36,8 @@ const ItemScanModal = React.memo((props: ScanModalProps) => {
   };
 
   console.log("item scan modal");
+  console.log(options);
+  console.log(item);
 
   if (item) {
     return (
@@ -115,14 +118,23 @@ const ItemScanModal = React.memo((props: ScanModalProps) => {
                 <Text style={{fontWeight: "bold"}}>Item Description: </Text>
                 <Text> {item.itmdsc}</Text>
               </View>
+
               <View style={format.twoRowText}>
                 <Text style={{fontWeight: "bold"}}>Int Quantity: </Text>
-                <Text> {`${item.intqty || ""} PCS`}</Text>
+                {options?.receivedQty ? (
+                  <Text> {`${item.itmqty || ""} PCS`}</Text>
+                ) : (
+                  <Text> {`${item.intqty || ""} PCS`}</Text>
+                )}
               </View>
 
               <View style={format.twoRowText}>
                 <Text style={{fontWeight: "bold"}}>Received Quantity: </Text>
-                <Text> {`${item.itmqty} PCS`}</Text>
+                {options?.receivedQty ? (
+                  <Text> {`${item.intqty} PCS`}</Text>
+                ) : (
+                  <Text> {`${item.itmqty} PCS`}</Text>
+                )}
               </View>
             </View>
 

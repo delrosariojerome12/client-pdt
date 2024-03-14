@@ -33,16 +33,13 @@ const WTO = () => {
     isSelectModal,
     selectedDocument,
     status,
+    wtoDetails,
   } = useInboundHooks({
     page: "wto",
   });
 
   const {handleScanModal, handleSelectModal, closeSelectModal, handlePost} =
     useDocumentHooks();
-
-  useEffect(() => {
-    console.log("api call");
-  }, []);
 
   console.log("WTO");
 
@@ -85,9 +82,9 @@ const WTO = () => {
             visibleProperties={tableVisibleProps}
             onSelect={handleSelectModal}
             onPost={handlePost}
-            selectType="pto"
-            postType="pto"
-            buttonUses="pto"
+            selectType="wto-inbound"
+            postType="wto-inbound"
+            buttonUses="wto-inbound"
           />
 
           {isScanModal && (
@@ -95,8 +92,9 @@ const WTO = () => {
               visible={isScanModal}
               onClose={handleScanModal}
               placeholder="Waiting to Scan WRR Barcode"
-              scanParams={"wrr"}
-              typeForFetching="pto"
+              scanParams={"wrr_wto"}
+              typeForFetching="wto-inbound"
+              usage="searching"
             />
           )}
 
@@ -105,14 +103,15 @@ const WTO = () => {
               visible={isSelectModal}
               onClose={closeSelectModal}
               selectedItem={selectedDocument}
-              // loadingStatus={ptoDetails.status === "loading"}
-              loadingStatus={false}
+              loadingStatus={wtoDetails.status === "loading"}
               title="Warehouse Transfer Order Details"
               propertiesToShow={[
                 {name: "docnum", label: "Document Number"},
                 {name: "intnum", label: "Intransit Number"},
               ]}
-              customContent={<ItemsList uses="inbound" subcategory="pto" />}
+              customContent={
+                <ItemsList uses="inbound" subcategory="wto-inbound" />
+              }
             />
           )}
         </ScrollView>

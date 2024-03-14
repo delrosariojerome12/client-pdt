@@ -43,8 +43,6 @@ const BatchSearch = React.memo((props: BatchSearchProps) => {
 
   console.log("batch search");
 
-  console.log(batch.data.length);
-
   return (
     <Modal visible={visible} onRequestClose={onClose}>
       <View style={styles.centeredView}>
@@ -97,6 +95,7 @@ const BatchSearch = React.memo((props: BatchSearchProps) => {
               isPostDisable={true}
               isSelectDisable={true}
               onBatchSelect={handleSetBatchNum}
+              buttonUses=""
             />
           </View>
         </ScrollView>

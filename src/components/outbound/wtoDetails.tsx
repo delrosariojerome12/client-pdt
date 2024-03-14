@@ -11,16 +11,17 @@ import {OutboundItem} from "../../models/warehouse/outbound/wto-outbound-item";
 import {useBatchHooks} from "../../hooks/batchHooks";
 import {useModalHooks} from "../../hooks/modalHooks";
 import {formatDateStringMMDDYYYY} from "../../helper/Date";
+import {Options} from "../list-holder/ItemsList";
 
 interface Items {
   item: OutboundItem;
+  options: Options;
 }
 const WTODetails = React.memo((props: Items) => {
   const {toggleOutboundItemScan} = useModalHooks();
   const {removeScannedQuantity} = useBatchHooks();
-  const {item} = props;
+  const {item, options} = props;
 
-  console.log(item.itmqty, item.scanqty);
   return (
     <>
       <View style={[styles.container, bgColors.mediumGrayishBG]}>
@@ -54,7 +55,7 @@ const WTODetails = React.memo((props: Items) => {
               style={item.itmqty === item.scanqty && {opacity: 0.5}}
               disabled={item.itmqty === item.scanqty ? true : false}
               onPress={() => {
-                removeScannedQuantity(item, "wto-outbound");
+                removeScannedQuantity(item, options.removeType);
               }}
             >
               <FontAwesome name="remove" size={24} color="black" />

@@ -5,6 +5,8 @@ import {
   getPTO,
   getWTOOutboundDetails,
   getWTOOutboundValid,
+  getWTO,
+  getWTODetails,
 } from "../store/actions/warehouse/warehouseActions";
 import {
   handleToggleAddBatchModal,
@@ -12,11 +14,7 @@ import {
   handleToggleSearchBatchModal,
 } from "../reducers/modalReducer";
 import {handleSetBatchItem} from "../reducers/documentReducer";
-import {
-  getBatch,
-  updateBatch,
-  deleteScanQuantity,
-} from "../store/actions/generalActions";
+import {getBatch, updateBatch} from "../store/actions/generalActions";
 import {
   setMfgDate,
   setBatchNo,
@@ -51,6 +49,10 @@ export const useBatchHooks = () => {
         dispatch(getPTODetails({docnum: selectedDocument.docnum}));
         dispatch(getPTO({limit: 10, offset: 0}));
         break;
+      case "wto-inbound":
+        dispatch(getWTODetails({docnum: selectedDocument.docnum}));
+        dispatch(getWTO({limit: 10, offset: 0}));
+        break;
       case "wto-outbound":
         dispatch(getWTOOutboundDetails({docnum: selectedDocument.docnum}));
         dispatch(getWTOOutboundValid({limit: 10, offset: 0}));
@@ -68,6 +70,8 @@ export const useBatchHooks = () => {
   }
 
   const checkRemove = async (uses: TypeSelect, item: any) => {
+    console.log(uses);
+
     switch (uses) {
       case "pto":
         const ptoEndpoints: Endpoint[] = [
@@ -92,28 +96,6 @@ export const useBatchHooks = () => {
             url: `/lst_tracc/purchasetofile2?linklpnnum=${item.lpnnum}`,
           },
         ];
-        // dispatch(
-        //   deleteScanQuantity({
-        //     document: {
-        //       data: {doclock: "Y", pdtopen: "Y"},
-        //       field: {docnum: selectedDocument.docnum},
-        //     },
-        //     item: {
-        //       data: {itmqty: 0},
-        //       field: {recid: item.recid},
-        //     },
-        //     lpnnum: item.lpnnum,
-        //     onSuccess: () => {
-        //       checkDetailsToReload(uses);
-        //       dispatch(setStatusText(`Scanned Quantity Removed Successfully.`));
-        //       connectToPHPNotDispatch({
-        //         recid: item.recid,
-        //         docnum: selectedDocument.docnum,
-        //         type: "rearrangelinennum",
-        //       });
-        //     },
-        //   })
-        // );
         const ptoResponse = await removeScannedQuantityService(
           ptoEndpoints,
           () => {
@@ -126,7 +108,7 @@ export const useBatchHooks = () => {
             });
           }
         );
-        console.log("wat da hel", ptoResponse);
+        // console.log("wat da hel", ptoResponse);
         break;
       case "wto-outbound":
         const wtoEndpoints: Endpoint[] = [
@@ -166,10 +148,45 @@ export const useBatchHooks = () => {
             dispatch(setStatusText(`Scanned Quantity Removed Successfully.`));
           }
         );
-        console.log("wat da hel", wtoResponse);
+        // console.log("wat da hel", wtoResponse);
         break;
-
+      case "wto-inbound":
+        const wtoInboundEndpoints: Endpoint[] = [
+          {
+            method: "PATCH",
+            url: `lst_tracc/warehousetransferorderfile2`,
+            payload: {
+              field: {
+                recid: item.recid,
+              },
+              data: {
+                intqty: 0,
+              },
+            },
+          },
+          {
+            method: "PATCH",
+            url: `lst_tracc/warehousetransferorderfile1`,
+            payload: {
+              field: {
+                docnum: selectedDocument.docnum,
+              },
+              data: {
+                doclock: "Y",
+              },
+            },
+          },
+        ];
+        const wtoInboundResponse = await removeScannedQuantityService(
+          wtoInboundEndpoints,
+          () => {
+            checkDetailsToReload(uses);
+            dispatch(setStatusText(`Scanned Quantity Removed Successfully.`));
+          }
+        );
+        break;
       default:
+        alert("Remove not supported");
         break;
     }
   };
@@ -226,7 +243,7 @@ export const useBatchHooks = () => {
               updateBatch({
                 document: {
                   data: {doclock: "Y", pdtopen: "Y"},
-                  field: {docnum: selectedDocument.batchnum},
+                  field: {docnum: selectedDocument.docnum},
                 },
                 item: {
                   field: {
@@ -235,7 +252,7 @@ export const useBatchHooks = () => {
                   data: {
                     batchnum: batchNo,
                     expdte: formatDateYYYYMMDD(expDate),
-                    mdgdte: formatDateYYYYMMDD(mfgDate),
+                    mfgdte: formatDateYYYYMMDD(mfgDate),
                   },
                 },
                 onSuccess: () => {

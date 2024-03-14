@@ -8,16 +8,13 @@ import {format} from "../../styles/styles";
 import {ProductData} from "../../models/generic/ProductData";
 import {useBatchHooks} from "../../hooks/batchHooks";
 import {formatDateStringMMDDYYYY} from "../../helper/Date";
+import {Options} from "../list-holder/ItemsList";
 
 interface Items {
   item: ProductData;
-  options?: {
-    removeEdit?: boolean;
-    removeDelete?: boolean;
-    removeLpn?: boolean;
-  };
+  options: Options;
 }
-const PTOItems = React.memo((props: Items) => {
+const PTODetails = React.memo((props: Items) => {
   const {handleItemScanModal} = useDocumentHooks();
   const {handleAddBatchModal, handleEditBatchModal, removeScannedQuantity} =
     useBatchHooks();
@@ -29,28 +26,43 @@ const PTOItems = React.memo((props: Items) => {
         <View style={styles.leftContainer}>
           <Text>{item.itmcde}</Text>
           <Text>{item.itmdsc}</Text>
-          <Text>{`${item.intqty || ""} PCS`}</Text>
+
+          {options?.receivedQty ? (
+            <Text>{`${item.itmqty || ""}PCS`}</Text>
+          ) : (
+            <Text>{`${item.intqty || ""}PCS`}</Text>
+          )}
+
           <View style={styles.remove}>
-            <Text>{`Received Qty: ${item.itmqty}`}</Text>
+            <Text>{`Received Qty: ${
+              options && options.receivedQty
+                ? item[options.receivedQty]
+                : item.itmqty
+            }`}</Text>
+
             {!options?.removeDelete && (
               <TouchableOpacity
                 onPress={() => {
-                  removeScannedQuantity(item, "pto");
+                  removeScannedQuantity(item, options?.removeType);
                 }}
               >
                 <FontAwesome name="remove" size={24} color="black" />
               </TouchableOpacity>
             )}
           </View>
-          <CustomButton
-            isDisable={item.itmqty === item.intqty}
-            onPress={() => handleItemScanModal(item)}
-            title="SCAN ITEM"
-            type="regular"
-            isWidthNotFull={true}
-            fontSize={12}
-          />
+
+          {!options?.removeScanBatch && (
+            <CustomButton
+              isDisable={item.itmqty === item.intqty}
+              onPress={() => handleItemScanModal(item)}
+              title="SCAN ITEM"
+              type="regular"
+              isWidthNotFull={true}
+              fontSize={12}
+            />
+          )}
         </View>
+
         <View style={styles.rightContainer}>
           {!options?.removeLpn && (
             <View style={{flexDirection: "row", gap: 5}}>
@@ -60,7 +72,13 @@ const PTOItems = React.memo((props: Items) => {
           )}
 
           <View style={styles.datesContainer}>
-            <View style={{flexWrap: "wrap", width: "80%"}}>
+            <View
+              style={
+                options.receivedQty
+                  ? {flexWrap: "wrap"}
+                  : {flexWrap: "wrap", width: "80%"}
+              }
+            >
               <View style={format.twoRowText}>
                 <Text style={{fontWeight: "bold"}}>Batch No.:</Text>
                 <Text>{` ${item.batchnum || "No BatchNo."}`}</Text>
@@ -87,14 +105,23 @@ const PTOItems = React.memo((props: Items) => {
             )}
           </View>
 
-          <CustomButton
-            isDisable={item.itmqty === item.intqty}
-            onPress={() => handleAddBatchModal(item)}
-            title="ADD ANOTHER BATCHING"
-            type="regular"
-            isWidthNotFull={true}
-            fontSize={12}
-          />
+          {options?.removeScanBatch ? (
+            <CustomButton
+              isDisable={item.itmqty === item.intqty}
+              onPress={() => handleItemScanModal(item)}
+              title="SCAN ITEM"
+              type="regular"
+              fontSize={12}
+            />
+          ) : (
+            <CustomButton
+              isDisable={item.itmqty === item.intqty}
+              onPress={() => handleAddBatchModal(item)}
+              title="ADD ANOTHER BATCHING"
+              type="regular"
+              fontSize={12}
+            />
+          )}
         </View>
       </View>
     </>
@@ -135,4 +162,4 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 });
-export default PTOItems;
+export default PTODetails;

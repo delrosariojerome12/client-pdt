@@ -14,9 +14,8 @@ interface InboundUse {
 }
 
 export const useInboundHooks = ({page}: InboundUse) => {
-  const {pto, pur, wto, srto, whs, ptoDetails} = useAppSelector(
-    (state) => state.inbound
-  );
+  const {pto, pur, wto, srto, whs, ptoDetails, srtoDetails, wtoDetails} =
+    useAppSelector((state) => state.inbound);
   const {status, statusText} = useAppSelector((state) => state.status);
 
   const {isScanModal, isSelectModal, isScanItemModal} = useAppSelector(
@@ -183,6 +182,8 @@ export const useInboundHooks = ({page}: InboundUse) => {
     srto,
     whs,
     ptoDetails,
+    wtoDetails,
+    srtoDetails,
     selectedDocument,
     isScanModal,
     isSelectModal,

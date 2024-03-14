@@ -16,9 +16,11 @@ import {
   getWPTODetails,
   getSTGValidateDetails,
   getPTO,
+  getWTO,
   getPUR,
   getWTOOutboundValid,
   getWTOOutboundPost,
+  getWTODetails,
 } from "../store/actions/warehouse/warehouseActions";
 import {handleSetDocument, handleSetItem} from "../reducers/documentReducer";
 import {ScanDocumentParams} from "../store/actions/generalActions";
@@ -32,21 +34,30 @@ import {setStatusText, showQuantityField} from "../reducers/statusReducer";
 export type ButtonUses =
   | "pto"
   | "pur"
+  | "wto-inbound"
   | "wto"
   | "whs"
   | "srto"
   | "wto-outbound"
-  | "wavepick";
+  | "wavepick"
+  | "";
 
 interface SearchContent {
   content: "warehouse" | "bin" | "item";
 }
-export type TypePost = "pto" | "pur" | "whs" | "pto-add-batch" | "wto-outbound";
+export type TypePost =
+  | "pto"
+  | "pur"
+  | "whs"
+  | "wto-inbound"
+  | "pto-add-batch"
+  | "wto-outbound";
 
 export type ScanValidate =
   | "pto"
   | "pur"
   | "whs"
+  | "wto-inbound"
   | "srto"
   | "wto-outbound"
   | "wavepick"
@@ -101,6 +112,9 @@ export const useDocumentHooks = () => {
       case "srto":
         dispatch(getSRTODetails({docnum: item.docnum}));
         break;
+      case "wto-inbound":
+        dispatch(getWTODetails({docnum: item.docnum}));
+        break;
       case "wto-outbound":
         dispatch(getWTOOutboundDetails({docnum: item.docnum}));
         break;
@@ -151,7 +165,30 @@ export const useDocumentHooks = () => {
             },
             onFailure: (e) => {
               dispatch(resetStatus());
-              Alert.alert("Transaction Posting", ` ${e}`, [
+              Alert.alert("Transaction Posting Fail", ` ${e}`, [
+                {
+                  text: "Ok",
+                  onPress: () => {},
+                  style: "destructive",
+                },
+              ]);
+            },
+          })
+        );
+        break;
+      case "wto-inbound":
+        dispatch(
+          connectToPHP({
+            recid: item.recid,
+            docnum: item.docnum,
+            type: "WTO",
+            onSuccess: () => {
+              dispatch(getWTO({limit: 10, offset: 0}));
+              dispatch(resetStatus());
+            },
+            onFailure: (e) => {
+              dispatch(resetStatus());
+              Alert.alert("Transaction Posting Fail", ` ${e}`, [
                 {
                   text: "Ok",
                   onPress: () => {},
@@ -258,89 +295,103 @@ export const useDocumentHooks = () => {
     if (selectedItem) {
       switch (scanUsage) {
         case "pto":
-          try {
-            const response = await scanBarcode({
-              barcode,
-              category: "lpnnum",
-              recid: selectedItem?.recid.toString(),
-              docnum: selectedDocument.docnum,
-              itmcde: selectedItem.itmcde,
-              untmea: selectedItem.untmea,
-              lpnnum: selectedItem.lpnnum,
-              itmqty: selectedItem.itmqty,
-              intqty: selectedItem.intqty,
-              linklpnnum: selectedItem.linklpnnum || "null",
-              addbatch: selectedItem.addbatch.toString(),
-              copyline: selectedItem.copyline.toString(),
-              pdtmanualqtyinbound: receiveQty.toString(),
-              linenum: selectedItem.linenum.toString(),
-              usrnam: userDetails?.usrcde,
-            });
+          const ptoResponse = await scanBarcode({
+            barcode,
+            category: "lpnnum",
+            recid: selectedItem?.recid.toString(),
+            docnum: selectedDocument.docnum,
+            itmcde: selectedItem.itmcde,
+            untmea: selectedItem.untmea,
+            lpnnum: selectedItem.lpnnum,
+            itmqty: selectedItem.itmqty,
+            intqty: selectedItem.intqty,
+            linklpnnum: selectedItem.linklpnnum || "null",
+            addbatch: selectedItem.addbatch.toString(),
+            copyline: selectedItem.copyline.toString(),
+            pdtmanualqtyinbound: receiveQty.toString(),
+            linenum: selectedItem.linenum.toString(),
+            usrnam: userDetails?.usrcde,
+          });
 
-            if (response.data.pto2_data) {
-              dispatch(getPTODetails({docnum: selectedDocument.docnum}));
-              dispatch(getPTO({limit: 10, offset: 0}));
-              // closing conditions
-              if (response.data.pto2_data[0]) {
-                dispatch(handleSetItem(response.data.pto2_data[0]));
-                if (response.data.pto2_data[0].itmqty === 0 && receiveQty > 1) {
-                  dispatch(setStatusText(`Item Successfully Scanned.`));
-                  dispatch(handleToggleItemScanModal());
-                }
-              }
-              if (response.data.pto2_data.length === 0) {
-                dispatch(setStatusText(`Item Successfully Scanned.`));
-                dispatch(handleToggleItemScanModal());
-              }
+          if (ptoResponse && ptoResponse.data.pto2_data) {
+            dispatch(getPTODetails({docnum: selectedDocument.docnum}));
+            dispatch(getPTO({limit: 10, offset: 0}));
+            if (ptoResponse.data.pto2_data[0]) {
+              dispatch(handleSetItem(ptoResponse.data.pto2_data[0]));
             }
-          } catch (error) {
-            console.log(error);
+            if (ptoResponse.data.pto2_data.length === 0) {
+              dispatch(setStatusText(`Item Successfully Scanned.`));
+              dispatch(handleToggleItemScanModal());
+            }
+          }
+
+          break;
+        case "wto-inbound":
+          const wtoiResponse = await scanBarcode({
+            barcode,
+            category: "lpnnum_wto",
+            recid: selectedItem?.recid.toString(),
+            docnum: selectedDocument.docnum,
+            itmcde: selectedItem.itmcde,
+            untmea: selectedItem.untmea,
+            lpnnum: selectedItem.lpnnum,
+            itmqty: selectedItem.itmqty,
+            intqty: selectedItem.intqty,
+            linklpnnum: selectedItem.linklpnnum || "null",
+            pdtmanualqtyinbound: receiveQty.toString(),
+            linenum: selectedItem.linenum.toString(),
+            usrnam: userDetails?.usrcde,
+          });
+          if (wtoiResponse && wtoiResponse.data.wto2_data) {
+            dispatch(getWTODetails({docnum: selectedDocument.docnum}));
+            dispatch(getWTO({limit: 10, offset: 0}));
+            if (wtoiResponse.data.wto2_data[0]) {
+              dispatch(handleSetItem(wtoiResponse.data.wto2_data[0]));
+            }
+            if (wtoiResponse.data.wto2_data.length === 0) {
+              console.log("daan rito");
+              dispatch(setStatusText(`Item Successfully Scanned.`));
+              dispatch(handleToggleItemScanModal());
+            }
           }
           break;
         case "wto-outbound":
-          try {
-            const response = await scanBarcode({
-              barcode,
-              category: "lpnnum_wto_outbound",
-              recid: selectedItem?.recid.toString(),
-              docnum: selectedDocument.docnum,
-              scanlevel: barcodelvl2 ? "2" : "1",
-              pdtmanualqtyoutbound: receiveQty.toString(),
-              fromspl: undefined,
-              spl_docnum: undefined,
-              usrnam: userDetails?.usrcde,
-              barcodelvl2: barcodelvl2,
-            });
+          const response = await scanBarcode({
+            barcode,
+            category: "lpnnum_wto_outbound",
+            recid: selectedItem?.recid.toString(),
+            docnum: selectedDocument.docnum,
+            scanlevel: barcodelvl2 ? "2" : "1",
+            pdtmanualqtyoutbound: receiveQty.toString(),
+            fromspl: undefined,
+            spl_docnum: undefined,
+            usrnam: userDetails?.usrcde,
+            barcodelvl2: barcodelvl2,
+          });
 
-            console.log("bato", response);
+          console.log("bato", response);
 
-            if (response && response.data.wto2_data) {
-              dispatch(showQuantityField(true));
-              !isQuantityFieldShown &&
-                dispatch(setStatusText(`Bin No. Successfully Scanned.`));
-              if (isQuantityFieldShown) {
-                console.log("wat", selectedDocument.docnum);
-                dispatch(
-                  getWTOOutboundDetails({docnum: selectedDocument.docnum})
-                );
-                dispatch(getWTOOutboundValid({limit: 10, offset: 0}));
-                dispatch(setStatusText(`Item Successfully Scanned.`));
-                if (response.data.wto2_data[0]) {
-                  dispatch(handleSetItem(response.data.wto2_data[0]));
-                  if (
-                    response.data.wto2_data[0].itmqty === 0 &&
-                    receiveQty > 1
-                  ) {
-                    dispatch(handleToggleOutboundItemScan());
-                  }
-                }
-                if (response.data.wto2_data.length === 0) {
-                  dispatch(handleToggleOutboundItemScan());
-                }
+          if (response && response.data.wto2_data) {
+            dispatch(showQuantityField(true));
+            !isQuantityFieldShown &&
+              dispatch(setStatusText(`Bin No. Successfully Scanned.`));
+            if (isQuantityFieldShown) {
+              console.log("wat", selectedDocument.docnum);
+              dispatch(
+                getWTOOutboundDetails({docnum: selectedDocument.docnum})
+              );
+              dispatch(getWTOOutboundValid({limit: 10, offset: 0}));
+              dispatch(setStatusText(`Item Successfully Scanned.`));
+              if (response.data.wto2_data[0]) {
+                dispatch(handleSetItem(response.data.wto2_data[0]));
+                // if (response.data.wto2_data[0].itmqty === 0 && receiveQty > 1) {
+                //   dispatch(handleToggleOutboundItemScan());
+                // }
+              }
+              if (response.data.wto2_data.length === 0) {
+                dispatch(handleToggleOutboundItemScan());
               }
             }
-          } catch (error) {
-            console.log(error);
           }
           break;
         default:
@@ -370,6 +421,15 @@ export const useDocumentHooks = () => {
           dispatch(handleSetDocument(response[0]));
         }
         break;
+      case "wto-inbound":
+        try {
+          const response = await scanBarcode({barcode, category});
+          handleSelectModal({item: response.data, type: uses});
+          dispatch(handleToggleScanModal());
+        } catch (error) {
+          console.log(error);
+        }
+        break;
       case "wto-outbound":
         try {
           const response = await scanBarcode({barcode, category});
@@ -379,11 +439,11 @@ export const useDocumentHooks = () => {
           console.log(error);
         }
         break;
+
       default:
         break;
     }
   };
-
   // end check categories and uses functions
 
   // start of  modals

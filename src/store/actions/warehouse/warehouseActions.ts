@@ -118,7 +118,6 @@ export const getSRTO = createAsyncThunk(
   }
 );
 
-// WTO - needed to change the api
 export const getWTO = createAsyncThunk(
   "inbound/getWTO",
   async (
@@ -132,7 +131,6 @@ export const getWTO = createAsyncThunk(
       const url = `${protocol}://${ipAddress}:${port}/api/lst_tracc/warehousetransferorderfile1?trntypcde=WHSTOIN&posted=0&canceldoc=0&trndte=nev2:null&_limit=${limit}&_sortby=trndte:DESC,docnum:DESC&_offset=${offset}`;
 
       const response = await axios.get(url);
-
       return {
         data: response.data,
         paginating: paginating,
@@ -160,6 +158,25 @@ export const getPTODetails = createAsyncThunk(
     }
   }
 );
+// WTO-DETAILS
+export const getWTODetails = createAsyncThunk(
+  "inbound/getWTODetails",
+  async ({docnum}: FetchDocnumDetails, {rejectWithValue, getState}) => {
+    try {
+      const state = getState() as RootState;
+      const {ipAddress, port, protocol} = state.auth.server;
+
+      const url = `${protocol}://${ipAddress}:${port}/api/getWTODetails/?docnum=${docnum}`;
+
+      const response = await axios.get(url);
+
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 // SRTO-DETAILS
 export const getSRTODetails = createAsyncThunk(
   "inbound/getSRTODetails",
@@ -195,8 +212,6 @@ export const getWTOOutboundValid = createAsyncThunk(
       const url = `${protocol}://${ipAddress}:${port}/api/getWTO_Outbound?posted=0&canceldoc=0&trntypcde=WHSTOOUT&limit=${limit}&category=validation&offset=${offset}`;
 
       const response = await axios.get(url);
-
-      console.log("huy", response.data);
 
       return {
         data: response.data,

@@ -80,7 +80,7 @@ interface BatchUpdate {
       lpnnum: string;
     };
     data: {
-      mdgdte: string;
+      mfgdte: string;
       expdte: string;
       batchnum: string;
     };
@@ -123,8 +123,6 @@ export const getDocument = createAsyncThunk(
 
       const response = await axios.get(url);
       console.log("eto");
-
-      console.log(response.data);
 
       return response.data;
     } catch (error: any) {
@@ -515,6 +513,10 @@ export const connectToPHP = createAsyncThunk(
           onFailure(formattedList);
           return rejectWithValue(formattedList);
         }
+        if (formattedResult.errmsg) {
+          onFailure(formattedResult.errmsg);
+          return rejectWithValue(formattedResult.errmsg);
+        }
         if (formattedResult.pdtmsg) {
           let errorMessage = "Something Went Wrong";
           const errorKeys = Object.keys(formattedResult.pdtmsg);
@@ -527,7 +529,7 @@ export const connectToPHP = createAsyncThunk(
         }
       }
     } catch (error: any) {
-      console.log(error);
+      console.log("mali", error);
       onFailure(error);
       return rejectWithValue(error.message);
     }
@@ -574,11 +576,20 @@ export const updateBatch = createAsyncThunk(
       const url1 = `${protocol}://${ipAddress}:${port}/api/lst_tracc/purchasetofile1`;
       const url2 = `${protocol}://${ipAddress}:${port}/api/lst_tracc/purchasetofile2`;
 
-      const responseDocument = await axios.patch(url1, document);
-      const responseItem = await axios.patch(url2, item);
+      // const responseDocument = await axios.patch(url1, document);
+      // const responseItem = await axios.patch(url2, item);
+
+      const [responseDocument, responseItem] = await Promise.all([
+        axios.patch(url1, document),
+        axios.patch(url2, item),
+      ]);
 
       onSuccess();
 
+      console.log("mga pinasa");
+      console.log(document, item);
+
+      console.log("responder");
       console.log(responseDocument);
       console.log(responseItem);
 
@@ -592,46 +603,3 @@ export const updateBatch = createAsyncThunk(
     }
   }
 );
-
-// to be removed
-export const deleteScanQuantity = createAsyncThunk(
-  "general/deleteScanQuantity",
-  async (
-    {document, item, onSuccess, lpnnum}: RemoveQuantity,
-    {rejectWithValue, getState}
-  ) => {
-    try {
-      const state = getState() as RootState;
-      const {ipAddress, port, protocol} = state.auth.server;
-
-      const url1 = `${protocol}://${ipAddress}:${port}/api/lst_tracc/purchasetofile1`;
-      const url2 = `${protocol}://${ipAddress}:${port}/api/lst_tracc/purchasetofile2`;
-      const url3 = `${protocol}://${ipAddress}:${port}/api/lst_tracc/purchasetofile2?linklpnnum=${lpnnum}`;
-
-      const responseDocument = await axios.patch(url1, document);
-      const responseItem = await axios.patch(url2, item);
-      const responseDeleteLPN = await axios.delete(url3);
-
-      console.log("payload");
-      console.log(document);
-      console.log(item);
-      console.log(url3);
-
-      onSuccess();
-
-      console.log("response");
-      console.log(responseDocument);
-      console.log(responseItem);
-      console.log(responseDeleteLPN);
-
-      return {
-        item: responseItem.data,
-        document: responseDocument.data,
-      };
-    } catch (error: any) {
-      console.log("mali:", error);
-      return rejectWithValue(error.message);
-    }
-  }
-);
-// to be removed

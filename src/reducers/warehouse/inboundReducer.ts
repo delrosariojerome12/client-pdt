@@ -7,27 +7,26 @@ import {
   getSRTO,
   getSRTODetails,
   getWTO,
+  getWTODetails,
 } from "../../store/actions/warehouse/warehouseActions";
 import {PTOData} from "../../models/warehouse/inbound/PTO";
 import {PURData} from "../../models/warehouse/inbound/PUR";
 import {SRTOData} from "../../models/warehouse/inbound/SRTO";
 import {ProductData} from "../../models/generic/ProductData";
+import {WTOData} from "../../models/warehouse/inbound/WTO";
 
 interface Inbound {
   pto: {
     data: PTOData[] | [];
     status: "idle" | "loading" | "success" | "failed";
   };
-  ptoDetails: {
-    data: ProductData[];
-    status: "idle" | "loading" | "success" | "failed";
-  };
+
   pur: {
     data: PURData[] | [];
     status: "idle" | "loading" | "success" | "failed";
   };
   wto: {
-    data: any[] | [];
+    data: WTOData[] | [];
     status: "idle" | "loading" | "success" | "failed";
   };
   whs: {
@@ -36,6 +35,14 @@ interface Inbound {
   };
   srto: {
     data: SRTOData[] | [];
+    status: "idle" | "loading" | "success" | "failed";
+  };
+  ptoDetails: {
+    data: ProductData[];
+    status: "idle" | "loading" | "success" | "failed";
+  };
+  wtoDetails: {
+    data: ProductData[];
     status: "idle" | "loading" | "success" | "failed";
   };
   srtoDetails: {
@@ -66,6 +73,10 @@ const initialState: Inbound = {
     status: "idle",
   },
   srto: {
+    data: [],
+    status: "idle",
+  },
+  wtoDetails: {
     data: [],
     status: "idle",
   },
@@ -135,17 +146,30 @@ const inboundReducer = createSlice({
       })
       .addCase(getWTO.fulfilled, (state, action) => {
         const {data, paginating} = action.payload;
+
         if (paginating) {
           console.log("paginating");
-          state.wto.data = [...state.wto.data, ...data.data];
+          state.wto.data = [...state.wto.data, ...data];
         } else {
           console.log("normal fetch");
-          state.wto.data = data.data;
+          state.wto.data = data;
         }
         state.wto.status = "success";
       })
       .addCase(getWTO.rejected, (state, action) => {
         state.wto.status = "failed";
+      });
+
+    builder
+      .addCase(getWTODetails.pending, (state, action) => {
+        state.wtoDetails.status = "loading";
+      })
+      .addCase(getWTODetails.fulfilled, (state, action) => {
+        state.wtoDetails.status = "success";
+        state.wtoDetails.data = action.payload.data;
+      })
+      .addCase(getWTODetails.rejected, (state) => {
+        state.wtoDetails.status = "failed";
       });
 
     builder
