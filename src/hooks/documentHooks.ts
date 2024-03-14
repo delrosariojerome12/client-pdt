@@ -91,7 +91,6 @@ export const useDocumentHooks = () => {
     useAPIHooks();
 
   // start check categories and uses functions
-
   const checkSelectType = ({item, type}: SelectProps) => {
     console.log(type);
 
