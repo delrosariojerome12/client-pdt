@@ -41,7 +41,7 @@ const CustomDrawers = (props: any) => {
           onPress={() => {
             Alert.alert(
               "Transaction Posting",
-              `Do you want to logout: ${userDetails?.usrname}?`,
+              `Do you want to logout: ${userDetails?.usrname || ""}?`,
               [
                 {
                   text: "Yes",

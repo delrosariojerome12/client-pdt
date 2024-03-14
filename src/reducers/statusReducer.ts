@@ -41,9 +41,10 @@ const statusReducer = createSlice({
         state.status = "loading";
       })
       .addCase(connectToPHP.fulfilled, (state, action) => {
-        console.log(action.payload);
-
-        state.status = "success";
+        console.log("wat happend", action.payload);
+        if (!action.payload?.dontShowSuccess) {
+          state.status = "success";
+        }
       })
       .addCase(connectToPHP.rejected, (state) => {
         state.status = "failed";

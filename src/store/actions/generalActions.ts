@@ -52,6 +52,7 @@ interface ConnectToPHPParams {
   type: string;
   onSuccess: () => void;
   onFailure: (e: any) => void;
+  dontShowSuccess?: boolean;
   refnum?: string;
   lpnnum?: string;
   itmcde?: string;
@@ -178,6 +179,7 @@ export const connectToPHP = createAsyncThunk(
       spldocnum = "",
       onFailure,
       onSuccess,
+      dontShowSuccess,
     } = props;
 
     if (!userDetails || !sesid) {
@@ -491,14 +493,19 @@ export const connectToPHP = createAsyncThunk(
 
       if (formattedResult.bool) {
         onSuccess();
-        return formattedResult;
+
+        return {formattedResult, dontShowSuccess};
       } else {
         if (formattedResult.msg) {
+          function stripHtmlTags(html: any) {
+            return html.replace(/<\/?[^>]+(>|$)/g, "");
+          }
           const listItemRegex = /<li>(.*?)<\/li>/g;
           const listItems = [];
           let match;
           while ((match = listItemRegex.exec(formattedResult.msg)) !== null) {
-            listItems.push(match[1]);
+            const strippedItem = stripHtmlTags(match[1]);
+            listItems.push(strippedItem);
           }
 
           const formattedList = listItems
@@ -586,6 +593,7 @@ export const updateBatch = createAsyncThunk(
   }
 );
 
+// to be removed
 export const deleteScanQuantity = createAsyncThunk(
   "general/deleteScanQuantity",
   async (
@@ -626,3 +634,4 @@ export const deleteScanQuantity = createAsyncThunk(
     }
   }
 );
+// to be removed

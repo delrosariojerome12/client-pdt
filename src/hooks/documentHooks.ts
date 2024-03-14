@@ -23,7 +23,7 @@ import {
 import {handleSetDocument, handleSetItem} from "../reducers/documentReducer";
 import {ScanDocumentParams} from "../store/actions/generalActions";
 import {connectToPHP} from "../store/actions/generalActions";
-import {resetStatus} from "../reducers/statusReducer";
+import {resetStatus, setStatus} from "../reducers/statusReducer";
 import {formatDateYYYYMMDD} from "../helper/Date";
 import {clearBatchDetails} from "../reducers/generalReducer";
 import {useAPIHooks} from "./apiHooks";
@@ -116,8 +116,7 @@ export const useDocumentHooks = () => {
     }
   };
 
-  const checkPostType = async (item: any, type: TypePost, docnum?: string) => {
-    console.log("tingin", docnum);
+  const checkPostType = async (item: any, type: TypePost) => {
     switch (type) {
       case "pto":
         dispatch(
@@ -202,42 +201,43 @@ export const useDocumentHooks = () => {
         );
         break;
       case "wto-outbound":
-        console.log(item.recid);
-        console.log(selectedDocument);
-
-        if (docnum) {
-          dispatch(
-            connectToPHP({
-              recid: item.recid,
-              docnum: item.docnum,
-              type: "WTO_SOFTVAL",
-              onSuccess: () => {
-                connectToPHPNotDispatch({
-                  recid: item.recid,
-                  docnum: item.docnum,
-                  type: "WTO_POST",
-                });
-
-                dispatch(
-                  getWTOOutboundPost({
-                    limit: 10,
-                    offset: 0,
-                  })
-                );
-              },
-              onFailure: (e) => {
-                dispatch(resetStatus());
-                Alert.alert("Transaction Posting Fail", `${e}`, [
-                  {
-                    text: "Ok",
-                    onPress: () => {},
-                    style: "destructive",
-                  },
-                ]);
-              },
-            })
-          );
-        }
+        dispatch(
+          connectToPHP({
+            recid: item.recid,
+            docnum: item.docnum,
+            type: "WTO_SOFTVAL",
+            onSuccess: async () => {
+              dispatch(setStatus("loading"));
+              console.log("loading muna");
+              await connectToPHPNotDispatch({
+                recid: item.recid,
+                docnum: item.docnum,
+                type: "WTO_POST",
+              });
+              console.log("dito sunod");
+              dispatch(
+                getWTOOutboundPost({
+                  limit: 10,
+                  offset: 0,
+                })
+              );
+              console.log("tapos na");
+              // setStatus("success");
+              dispatch(setStatus("success"));
+            },
+            onFailure: (e) => {
+              dispatch(resetStatus());
+              Alert.alert("Transaction Posting Fail", `${e}`, [
+                {
+                  text: "Ok",
+                  onPress: () => {},
+                  style: "destructive",
+                },
+              ]);
+            },
+            dontShowSuccess: true,
+          })
+        );
 
         break;
 
@@ -447,7 +447,7 @@ export const useDocumentHooks = () => {
           {
             text: "Yes",
             onPress: () => {
-              checkPostType(item, type, item.docnum);
+              checkPostType(item, type);
             },
             style: "destructive",
           },
