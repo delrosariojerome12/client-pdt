@@ -491,7 +491,6 @@ export const connectToPHP = createAsyncThunk(
 
       if (formattedResult.bool) {
         onSuccess();
-
         return {formattedResult, dontShowSuccess};
       } else {
         if (formattedResult.msg) {

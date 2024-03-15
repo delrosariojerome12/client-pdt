@@ -46,7 +46,7 @@ export const useDrawerHooks = () => {
     if (drawerItem.children.length > 0) {
       return drawerItem.isDropdownOpen ? (
         <FontAwesome
-          name="chevron-up"
+          name="chevron-down"
           size={24}
           color={color}
           onPress={() => {
@@ -55,7 +55,7 @@ export const useDrawerHooks = () => {
         />
       ) : (
         <FontAwesome
-          name="chevron-down"
+          name="chevron-right"
           size={24}
           color={color}
           onPress={() => {
