@@ -152,6 +152,8 @@ export const getPTODetails = createAsyncThunk(
 
       const response = await axios.get(url);
 
+      console.log("kuha", response);
+
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.message);

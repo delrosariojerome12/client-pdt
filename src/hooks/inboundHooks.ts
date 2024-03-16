@@ -152,6 +152,7 @@ export const useInboundHooks = ({page}: InboundUse) => {
 
   useEffect(() => {
     checkPageToLoad();
+    console.log("Component mounted");
   }, []);
 
   const handleScroll = (event: any) => {

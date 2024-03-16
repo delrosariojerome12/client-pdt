@@ -22,6 +22,7 @@ interface ConnectToPHPParams {
 }
 interface GetLPN {
   lpnnum: string;
+  usage: "pur" | "whs";
 }
 interface ValidateBin {
   binnum: string;
@@ -396,7 +397,6 @@ export const useAPIHooks = () => {
     dispatch(setStatus("loading"));
     try {
       const {barcode, category, ...restParams} = queryParams;
-      // const baseUrl = `${protocol}://${ipAddress}:${port}/api/scanbarcode/`;
       const searchParams = new URLSearchParams();
       searchParams.append("barcode", barcode);
       searchParams.append("category", category);
@@ -441,13 +441,29 @@ export const useAPIHooks = () => {
     }
   };
 
-  const getLPN = async ({lpnnum}: GetLPN) => {
+  const getLPN = async ({lpnnum, usage}: GetLPN) => {
     try {
       dispatch(setStatus("loading"));
-      const response = await handleGet({
-        url: `lst_tracc/purchasetofile2?lpnnum=${lpnnum}&ptostat=TO%20-%20POSTED`,
+      let response;
+      let url = "";
+
+      switch (usage) {
+        case "pur":
+          url = `lst_tracc/purchasetofile2?lpnnum=${lpnnum}&ptostat=TO%20-%20POSTED`;
+          break;
+        case "whs":
+          url = `lst_tracc/warehousetransferorderfile2?lpnnum=${lpnnum}&posted=1`;
+          break;
+
+        default:
+          break;
+      }
+
+      response = await handleGet({
+        url: url,
         disableToast: true,
       });
+
       if (response.length === 0) {
         dispatch(setStatus("idle"));
         Alert.alert(

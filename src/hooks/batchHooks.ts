@@ -7,6 +7,8 @@ import {
   getWTOOutboundValid,
   getWTO,
   getWTODetails,
+  getSRTO,
+  getSRTODetails,
 } from "../store/actions/warehouse/warehouseActions";
 import {
   handleToggleAddBatchModal,
@@ -56,6 +58,10 @@ export const useBatchHooks = () => {
       case "wto-outbound":
         dispatch(getWTOOutboundDetails({docnum: selectedDocument.docnum}));
         dispatch(getWTOOutboundValid({limit: 10, offset: 0}));
+        break;
+      case "srto":
+        dispatch(getSRTODetails({docnum: selectedDocument.docnum}));
+        dispatch(getSRTO({limit: 10, offset: 0}));
         break;
 
       default:
@@ -185,6 +191,44 @@ export const useBatchHooks = () => {
           }
         );
         break;
+      case "srto":
+        const srtoEndpoints: Endpoint[] = [
+          {
+            method: "PATCH",
+            url: `lst_tracc/salesreturntofile2`,
+            payload: {
+              field: {
+                recid: item.recid,
+              },
+              data: {
+                srtqty: 0,
+              },
+            },
+          },
+          {
+            method: "PATCH",
+            url: `lst_tracc/salesreturntofile1`,
+            payload: {
+              field: {
+                docnum: selectedDocument.docnum,
+              },
+              data: {
+                doclock: "Y",
+              },
+            },
+          },
+        ];
+        const srtoResponse = await removeScannedQuantityService(
+          srtoEndpoints,
+          () => {
+            checkDetailsToReload(uses);
+            dispatch(setStatusText(`Scanned Quantity Removed Successfully.`));
+          }
+        );
+
+        console.log("pasa", srtoResponse);
+
+        break;
       default:
         alert("Remove not supported");
         break;
@@ -276,7 +320,7 @@ export const useBatchHooks = () => {
   const removeScannedQuantity = (item: any, detailsToLoad: TypeSelect) => {
     Alert.alert(
       "Remove Scanned Quantity",
-      `Are you sure you want to remove the scanned quantity of item: '${item.itmdsc}'`,
+      `Are you sure you want to remove the scanned quantity of item: '${item.itmdsc}' ?`,
       [
         {
           text: "Yes",

@@ -18,12 +18,12 @@ export type Options = {
   removeDelete?: boolean;
   removeLpn?: boolean;
   removeScanBatch?: boolean;
-  receivedQty?: "intqty" | "itmqty";
+  receivedQty?: "intqty" | "itmqty" | "srtqty";
   removeType: TypeSelect;
 };
 
 export type ScanOptions = {
-  receivedQty?: "intqty" | "itmqty";
+  receivedQty?: "intqty" | "itmqty" | "srtqty";
 };
 
 interface Props {
@@ -84,6 +84,8 @@ const ItemsList = React.memo((props: Props) => {
         return {};
       case "wto-inbound":
         return {receivedQty: "intqty"};
+      case "srto":
+        return {receivedQty: "srtqty"};
 
       default:
         return {};
@@ -110,7 +112,13 @@ const ItemsList = React.memo((props: Props) => {
             });
           case "srto":
             return srtoDetails.data.map((item: any, index: number) => {
-              return renderItems(item, index, {removeType: "srto"});
+              return renderItems(item, index, {
+                removeType: "srto",
+                removeLpn: true,
+                removeScanBatch: true,
+                removeEdit: true,
+                receivedQty: "srtqty",
+              });
             });
         }
       case "outbound":

@@ -65,6 +65,7 @@ const WHS = () => {
             isNextBtn={true}
             scanParams={"lpnnum"}
             typeForFetching="whs"
+            usage="scanning"
           />
         )}
       </ScrollView>

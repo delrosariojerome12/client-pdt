@@ -10,6 +10,7 @@ import {Table, Row, Rows} from "react-native-reanimated-table";
 import {generalStyles} from "../../../styles/styles";
 import {SelectProps, PostProps} from "../../../hooks/documentHooks";
 import {TypeSelect, TypePost, ButtonUses} from "../../../hooks/documentHooks";
+import {formatDateStringMMDDYYYY} from "../../../helper/Date";
 
 interface TableProps {
   tableHeaders: string[];
@@ -59,6 +60,11 @@ const CustomTable = (props: TableProps) => {
           return true;
         }
         return;
+      case "srto":
+        if (rowData.for_posting === true) {
+          return true;
+        }
+        return false;
       default:
         break;
     }
@@ -117,11 +123,32 @@ const CustomTable = (props: TableProps) => {
     );
   };
 
+  // const renderDataRows = () => {
+  //   const rowDataArray = tableData.map((rowData) => [
+  //     ...visibleProperties.map((prop) => rowData[prop]),
+  //     renderButtons(rowData),
+  //   ]);
+
+  //   return (
+  //     <Rows
+  //       data={rowDataArray}
+  //       style={styles.rows}
+  //       textStyle={styles.rowText}
+  //     />
+  //   );
+  // };
+
   const renderDataRows = () => {
-    const rowDataArray = tableData.map((rowData) => [
-      ...visibleProperties.map((prop) => rowData[prop]),
-      renderButtons(rowData),
-    ]);
+    const rowDataArray = tableData.map((rowData) => {
+      const formattedRowData = visibleProperties.map((prop) => {
+        if (prop === "trndte") {
+          return formatDateStringMMDDYYYY(rowData[prop]);
+        }
+        return rowData[prop];
+      });
+
+      return [...formattedRowData, renderButtons(rowData)];
+    });
 
     return (
       <Rows

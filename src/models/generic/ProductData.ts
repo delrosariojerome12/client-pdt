@@ -17,4 +17,5 @@ export interface ProductData {
   reqbatchnum: boolean;
   reachlimit: boolean;
   linenum: number;
+  srtqty: number;
 }

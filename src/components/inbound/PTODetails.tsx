@@ -20,6 +20,8 @@ const PTODetails = React.memo((props: Items) => {
     useBatchHooks();
   const {item, options} = props;
 
+  console.log(options);
+
   return (
     <>
       <View style={[styles.container, bgColors.mediumGrayishBG]}>
@@ -28,9 +30,9 @@ const PTODetails = React.memo((props: Items) => {
           <Text>{item.itmdsc}</Text>
 
           {options?.receivedQty ? (
-            <Text>{`${item.itmqty || ""}PCS`}</Text>
+            <Text>{`${item.itmqty || ""} PCS`}</Text>
           ) : (
-            <Text>{`${item.intqty || ""}PCS`}</Text>
+            <Text>{`${item.intqty || item.itmqty}PCS`}</Text>
           )}
 
           <View style={styles.remove}>
@@ -107,7 +109,9 @@ const PTODetails = React.memo((props: Items) => {
 
           {options?.removeScanBatch ? (
             <CustomButton
-              isDisable={item.itmqty === item.intqty}
+              isDisable={
+                item.itmqty === item.intqty || item.itmqty === item.srtqty
+              }
               onPress={() => handleItemScanModal(item)}
               title="SCAN ITEM"
               type="regular"

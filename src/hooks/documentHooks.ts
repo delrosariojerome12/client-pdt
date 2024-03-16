@@ -21,6 +21,7 @@ import {
   getWTOOutboundValid,
   getWTOOutboundPost,
   getWTODetails,
+  getSRTO,
 } from "../store/actions/warehouse/warehouseActions";
 import {handleSetDocument, handleSetItem} from "../reducers/documentReducer";
 import {ScanDocumentParams} from "../store/actions/generalActions";
@@ -312,7 +313,6 @@ export const useDocumentHooks = () => {
             linenum: selectedItem.linenum.toString(),
             usrnam: userDetails?.usrcde,
           });
-
           if (ptoResponse && ptoResponse.data.pto2_data) {
             dispatch(getPTODetails({docnum: selectedDocument.docnum}));
             dispatch(getPTO({limit: 10, offset: 0}));
@@ -355,6 +355,34 @@ export const useDocumentHooks = () => {
             }
           }
           break;
+        case "srto":
+          const srtoResponse = await scanBarcode({
+            barcode,
+            category: "lpnnum_srto",
+            recid: selectedItem?.recid.toString(),
+            docnum: selectedDocument.docnum,
+            itmcde: selectedItem.itmcde,
+            untmea: selectedItem.untmea,
+            itmqty: selectedItem.itmqty,
+            srtqty: selectedItem.srtqty,
+            pdtmanualqtyinbound: receiveQty.toString(),
+            linenum: selectedItem.linenum.toString(),
+            usrnam: userDetails?.usrcde,
+          });
+          if (srtoResponse && srtoResponse.data.srto2_data) {
+            dispatch(getSRTODetails({docnum: selectedDocument.docnum}));
+            dispatch(getSRTO({limit: 10, offset: 0}));
+            if (srtoResponse.data.srto2_data[0]) {
+              dispatch(handleSetItem(srtoResponse.data.srto2_data[0]));
+            }
+            if (srtoResponse.data.srto2_data.length === 0) {
+              dispatch(setStatusText(`Item Successfully Scanned.`));
+              dispatch(handleToggleItemScanModal());
+            }
+          }
+
+          break;
+
         case "wto-outbound":
           const response = await scanBarcode({
             barcode,
@@ -415,13 +443,29 @@ export const useDocumentHooks = () => {
         }
         break;
       case "pur":
-        const response: any = await getLPN({lpnnum: barcode});
-        console.log("ansabe", response);
-        if (response) {
-          dispatch(handleSetDocument(response[0]));
+        const purResponse: any = await getLPN({lpnnum: barcode, usage: "pur"});
+        console.log("ansabe", purResponse);
+        if (purResponse) {
+          dispatch(handleSetDocument(purResponse[0]));
         }
         break;
       case "wto-inbound":
+        try {
+          const response = await scanBarcode({barcode, category});
+          handleSelectModal({item: response.data, type: uses});
+          dispatch(handleToggleScanModal());
+        } catch (error) {
+          console.log(error);
+        }
+        break;
+      case "whs":
+        const whsResponse: any = await getLPN({lpnnum: barcode, usage: "whs"});
+        console.log("ansabe", whsResponse);
+        if (whsResponse) {
+          dispatch(handleSetDocument(whsResponse[0]));
+        }
+        break;
+      case "srto":
         try {
           const response = await scanBarcode({barcode, category});
           handleSelectModal({item: response.data, type: uses});
@@ -555,7 +599,7 @@ export const useDocumentHooks = () => {
   };
 
   // subject to change
-  const validateBin = async (binnum: string) => {
+  const validateBin = async (binnum: string, usage: ScanValidate) => {
     if (!binnum) {
       Alert.alert(
         "Empty Bin Number",

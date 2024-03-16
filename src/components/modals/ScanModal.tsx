@@ -133,7 +133,9 @@ const ScanModal = React.memo((props: ScanModalProps) => {
               <>
                 <View style={styles.itemContainer}>
                   <Text style={styles.floatingText}>Item Details</Text>
-                  <Text>{`Int No.: ${selectedDocument.intnum}`}</Text>
+                  <Text>{`Int No.: ${
+                    selectedDocument.intnum || selectedDocument.intdocnum
+                  }`}</Text>
                   <Text>{`TO No.: ${selectedDocument.docnum}`}</Text>
                   <Text>{`Item Code: ${selectedDocument.itmcde}`}</Text>
                   <Text>{`Description: ${selectedDocument.itmdsc}`}</Text>
@@ -152,11 +154,11 @@ const ScanModal = React.memo((props: ScanModalProps) => {
                   type="text"
                   placeHolder={"Scan Bin No."}
                   inputKey="bin"
-                  onSubmit={() => validateBin(binfield)}
+                  onSubmit={() => validateBin(binfield, typeForFetching)}
                 />
 
                 <CustomButton
-                  onPress={() => validateBin(binfield)}
+                  onPress={() => validateBin(binfield, typeForFetching)}
                   title="VALIDATE"
                   type="save"
                   isWidthNotFull={true}

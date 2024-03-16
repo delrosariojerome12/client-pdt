@@ -37,7 +37,6 @@ const ItemScanModal = React.memo((props: ScanModalProps) => {
 
   console.log("item scan modal");
   console.log(options);
-  console.log(item);
 
   if (item) {
     return (
@@ -120,20 +119,25 @@ const ItemScanModal = React.memo((props: ScanModalProps) => {
               </View>
 
               <View style={format.twoRowText}>
-                <Text style={{fontWeight: "bold"}}>Int Quantity: </Text>
+                <Text style={{fontWeight: "bold"}}>UOM: </Text>
+                <Text> {item.untmea}</Text>
+              </View>
+
+              <View style={format.twoRowText}>
+                <Text style={{fontWeight: "bold"}}>Quantity: </Text>
                 {options?.receivedQty ? (
-                  <Text> {`${item.itmqty || ""} PCS`}</Text>
+                  <Text> {`${item.itmqty || ""}`}</Text>
                 ) : (
-                  <Text> {`${item.intqty || ""} PCS`}</Text>
+                  <Text> {`${item.intqty || item.itemqty} `}</Text>
                 )}
               </View>
 
               <View style={format.twoRowText}>
                 <Text style={{fontWeight: "bold"}}>Received Quantity: </Text>
                 {options?.receivedQty ? (
-                  <Text> {`${item.intqty} PCS`}</Text>
+                  <Text> {`${item[options.receivedQty]}`}</Text>
                 ) : (
-                  <Text> {`${item.itmqty} PCS`}</Text>
+                  <Text> {`${item.itmqty}`}</Text>
                 )}
               </View>
             </View>

@@ -31,6 +31,8 @@ const SRTO = () => {
     isScanModal,
     isSelectModal,
     selectedDocument,
+    isScanItemModal,
+    status,
   } = useInboundHooks({
     page: "srto",
   });
@@ -38,80 +40,91 @@ const SRTO = () => {
   const {handleScanModal, handleSelectModal, closeSelectModal, handlePost} =
     useDocumentHooks();
 
-  if (srto.status === "loading" && !refreshing && !isPaginating) {
-    return <LoadingSpinner />;
-  }
+  // if (srto.status === "loading" && !refreshing && !isPaginating) {
+  //   return <LoadingSpinner />;
+  // }
 
   console.log("SRTO");
-  console.log(srto.data);
 
   return (
-    <View style={generalStyles.outerContainer}>
-      <CustomButton title="SCAN SRT" onPress={handleScanModal} type="regular" />
-      <ScrollView
-        style={generalStyles.innerContainer}
-        contentContainerStyle={{flexGrow: 1}}
-        refreshControl={
-          <RefreshControl refreshing={false} onRefresh={onRefresh} />
-        }
-        onScroll={handleScroll}
-        scrollEventThrottle={150}
-      >
-        <CustomTable
-          tableHeaders={tableHeaders}
-          tableData={srto.data}
-          visibleProperties={tableVisibleProps}
-          isPostDisable={true}
-          onSelect={handleSelectModal}
-          selectType="srto"
-          buttonUses="srto"
+    <>
+      {status === "success" &&
+        !isSelectModal &&
+        !isScanModal &&
+        !isScanItemModal && (
+          <MessageToast
+            status="success"
+            text="Document Successfully Posted"
+            speed={2500}
+          />
+        )}
+
+      <View style={generalStyles.outerContainer}>
+        <CustomButton
+          title="SCAN SRT"
+          onPress={handleScanModal}
+          type="regular"
         />
-
-        {isScanModal && (
-          <ScanModal
-            visible={isScanModal}
-            onClose={handleScanModal}
-            placeholder="Waiting to Scan SRT Barcode..."
-            scanParams={"wrr_srto"}
-            typeForFetching="srto"
-          />
-        )}
-
-        {isSelectModal && (
-          <SelectModal
-            visible={isSelectModal}
-            onClose={closeSelectModal}
-            selectedItem={selectedDocument}
-            title="Sales Return Transfer Order Details"
-            propertiesToShow={[
-              {name: "docnum", label: "Document Number"},
-              {name: "srtdocnum", label: "SRT Number"},
-            ]}
-            customContent={
-              <ItemsList
-                uses="inbound"
-                subcategory="srto"
-                options={{removeEdit: true, removeLpn: true}}
-              />
-            }
-          />
-        )}
-      </ScrollView>
-
-      {isPaginating && (
-        <View
-          style={{
-            justifyContent: "center",
-            alignItems: "center",
-            paddingVertical: 10,
-            height: 100,
-          }}
+        <ScrollView
+          style={generalStyles.innerContainer}
+          contentContainerStyle={{flexGrow: 1}}
+          refreshControl={
+            <RefreshControl refreshing={false} onRefresh={onRefresh} />
+          }
+          onScroll={handleScroll}
+          scrollEventThrottle={150}
         >
-          <ActivityIndicator size="large" color="#0000ff" />
-          <Text>Loading more data...</Text>
-        </View>
-      )}
-    </View>
+          <CustomTable
+            tableHeaders={tableHeaders}
+            tableData={srto.data}
+            visibleProperties={tableVisibleProps}
+            isPostDisable={true}
+            onSelect={handleSelectModal}
+            selectType="srto"
+            buttonUses="srto"
+          />
+
+          {isScanModal && (
+            <ScanModal
+              visible={isScanModal}
+              onClose={handleScanModal}
+              placeholder="Waiting to Scan SRT Barcode..."
+              scanParams={"wrr_srto"}
+              typeForFetching="srto"
+              usage="searching"
+            />
+          )}
+
+          {isSelectModal && (
+            <SelectModal
+              visible={isSelectModal}
+              onClose={closeSelectModal}
+              selectedItem={selectedDocument}
+              title="Sales Return Transfer Order Details"
+              propertiesToShow={[
+                {name: "docnum", label: "TO Number"},
+                {name: "srtdocnum", label: "SRT Number"},
+              ]}
+              customContent={<ItemsList uses="inbound" subcategory="srto" />}
+            />
+          )}
+        </ScrollView>
+
+        {isPaginating && (
+          <View
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              paddingVertical: 10,
+              height: 100,
+            }}
+          >
+            <ActivityIndicator size="large" color="#0000ff" />
+            <Text>Loading more data...</Text>
+          </View>
+        )}
+      </View>
+    </>
   );
 };
 
