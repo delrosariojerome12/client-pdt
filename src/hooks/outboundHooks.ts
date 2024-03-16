@@ -329,9 +329,10 @@ export const useOutboundHooks = ({page}: OutboundUse) => {
     }
   };
 
-  useEffect(() => {
-    checkPageToLoad();
-  }, []);
+  // deprecated refer to usehomeroutes
+  // useEffect(() => {
+  // checkPageToLoad();
+  // }, []);
 
   useEffect(() => {
     if (activeIndex !== null) {

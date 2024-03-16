@@ -18,14 +18,26 @@ const Inbound = () => {
     return getBasePath();
   }, [getBasePath]);
 
+  console.log(routes.children[0]);
+
   return (
     <View style={generalStyles.wideContainer}>
-      {routes?.children?.map((item, index) => {
+      {routes?.children?.map((routeItem, index) => {
+        let item: {
+          title: string;
+          path: string;
+          onLoad?: () => void;
+        } = routeItem as {
+          title: string;
+          path: string;
+          onLoad?: () => void;
+        };
         return (
           <HomeNavButtons
             key={index}
             title={item.title}
             routePath={`${basePath}/${routes.path}/${item.path}`}
+            onLoad={item.onLoad}
           />
         );
       })}

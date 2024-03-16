@@ -8,7 +8,6 @@ import {
   getWHS,
   getSRTO,
 } from "../store/actions/warehouse/warehouseActions";
-
 interface InboundUse {
   page: "pto" | "pur" | "srto" | "whs" | "wto";
 }
@@ -150,10 +149,10 @@ export const useInboundHooks = ({page}: InboundUse) => {
     }
   };
 
-  useEffect(() => {
-    checkPageToLoad();
-    console.log("Component mounted");
-  }, []);
+  // put the call on press refer to useHomeRoutes
+  // useEffect(() => {
+  // checkPageToLoad();
+  // }, []);
 
   const handleScroll = (event: any) => {
     const {layoutMeasurement, contentOffset, contentSize} = event.nativeEvent;

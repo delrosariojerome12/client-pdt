@@ -1,6 +1,8 @@
-import {homeRoutes} from "../routes/homeRoutes";
+// import {homeRoutes} from "../routes/homeRoutes";
+import {useHomeRoutes} from "../routes/homeRoutes";
 
 export const useRouteHooks = (title: string, childTitle?: string) => {
+  const {homeRoutes} = useHomeRoutes();
   const getChildRoutes = () => {
     const childRoutes = homeRoutes.filter((route) => {
       if (route.title === title) {
