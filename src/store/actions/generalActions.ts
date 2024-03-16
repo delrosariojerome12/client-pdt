@@ -478,7 +478,7 @@ export const connectToPHP = createAsyncThunk(
     const url = `${traccDomain}${traccDirectory}/${targerPPHP}`;
     console.log("post url:", url);
 
-    console.log("pinasa", formData);
+    console.log("form data", formData);
 
     try {
       const response = await fetch(url, {
@@ -487,7 +487,7 @@ export const connectToPHP = createAsyncThunk(
         headers: {},
       });
       const formattedResult = await response.json();
-      console.log("sukli", formattedResult);
+      console.log("AXIOS RESPONSE:", formattedResult);
 
       if (formattedResult.bool) {
         onSuccess();

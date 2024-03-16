@@ -76,6 +76,9 @@ export const useServiceHooks = () => {
   }: SendProps) => {
     const completeUrl = `${baseURl}/api/${url}`;
 
+    console.log(completeUrl);
+    console.log(requestData);
+
     setStatus("loading");
     if (!disableToast) {
       ToastMessage(toastMessage?.loading || "Loading...", 500);
@@ -137,7 +140,7 @@ export const useServiceHooks = () => {
     toastMessage,
   }: SendProps) => {
     const completeUrl = `${baseURl}/api/${url}`;
-    console.log(completeUrl);
+    console.log("daan url", completeUrl);
 
     setStatus("loading");
 
@@ -154,7 +157,7 @@ export const useServiceHooks = () => {
 
       // Invoke the onSuccess callback with response data
       onSuccess && onSuccess(response.data);
-      console.log(response.data);
+      console.log("patch sukli", response.data);
 
       return response.data;
     } catch (error) {

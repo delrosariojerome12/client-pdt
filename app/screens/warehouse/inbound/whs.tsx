@@ -13,77 +13,89 @@ import {useDocumentHooks} from "../../../../src/hooks/documentHooks";
 import {generalStyles} from "../../../../src/styles/styles";
 import {useInboundHooks} from "../../../../src/hooks/inboundHooks";
 import LoadingSpinner from "../../../../src/components/load-spinner/LoadingSpinner";
+import MessageToast from "../../../../src/components/message-toast/MessageToast";
+import CustomLoadingText from "../../../../src/components/load-spinner/CustomLoadingText";
 
 const tableHeaders = ["Date", "Document No.", "Intransit No.", ""];
 const tableVisibleProps = ["trndte", "docnum", "intnum"];
 
 const WHS = () => {
-  const {handleScroll, isPaginating, onRefresh, refreshing, whs, isScanModal} =
+  const {handleScroll, isPaginating, onRefresh, status, whs, isScanModal} =
     useInboundHooks({
       page: "whs",
     });
 
   const {handleScanModal, handlePost} = useDocumentHooks();
 
-  if (whs.status === "loading" && !refreshing && !isPaginating) {
-    return <LoadingSpinner />;
-  }
+  // if (whs.status === "loading" && !refreshing && !isPaginating) {
+  //   return <LoadingSpinner />;
+  // }
 
   console.log("WHS");
 
   return (
-    <View style={generalStyles.outerContainer}>
-      <CustomButton
-        title="SCAN LPN NO."
-        onPress={handleScanModal}
-        type="regular"
-      />
-      <ScrollView
-        style={generalStyles.innerContainer}
-        contentContainerStyle={{flexGrow: 1}}
-        refreshControl={
-          <RefreshControl refreshing={false} onRefresh={onRefresh} />
-        }
-        onScroll={handleScroll}
-        scrollEventThrottle={150}
-      >
-        <CustomTable
-          tableHeaders={tableHeaders}
-          tableData={whs.data}
-          visibleProperties={tableVisibleProps}
-          onPost={handlePost}
-          isSelectDisable={true}
-          buttonUses="whs"
-          postType="whs"
+    <>
+      {status === "success" && !isScanModal && (
+        <MessageToast
+          status="success"
+          text={"Document Successfully Posted Putway TO"}
+          speed={2500}
         />
-
-        {isScanModal && (
-          <ScanModal
-            visible={isScanModal}
-            onClose={handleScanModal}
-            placeholder="Waiting to Scan LPN No."
-            isNextBtn={true}
-            scanParams={"lpnnum"}
-            typeForFetching="whs"
-            usage="scanning"
-          />
-        )}
-      </ScrollView>
-
-      {isPaginating && (
-        <View
-          style={{
-            justifyContent: "center",
-            alignItems: "center",
-            paddingVertical: 10,
-            height: 100,
-          }}
-        >
-          <ActivityIndicator size="large" color="#0000ff" />
-          <Text>Loading more data...</Text>
-        </View>
       )}
-    </View>
+
+      <View style={generalStyles.outerContainer}>
+        <CustomButton
+          title="SCAN LPN NO."
+          onPress={handleScanModal}
+          type="regular"
+        />
+        <ScrollView
+          style={generalStyles.innerContainer}
+          contentContainerStyle={{flexGrow: 1}}
+          refreshControl={
+            <RefreshControl refreshing={false} onRefresh={onRefresh} />
+          }
+          onScroll={handleScroll}
+          scrollEventThrottle={150}
+        >
+          <CustomTable
+            tableHeaders={tableHeaders}
+            tableData={whs.data}
+            visibleProperties={tableVisibleProps}
+            onPost={handlePost}
+            isSelectDisable={true}
+            buttonUses="whs"
+            postType="whs"
+          />
+
+          {isScanModal && (
+            <ScanModal
+              visible={isScanModal}
+              onClose={handleScanModal}
+              placeholder="Waiting to Scan LPN No."
+              isNextBtn={true}
+              scanParams={"lpnnum"}
+              typeForFetching="whs"
+              usage="scanning"
+            />
+          )}
+        </ScrollView>
+
+        {isPaginating && (
+          <View
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              paddingVertical: 10,
+              height: 100,
+            }}
+          >
+            <ActivityIndicator size="large" color="#0000ff" />
+            <Text>Loading more data...</Text>
+          </View>
+        )}
+      </View>
+    </>
   );
 };
 

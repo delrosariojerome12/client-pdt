@@ -22,6 +22,7 @@ import {
   getWTOOutboundPost,
   getWTODetails,
   getSRTO,
+  getWHS,
 } from "../store/actions/warehouse/warehouseActions";
 import {handleSetDocument, handleSetItem} from "../reducers/documentReducer";
 import {ScanDocumentParams} from "../store/actions/generalActions";
@@ -162,6 +163,29 @@ export const useDocumentHooks = () => {
             type: "PTAPUR",
             onSuccess: () => {
               dispatch(getPUR({limit: 10, offset: 0}));
+              dispatch(resetStatus());
+            },
+            onFailure: (e) => {
+              dispatch(resetStatus());
+              Alert.alert("Transaction Posting Fail", ` ${e}`, [
+                {
+                  text: "Ok",
+                  onPress: () => {},
+                  style: "destructive",
+                },
+              ]);
+            },
+          })
+        );
+        break;
+      case "whs":
+        dispatch(
+          connectToPHP({
+            recid: item.recid,
+            docnum: item.intnum,
+            type: "PTAWHS",
+            onSuccess: () => {
+              dispatch(getWHS({limit: 10, offset: 0}));
               dispatch(resetStatus());
             },
             onFailure: (e) => {
@@ -380,9 +404,7 @@ export const useDocumentHooks = () => {
               dispatch(handleToggleItemScanModal());
             }
           }
-
           break;
-
         case "wto-outbound":
           const response = await scanBarcode({
             barcode,
@@ -612,14 +634,39 @@ export const useDocumentHooks = () => {
       );
       return;
     }
+
+    let patchUrl = "";
+    switch (usage) {
+      case "pur":
+        patchUrl = "lst_tracc/purchasetofile2";
+        break;
+      case "whs":
+        patchUrl = "lst_tracc/warehousetransferorderfile2";
+        break;
+
+      default:
+        break;
+    }
+
     const binDetails = await getBinAndValidate({
       binnum: binnum,
       lpnnum: selectedDocument.lpnnum,
+      patchUrl: patchUrl,
     });
 
     if (binDetails) {
       dispatch(handleToggleScanModal());
-      dispatch(getPUR({limit: 10, offset: 0}));
+      switch (usage) {
+        case "pur":
+          dispatch(getPUR({limit: 10, offset: 0}));
+          break;
+        case "whs":
+          dispatch(getWHS({limit: 10, offset: 0}));
+          break;
+
+        default:
+          break;
+      }
       Alert.alert(
         "Validation Success",
         "Bin Number Matched. You May procceed to Manual Putaway Procedure.",

@@ -27,6 +27,7 @@ interface GetLPN {
 interface ValidateBin {
   binnum: string;
   lpnnum: string;
+  patchUrl: string;
 }
 
 interface Endpoint {
@@ -500,12 +501,15 @@ export const useAPIHooks = () => {
     }
   };
 
-  const getBinAndValidate = async ({binnum, lpnnum}: ValidateBin) => {
+  const getBinAndValidate = async ({binnum, lpnnum, patchUrl}: ValidateBin) => {
     try {
       const binDetails = await handleGet({
         url: `lst_tracc/binfile1?binnum=${binnum}`,
         disableToast: true,
       });
+
+      console.log("ito ang bin", binDetails);
+      console.log();
 
       if (binDetails) {
         if (binDetails.length === 0) {
@@ -531,7 +535,8 @@ export const useAPIHooks = () => {
             },
           };
           handlePatch({
-            url: "lst_tracc/purchasetofile2",
+            // url: "lst_tracc/purchasetofile2",
+            url: patchUrl,
             requestData: patchDocument,
             disableToast: true,
           });
