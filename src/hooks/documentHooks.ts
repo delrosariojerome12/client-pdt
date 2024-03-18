@@ -23,6 +23,8 @@ import {
   getWTODetails,
   getSRTO,
   getWHS,
+  getWPTOValid,
+  getPKValidate,
 } from "../store/actions/warehouse/warehouseActions";
 import {handleSetDocument, handleSetItem} from "../reducers/documentReducer";
 import {ScanDocumentParams} from "../store/actions/generalActions";
@@ -53,7 +55,10 @@ export type TypePost =
   | "whs"
   | "wto-inbound"
   | "pto-add-batch"
-  | "wto-outbound";
+  | "wto-outbound"
+  | "wavepick"
+  | "inv-singlepick"
+  | "spl-singlepick";
 
 export type ScanValidate =
   | "pto"
@@ -63,6 +68,7 @@ export type ScanValidate =
   | "srto"
   | "wto-outbound"
   | "wavepick"
+  | "singlepick"
   | "stg-validate";
 
 export type TypeSelect =
@@ -71,6 +77,7 @@ export type TypeSelect =
   | "wto-inbound"
   | "wto-outbound"
   | "wavepick"
+  | "singlepick"
   | "stg-validate";
 
 export interface SelectProps {
@@ -106,7 +113,6 @@ export const useDocumentHooks = () => {
   // start check categories and uses functions
   const checkSelectType = ({item, type}: SelectProps) => {
     console.log(type);
-
     switch (type) {
       case "pto":
         dispatch(getPTODetails({docnum: item.docnum}));
@@ -121,6 +127,7 @@ export const useDocumentHooks = () => {
         dispatch(getWTOOutboundDetails({docnum: item.docnum}));
         break;
       case "wavepick":
+      case "singlepick":
         dispatch(getWPTODetails({docnum: item.docnum}));
         break;
       case "stg-validate":
@@ -283,7 +290,6 @@ export const useDocumentHooks = () => {
                 })
               );
               console.log("tapos na");
-              // setStatus("success");
               dispatch(setStatus("success"));
             },
             onFailure: (e) => {
@@ -299,15 +305,45 @@ export const useDocumentHooks = () => {
             dontShowSuccess: true,
           })
         );
-
         break;
-
+      case "wavepick":
+        dispatch(
+          connectToPHP({
+            recid: item.recid,
+            docnum: item.docnum,
+            type: "VALIDATE_WPL",
+            onSuccess: async () => {
+              dispatch(setStatus("loading"));
+              console.log("loading muna");
+              await connectToPHPNotDispatch({
+                recid: item.recid,
+                docnum: item.docnum,
+                type: "WPTO",
+              });
+              console.log("dito sunod");
+              dispatch(getWPTOValid({limit: 10, offset: 0}));
+              console.log("tapos na");
+              dispatch(setStatus("success"));
+            },
+            onFailure: (e) => {
+              dispatch(resetStatus());
+              Alert.alert("Transaction Posting Fail", `${e}`, [
+                {
+                  text: "Ok",
+                  onPress: () => {},
+                  style: "destructive",
+                },
+              ]);
+            },
+            dontShowSuccess: true,
+          })
+        );
+        break;
       default:
         alert("No api yet.");
         break;
     }
   };
-
   // scanning item
   const checkScanType = async (
     {
@@ -418,9 +454,7 @@ export const useDocumentHooks = () => {
             usrnam: userDetails?.usrcde,
             barcodelvl2: barcodelvl2,
           });
-
           console.log("bato", response);
-
           if (response && response.data.wto2_data) {
             dispatch(showQuantityField(true));
             !isQuantityFieldShown &&
@@ -434,11 +468,66 @@ export const useDocumentHooks = () => {
               dispatch(setStatusText(`Item Successfully Scanned.`));
               if (response.data.wto2_data[0]) {
                 dispatch(handleSetItem(response.data.wto2_data[0]));
-                // if (response.data.wto2_data[0].itmqty === 0 && receiveQty > 1) {
-                //   dispatch(handleToggleOutboundItemScan());
-                // }
               }
               if (response.data.wto2_data.length === 0) {
+                dispatch(handleToggleOutboundItemScan());
+              }
+            }
+          }
+          break;
+        case "wavepick":
+        case "singlepick":
+          if (barcodelvl2 !== "") {
+            dispatch(setStatus("loading"));
+            const response = await connectToPHPNotDispatch({
+              recid: selectedDocument.recid,
+              docnum: selectedDocument.docnum,
+              type: "chk_binbatch_onhand",
+            });
+
+            if (parseFloat(response.finalyqty) < receiveQty) {
+              Alert.alert(
+                "Something went wrong",
+                "The requested qty. exceeded the onhand qty.",
+                [
+                  {
+                    text: "OK",
+                  },
+                ]
+              );
+              return;
+            }
+          }
+          const wpResponse = await scanBarcode({
+            barcode,
+            category: "wpto_item",
+            recid: selectedItem?.recid.toString(),
+            docnum: selectedDocument.docnum,
+            scanlevel: barcodelvl2 ? "2" : "1",
+            pdtmanualqtyoutbound: receiveQty.toString(),
+            fromspl: scanUsage === "singlepick" ? "1" : undefined,
+            spl_docnum: selectedDocument.docnum,
+            usrnam: userDetails?.usrcde,
+            barcodelvl2: barcodelvl2,
+          });
+          console.log("bato", wpResponse);
+          if (wpResponse && wpResponse.data.wpto2_data) {
+            dispatch(showQuantityField(true));
+            !isQuantityFieldShown &&
+              dispatch(setStatusText(`Bin No. Successfully Scanned.`));
+            if (isQuantityFieldShown) {
+              console.log("wat", selectedDocument.docnum);
+              if (scanUsage === "singlepick") {
+                dispatch(getPKValidate({limit: 10, offset: 0}));
+              } else {
+                dispatch(getWPTOValid({limit: 10, offset: 0}));
+              }
+              dispatch(getWPTODetails({docnum: selectedDocument.docnum}));
+              dispatch(setStatusText(`Item Successfully Scanned.`));
+              if (wpResponse.data.wpto2_data[0]) {
+                dispatch(handleSetItem(wpResponse.data.wpto2_data[0]));
+              }
+              if (wpResponse.data.wpto2_data[0].validated === 1) {
                 dispatch(handleToggleOutboundItemScan());
               }
             }
@@ -455,57 +544,25 @@ export const useDocumentHooks = () => {
     {barcode, category}: ScanDocumentParams
   ) => {
     switch (uses) {
-      case "pto":
-        try {
-          const response = await scanBarcode({barcode, category});
-          handleSelectModal({item: response.data, type: uses});
-          dispatch(handleToggleScanModal());
-        } catch (error) {
-          console.log(error);
-        }
-        break;
       case "pur":
-        const purResponse: any = await getLPN({lpnnum: barcode, usage: "pur"});
-        console.log("ansabe", purResponse);
-        if (purResponse) {
-          dispatch(handleSetDocument(purResponse[0]));
-        }
-        break;
-      case "wto-inbound":
-        try {
-          const response = await scanBarcode({barcode, category});
-          handleSelectModal({item: response.data, type: uses});
-          dispatch(handleToggleScanModal());
-        } catch (error) {
-          console.log(error);
-        }
-        break;
       case "whs":
-        const whsResponse: any = await getLPN({lpnnum: barcode, usage: "whs"});
-        console.log("ansabe", whsResponse);
-        if (whsResponse) {
-          dispatch(handleSetDocument(whsResponse[0]));
+        const lpnResponse: any = await getLPN({lpnnum: barcode, usage: uses});
+        if (lpnResponse) {
+          dispatch(handleSetDocument(lpnResponse[0]));
         }
         break;
+      case "pto":
+      case "wto-inbound":
       case "srto":
-        try {
-          const response = await scanBarcode({barcode, category});
-          handleSelectModal({item: response.data, type: uses});
-          dispatch(handleToggleScanModal());
-        } catch (error) {
-          console.log(error);
-        }
-        break;
       case "wto-outbound":
-        try {
-          const response = await scanBarcode({barcode, category});
+      case "wavepick":
+      case "singlepick":
+        const response = await scanBarcode({barcode, category});
+        if (response) {
           handleSelectModal({item: response.data, type: uses});
           dispatch(handleToggleScanModal());
-        } catch (error) {
-          console.log(error);
         }
         break;
-
       default:
         break;
     }
@@ -552,7 +609,6 @@ export const useDocumentHooks = () => {
   // end of  modals
 
   const handlePost = ({item, type, customMessage}: PostProps) => {
-    // checkPostType(item, type);
     if (customMessage) {
       Alert.alert(`${customMessage.header}`, `${customMessage.body}`, [
         {

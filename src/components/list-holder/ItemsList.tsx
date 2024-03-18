@@ -32,14 +32,14 @@ interface Props {
     | "outbound"
     | "subcon"
     | "stockTransfer"
-    | "physicalInventory"
-    | "stgDetails";
+    | "physicalInventory";
   subcategory:
     | "pto"
     | "wto-inbound"
     | "srto"
     | "wto-outbound"
     | "wavepick"
+    | "singlepick"
     | "stg-validate";
 }
 
@@ -65,8 +65,6 @@ const ItemsList = React.memo((props: Props) => {
         return <PTODetails item={item} key={index} options={options} />;
       case "outbound":
         return <WTODetails item={item} key={index} options={options} />;
-      case "stgDetails":
-        return <STGDetails item={item} key={index} />;
       case "subcon":
         return <SubConBinDetails item={item} key={index} />;
       case "stockTransfer":
@@ -86,7 +84,6 @@ const ItemsList = React.memo((props: Props) => {
         return {receivedQty: "intqty"};
       case "srto":
         return {receivedQty: "srtqty"};
-
       default:
         return {};
     }
@@ -131,11 +128,15 @@ const ItemsList = React.memo((props: Props) => {
             return wavepickDetails.data.map((item: any, index: number) => {
               return renderItems(item, index, {removeType: "wavepick"});
             });
+          case "singlepick":
+            return wavepickDetails.data.map((item: any, index: number) => {
+              return renderItems(item, index, {removeType: "singlepick"});
+            });
+          case "stg-validate":
+            return stgDetails.data.map((item: any, index: number) => {
+              return renderItems(item, index, {removeType: "stg-validate"});
+            });
         }
-      case "stgDetails":
-        return stgDetails.data.map((item: any, index: number) => {
-          return renderItems(item, index, {removeType: "stg-validate"});
-        });
     }
   };
 

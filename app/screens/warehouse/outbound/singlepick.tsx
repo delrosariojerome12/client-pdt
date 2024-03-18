@@ -16,6 +16,8 @@ import ItemsList from "../../../../src/components/list-holder/ItemsList";
 import SwitchButton from "../../../../src/components/forms/buttons/SwitchButton";
 import {useOutboundHooks} from "../../../../src/hooks/outboundHooks";
 import LoadingSpinner from "../../../../src/components/load-spinner/LoadingSpinner";
+import CustomLoadingText from "../../../../src/components/load-spinner/CustomLoadingText";
+import MessageToast from "../../../../src/components/message-toast/MessageToast";
 
 const tableHeaders = ["Date", "Document No.", ""];
 const tableVisibleProps = ["trndte", "docnum"];
@@ -32,6 +34,8 @@ const SinglePick = () => {
     activeIndex,
     handleIndexChange,
     singlepick,
+    status,
+    wavepickDetails,
   } = useOutboundHooks({
     page: "singlepick",
   });
@@ -50,7 +54,8 @@ const SinglePick = () => {
             visibleProperties={tableVisibleProps}
             isPostDisable={true}
             onSelect={handleSelectModal}
-            selectType="wavepick"
+            selectType="singlepick"
+            buttonUses=""
           />
         );
       case 1:
@@ -61,6 +66,8 @@ const SinglePick = () => {
             visibleProperties={tableVisibleProps}
             isSelectDisable={true}
             onPost={handlePost}
+            buttonUses=""
+            postType="inv-singlepick"
           />
         );
       case 2:
@@ -72,6 +79,7 @@ const SinglePick = () => {
             isPostDisable={true}
             onSelect={handleSelectModal}
             selectType="stg-validate"
+            buttonUses=""
           />
         );
       case 3:
@@ -82,6 +90,8 @@ const SinglePick = () => {
             visibleProperties={tableVisibleProps}
             isSelectDisable={true}
             onPost={handlePost}
+            buttonUses=""
+            postType="spl-singlepick"
           />
         );
     }
@@ -89,97 +99,100 @@ const SinglePick = () => {
 
   console.log("single pick");
 
-  // if (
-  //   singlepick.pkValidate.status === "loading" &&
-  //   !refreshing &&
-  //   !isPaginating
-  // ) {
-  //   return <LoadingSpinner />;
-  // }
-
-  // const checkSelectOptions = () => {
-  //   switch (activeIndex) {
-  //     case 0:
-  //     case null:
-  //       return;
-  //       break;
-  //     case 3:
-  //       break;
-  //   }
-  // };
-
   return (
-    <View style={generalStyles.outerContainer}>
-      <CustomButton
-        title="SCAN SINGLE PICK"
-        onPress={handleScanModal}
-        type="regular"
-      />
-      <SwitchButton
-        options={["PK VALIDATE", "INV POSTING", "STG VALIDATE", "SPL POSTING"]}
-        activeIndex={!activeIndex ? 0 : activeIndex}
-        onChange={handleIndexChange}
-      />
-
-      <ScrollView
-        style={generalStyles.innerContainer}
-        contentContainerStyle={{flexGrow: 1}}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-        onScroll={handleScroll}
-        scrollEventThrottle={150}
-      >
-        {renderTables()}
-
-        {isScanModal && (
-          <ScanModal
-            visible={isScanModal}
-            onClose={handleScanModal}
-            placeholder="Waiting to Scan Single Pick Barcode..."
-            scanParams={{category: "bnt"}}
-          />
-        )}
-
-        {isSelectModal && (
-          <SelectModal
-            visible={isSelectModal}
-            onClose={closeSelectModal}
-            selectedItem={selectedDocument}
-            title="Single Pick List Details"
-            propertiesToShow={[
-              {
-                name: "docnum",
-                label:
-                  activeIndex === 0 || activeIndex === null
-                    ? "TO Number"
-                    : "SP TO NO. ",
-              },
-            ]}
-            customContent={
-              activeIndex === null || activeIndex === 0 ? (
-                <ItemsList uses="outbound" subcategory={"wavepick"} />
-              ) : (
-                <ItemsList uses="stgDetails" subcategory={"stg-validate"} />
-              )
-            }
-          />
-        )}
-      </ScrollView>
-      {isPaginating && (
-        <View
-          style={{
-            justifyContent: "center",
-            alignItems: "center",
-            paddingVertical: 10,
-            height: 100,
-          }}
-        >
-          <ActivityIndicator size="large" color="#0000ff" />
-          <Text>Loading more data...</Text>
-        </View>
+    <>
+      {status === "success" && !isSelectModal && !isScanModal && (
+        <MessageToast
+          status="success"
+          text="Document Successfully Posted"
+          speed={2500}
+        />
       )}
-    </View>
+
+      <View style={generalStyles.outerContainer}>
+        <CustomButton
+          title="SCAN SINGLE PICK"
+          onPress={handleScanModal}
+          type="regular"
+        />
+        {status === "loading" && !isSelectModal && !isScanModal && (
+          <CustomLoadingText text="Posting..." visible={true} />
+        )}
+
+        <SwitchButton
+          options={[
+            "PK VALIDATE",
+            "INV POSTING",
+            "STG VALIDATE",
+            "SPL POSTING",
+          ]}
+          activeIndex={!activeIndex ? 0 : activeIndex}
+          onChange={handleIndexChange}
+        />
+
+        <ScrollView
+          style={generalStyles.innerContainer}
+          contentContainerStyle={{flexGrow: 1}}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          onScroll={handleScroll}
+          scrollEventThrottle={150}
+        >
+          {renderTables()}
+
+          {isScanModal && (
+            <ScanModal
+              visible={isScanModal}
+              onClose={handleScanModal}
+              placeholder="Waiting to Scan Single Pick Barcode..."
+              scanParams={"spl"}
+              typeForFetching="singlepick"
+              usage="searching"
+            />
+          )}
+
+          {isSelectModal && (
+            <SelectModal
+              loadingStatus={wavepickDetails.status === "loading" && true}
+              visible={isSelectModal}
+              onClose={closeSelectModal}
+              selectedItem={selectedDocument}
+              title="Single Pick List Details"
+              propertiesToShow={[
+                {
+                  name: "docnum",
+                  label:
+                    activeIndex === 0 || activeIndex === null
+                      ? "TO Number"
+                      : "SP TO NO. ",
+                },
+              ]}
+              customContent={
+                activeIndex === null || activeIndex === 0 ? (
+                  <ItemsList uses="outbound" subcategory={"singlepick"} />
+                ) : (
+                  <ItemsList uses="outbound" subcategory={"stg-validate"} />
+                )
+              }
+            />
+          )}
+        </ScrollView>
+        {isPaginating && (
+          <View
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              paddingVertical: 10,
+              height: 100,
+            }}
+          >
+            <ActivityIndicator size="large" color="#0000ff" />
+            <Text>Loading more data...</Text>
+          </View>
+        )}
+      </View>
+    </>
   );
 };
 

@@ -18,9 +18,8 @@ interface OutboundUse {
 }
 
 export const useOutboundHooks = ({page}: OutboundUse) => {
-  const {singlepick, wavepick, wto, wtoOutboundDetails} = useAppSelector(
-    (state) => state.outbound
-  );
+  const {singlepick, wavepick, wto, wtoOutboundDetails, wavepickDetails} =
+    useAppSelector((state) => state.outbound);
   const {isScanModal, isSelectModal} = useAppSelector((state) => state.modal);
   const {selectedDocument} = useAppSelector((state) => state.document);
   const {status, statusText} = useAppSelector((state) => state.status);
@@ -377,5 +376,6 @@ export const useOutboundHooks = ({page}: OutboundUse) => {
     wavepick,
     activeIndex,
     handleIndexChange,
+    wavepickDetails,
   };
 };

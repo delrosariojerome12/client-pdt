@@ -430,6 +430,7 @@ export const useAPIHooks = () => {
             text: "OK",
           },
         ]);
+        return null;
       }
     } catch (error: any) {
       dispatch(setStatus("failed"));

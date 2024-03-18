@@ -13,6 +13,7 @@ export interface OutboundItem {
   linenum: number;
   recid: number;
   binnum2: string;
+  binfrom?: string | undefined;
   validate: number;
   scanqty: number;
   batchexist: boolean;
