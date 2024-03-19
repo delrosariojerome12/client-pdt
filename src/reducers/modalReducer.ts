@@ -10,6 +10,8 @@ interface Modal {
   isSearchBatchModal: boolean;
   isEditBatchModal: boolean;
   isOutboundItemScan: boolean;
+  isNotificationModal: boolean;
+  notificationText: string;
 }
 
 const initialState: Modal = {
@@ -17,6 +19,8 @@ const initialState: Modal = {
   isSelectModal: false,
   isScanItemModal: false,
   isOutboundItemScan: false,
+  isNotificationModal: false,
+  notificationText: "",
 
   isAddBatchModal: false,
   isSearchBatchModal: false,
@@ -30,6 +34,12 @@ const modalReducer = createSlice({
   name: "modal",
   initialState,
   reducers: {
+    handleToggleNotificationModal: (state) => {
+      state.isNotificationModal = !state.isNotificationModal;
+    },
+    handleSetNotificationText: (state, action) => {
+      state.notificationText = action.payload;
+    },
     handleToggleScanModal: (state) => {
       state.isScanModal = !state.isScanModal;
     },
@@ -66,6 +76,8 @@ const modalReducer = createSlice({
 });
 
 export const {
+  handleToggleNotificationModal,
+  handleSetNotificationText,
   handleToggleScanModal,
   handleToggleSelectModal,
   handleCloseModal,

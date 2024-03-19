@@ -18,7 +18,7 @@ import {useOutboundHooks} from "../../../../src/hooks/outboundHooks";
 import LoadingSpinner from "../../../../src/components/load-spinner/LoadingSpinner";
 import CustomLoadingText from "../../../../src/components/load-spinner/CustomLoadingText";
 import MessageToast from "../../../../src/components/message-toast/MessageToast";
-
+import NotificationModal from "../../../../src/components/modals/NotificationModal";
 const tableHeaders = ["Date", "Document No.", ""];
 const tableVisibleProps = ["trndte", "docnum"];
 
@@ -35,7 +35,8 @@ const SinglePick = () => {
     handleIndexChange,
     singlepick,
     status,
-    wavepickDetails,
+    singlepickDetails,
+    isNotificationModal,
   } = useOutboundHooks({
     page: "singlepick",
   });
@@ -109,6 +110,8 @@ const SinglePick = () => {
         />
       )}
 
+      {isNotificationModal && <NotificationModal />}
+
       <View style={generalStyles.outerContainer}>
         <CustomButton
           title="SCAN SINGLE PICK"
@@ -154,7 +157,7 @@ const SinglePick = () => {
 
           {isSelectModal && (
             <SelectModal
-              loadingStatus={wavepickDetails.status === "loading" && true}
+              loadingStatus={singlepickDetails.status === "loading" && true}
               visible={isSelectModal}
               onClose={closeSelectModal}
               selectedItem={selectedDocument}

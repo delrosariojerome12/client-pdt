@@ -36,7 +36,6 @@ const ItemScanModal = React.memo((props: ScanModalProps) => {
   };
 
   console.log("item scan modal");
-  console.log(options);
 
   if (item) {
     return (

@@ -4,6 +4,10 @@ import axios, {AxiosResponse} from "axios";
 import {Alert} from "react-native";
 import {setStatus} from "../reducers/statusReducer";
 import {useServiceHooks} from "./serviceHooks";
+import {
+  handleToggleNotificationModal,
+  handleSetNotificationText,
+} from "../reducers/modalReducer";
 
 interface ConnectToPHPParams {
   recid: any;
@@ -381,12 +385,28 @@ export const useAPIHooks = () => {
       const formattedResult = await response.json();
       console.log("sukli", formattedResult);
 
+      if (formattedResult.sofValMsg.length > 0) {
+        dispatch(handleToggleNotificationModal());
+        dispatch(handleSetNotificationText(formattedResult.sofValMsg));
+        return null;
+      }
       if (formattedResult.bool) {
         console.log("connect php success");
         return formattedResult;
       } else {
         console.log("connect php error");
-        throw new Error(formattedResult.pdtmsg["1"] || formattedResult.msg);
+        // throw new Error(formattedResult.pdtmsg["1"] || formattedResult.msg);
+        Alert.alert(
+          "Transaction Posting Fail",
+          `${formattedResult.pdtmsg["1"] || formattedResult.msg}`,
+          [
+            {
+              text: "Ok",
+              onPress: () => {},
+              style: "destructive",
+            },
+          ]
+        );
       }
     } catch (error: any) {
       console.log(error);
@@ -394,7 +414,10 @@ export const useAPIHooks = () => {
     }
   };
 
-  const scanBarcode = async (queryParams: ScanDocumentParams) => {
+  const scanBarcode = async (
+    queryParams: ScanDocumentParams,
+    disableStatus?: boolean
+  ) => {
     dispatch(setStatus("loading"));
     try {
       const {barcode, category, ...restParams} = queryParams;
@@ -419,7 +442,7 @@ export const useAPIHooks = () => {
 
       const response = await axios.get(url);
       if (response.data.bool) {
-        dispatch(setStatus("success"));
+        !disableStatus && dispatch(setStatus("success"));
         console.log("tae", response.data);
         return response.data;
       } else {

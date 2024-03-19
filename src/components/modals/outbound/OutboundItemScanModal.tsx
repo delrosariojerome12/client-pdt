@@ -19,10 +19,12 @@ import {ScanValidate} from "../../../hooks/documentHooks";
 import CustomLoadingText from "../../load-spinner/CustomLoadingText";
 import {useModalHooks} from "../../../hooks/modalHooks";
 import {formatDateStringMMDDYYYY} from "../../../helper/Date";
+import {ScanOptions} from "../../list-holder/ItemsList";
 
 interface ScanModalProps {
   visible: boolean;
   scanType: ScanValidate;
+  options?: ScanOptions;
 }
 
 const OutboundItemScanModal = React.memo((props: ScanModalProps) => {
@@ -38,7 +40,7 @@ const OutboundItemScanModal = React.memo((props: ScanModalProps) => {
   const [itemBarcode, setItemBarcode] = useState<string>("");
   const [quantityField, setQuantityField] = useState<number>(1);
 
-  const {visible, scanType} = props;
+  const {visible, scanType, options} = props;
 
   const handleOnChange = (key: string, value: string | number) => {
     setScanfield(String(value));
@@ -67,6 +69,8 @@ const OutboundItemScanModal = React.memo((props: ScanModalProps) => {
       scanType
     );
   };
+
+  console.log(item);
 
   if (item) {
     return (
@@ -106,7 +110,11 @@ const OutboundItemScanModal = React.memo((props: ScanModalProps) => {
                 onInputChange={handleOnChange}
                 inputValue={scanfield}
                 type="text"
-                placeHolder="Waiting to Scan Bin No. Barcode..."
+                placeHolder={
+                  options?.scanUsage === "bin"
+                    ? "Waiting to Scan Bin No. Barcode..."
+                    : "Waiting to Scan Barcode..."
+                }
                 inputKey="scan"
                 isFocus={true}
                 onSubmit={() => {
@@ -156,7 +164,7 @@ const OutboundItemScanModal = React.memo((props: ScanModalProps) => {
                 </View>
                 <View style={format.twoRowText}>
                   <Text style={{fontWeight: "bold"}}>Bin No.:</Text>
-                  <Text>{`${item.binnum} `}</Text>
+                  <Text>{`${item.binnum || item.binfrom} `}</Text>
                 </View>
 
                 <View style={format.twoRowText}>
@@ -174,6 +182,21 @@ const OutboundItemScanModal = React.memo((props: ScanModalProps) => {
                   <Text> {`${item.scanqty}`}</Text>
                 </View>
               </View>
+
+              {options?.showQuantity && (
+                <View style={styles.quantityContainer}>
+                  <Text>Quantity: </Text>
+                  <CustomInputs
+                    onInputChange={handleOnQuantityChange}
+                    inputValue={quantityField}
+                    type="numeric"
+                    placeHolder="Quantity"
+                    inputKey="quantity"
+                    customWidth={252}
+                    useFlex={true}
+                  />
+                </View>
+              )}
 
               {isQuantityFieldShown && (
                 <>

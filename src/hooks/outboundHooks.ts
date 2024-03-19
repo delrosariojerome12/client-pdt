@@ -10,7 +10,6 @@ import {
   getINVPosting,
   getSTGValidate,
   getSPLPosting,
-  getSTGValidateDetails,
 } from "../store/actions/warehouse/warehouseActions";
 
 interface OutboundUse {
@@ -18,9 +17,18 @@ interface OutboundUse {
 }
 
 export const useOutboundHooks = ({page}: OutboundUse) => {
-  const {singlepick, wavepick, wto, wtoOutboundDetails, wavepickDetails} =
-    useAppSelector((state) => state.outbound);
-  const {isScanModal, isSelectModal} = useAppSelector((state) => state.modal);
+  const {
+    singlepick,
+    wavepick,
+    wto,
+    wtoOutboundDetails,
+    wavepickDetails,
+    stgDetails,
+    singlepickDetails,
+  } = useAppSelector((state) => state.outbound);
+  const {isScanModal, isSelectModal, isNotificationModal} = useAppSelector(
+    (state) => state.modal
+  );
   const {selectedDocument} = useAppSelector((state) => state.document);
   const {status, statusText} = useAppSelector((state) => state.status);
 
@@ -141,8 +149,6 @@ export const useOutboundHooks = ({page}: OutboundUse) => {
               singlepick.pkValidate.data.length - 10 === 0
                 ? 10
                 : singlepick.pkValidate.data.length - 10;
-
-            // singlepick.pkValidate.data.length + 10;
             dispatch(
               getPKValidate({
                 limit: 10,
@@ -159,7 +165,6 @@ export const useOutboundHooks = ({page}: OutboundUse) => {
               singlepick.invPosting.data.length - 10 === 0
                 ? 10
                 : singlepick.invPosting.data.length - 10;
-            // singlepick.invPosting.data.length + 10;
             dispatch(
               getINVPosting({
                 limit: 10,
@@ -368,6 +373,7 @@ export const useOutboundHooks = ({page}: OutboundUse) => {
     selectedDocument,
     isScanModal,
     isSelectModal,
+    isNotificationModal,
     wto,
     wtoOutboundDetails,
     status,
@@ -377,5 +383,6 @@ export const useOutboundHooks = ({page}: OutboundUse) => {
     activeIndex,
     handleIndexChange,
     wavepickDetails,
+    singlepickDetails,
   };
 };

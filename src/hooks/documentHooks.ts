@@ -25,6 +25,9 @@ import {
   getWHS,
   getWPTOValid,
   getPKValidate,
+  getSPLPosting,
+  getINVPosting,
+  getSTGValidate,
 } from "../store/actions/warehouse/warehouseActions";
 import {handleSetDocument, handleSetItem} from "../reducers/documentReducer";
 import {ScanDocumentParams} from "../store/actions/generalActions";
@@ -339,6 +342,71 @@ export const useDocumentHooks = () => {
           })
         );
         break;
+      case "spl-singlepick":
+        dispatch(
+          connectToPHP({
+            recid: item.recid,
+            docnum: item.docnum,
+            type: "SPL",
+            onSuccess: async () => {
+              dispatch(setStatus("loading"));
+              dispatch(getSPLPosting({limit: 10, offset: 0}));
+              dispatch(setStatus("success"));
+            },
+            onFailure: (e) => {
+              dispatch(resetStatus());
+              Alert.alert("Transaction Posting Fail", `${e}`, [
+                {
+                  text: "Ok",
+                  onPress: () => {},
+                  style: "destructive",
+                },
+              ]);
+            },
+            dontShowSuccess: true,
+          })
+        );
+        break;
+      case "inv-singlepick":
+        dispatch(
+          connectToPHP({
+            recid: item.recid,
+            docnum: item.docnum,
+            type: "VALIDATE_WPL",
+            onSuccess: async () => {
+              dispatch(setStatus("loading"));
+              const response = await connectToPHPNotDispatch({
+                recid: item.recid,
+                docnum: item.docnum,
+                type: "INVPOST",
+              });
+              dispatch(
+                getINVPosting({
+                  limit: 10,
+                  offset: 0,
+                })
+              );
+              if (response) {
+                dispatch(setStatus("success"));
+              } else {
+                dispatch(setStatus("failed"));
+              }
+            },
+            onFailure: (e) => {
+              dispatch(resetStatus());
+              Alert.alert("Transaction Posting Fail", `${e}`, [
+                {
+                  text: "Ok",
+                  onPress: () => {},
+                  style: "destructive",
+                },
+              ]);
+            },
+            dontShowSuccess: true,
+          })
+        );
+        break;
+
       default:
         alert("No api yet.");
         break;
@@ -533,6 +601,29 @@ export const useDocumentHooks = () => {
             }
           }
           break;
+        case "stg-validate":
+          const stgResponse = await scanBarcode({
+            barcode,
+            category: "spl_item",
+            recid: selectedItem?.recid.toString(),
+            docnum: selectedDocument.docnum,
+            scanlevel: "1",
+            pdtmanualqtyoutbound: receiveQty.toString(),
+            spl_docnum: selectedDocument.docnum,
+            usrnam: userDetails?.usrcde,
+          });
+          if (stgResponse && stgResponse.data.spl2_data) {
+            dispatch(getSTGValidateDetails({docnum: selectedDocument.docnum}));
+            dispatch(getSTGValidate({limit: 10, offset: 0}));
+            if (stgResponse.data.spl2_data[0]) {
+              dispatch(handleSetItem(stgResponse.data.spl2_data[0]));
+            }
+            if (stgResponse.data.spl2_data.length === 0) {
+              dispatch(setStatusText(`Item Successfully Scanned.`));
+              dispatch(handleToggleItemScanModal());
+            }
+          }
+          break;
         default:
           break;
       }
@@ -556,13 +647,43 @@ export const useDocumentHooks = () => {
       case "srto":
       case "wto-outbound":
       case "wavepick":
-      case "singlepick":
         const response = await scanBarcode({barcode, category});
         if (response) {
           handleSelectModal({item: response.data, type: uses});
           dispatch(handleToggleScanModal());
         }
         break;
+      case "singlepick":
+        const spResponse = await scanBarcode({barcode, category}, true);
+        if (spResponse) {
+          dispatch(handleToggleScanModal());
+          console.log("dito daapat");
+          console.log(spResponse.data);
+
+          if (spResponse.data.for_posting_stg || spResponse.data.for_posting) {
+            switch (spResponse.data.page) {
+              case "WPL":
+                alert("eto na");
+                break;
+              case "SPL":
+                handlePost({item: spResponse.data, type: "spl-singlepick"});
+                break;
+            }
+            return;
+          }
+          switch (spResponse.data.page) {
+            case "WPL":
+              handleSelectModal({item: spResponse.data, type: "singlepick"});
+              break;
+            case "SPL":
+              handleSelectModal({
+                item: spResponse.data,
+                type: "stg-validate",
+              });
+              break;
+          }
+        }
+
       default:
         break;
     }

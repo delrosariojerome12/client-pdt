@@ -87,27 +87,6 @@ interface BatchUpdate {
   };
   onSuccess: () => void;
 }
-interface RemoveQuantity {
-  document: {
-    field: {
-      docnum: string;
-    };
-    data: {
-      pdtopen: "Y";
-      doclock: "Y";
-    };
-  };
-  item: {
-    field: {
-      recid: number;
-    };
-    data: {
-      itmqty: 0;
-    };
-  };
-  lpnnum: string;
-  onSuccess: () => void;
-}
 
 export const getDocument = createAsyncThunk(
   "general/getDocument",

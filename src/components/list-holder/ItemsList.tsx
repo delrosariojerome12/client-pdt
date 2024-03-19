@@ -6,7 +6,6 @@ import WTODetails from "../outbound/wtoDetails";
 import SubConBinDetails from "../inventory-management/subConBinDetails";
 import StockTransferDetails from "../stockTransfer/stockTransferDetails";
 import PhysicalInventoryDetails from "../physical-inventory/physicalInventoryDetails";
-import STGDetails from "../outbound/stgDetails";
 import AddBatchModal from "../modals/AddBatchModal";
 import EditBatchModal from "../modals/EditBatchModal";
 import ItemScanModal from "../modals/ItemScanModal";
@@ -24,6 +23,8 @@ export type Options = {
 
 export type ScanOptions = {
   receivedQty?: "intqty" | "itmqty" | "srtqty";
+  showQuantity?: boolean;
+  scanUsage?: "bin" | "barcode";
 };
 
 interface Props {
@@ -56,9 +57,8 @@ const ItemsList = React.memo((props: Props) => {
   const {ptoDetails, srtoDetails, wtoDetails} = useAppSelector(
     (state) => state.inbound
   );
-  const {wtoOutboundDetails, wavepickDetails, stgDetails} = useAppSelector(
-    (state) => state.outbound
-  );
+  const {wtoOutboundDetails, wavepickDetails, stgDetails, singlepickDetails} =
+    useAppSelector((state) => state.outbound);
   const renderItems = (item: any, index: number, options: Options) => {
     switch (uses) {
       case "inbound":
@@ -84,12 +84,18 @@ const ItemsList = React.memo((props: Props) => {
         return {receivedQty: "intqty"};
       case "srto":
         return {receivedQty: "srtqty"};
+      case "wto-outbound":
+        return {};
+      case "stg-validate":
+        return {scanUsage: "barcode", showQuantity: true};
       default:
         return {};
     }
   };
 
   const renderView = () => {
+    console.log("why", uses, subcategory);
+
     switch (uses) {
       case "inbound":
         switch (subcategory) {
@@ -129,11 +135,11 @@ const ItemsList = React.memo((props: Props) => {
               return renderItems(item, index, {removeType: "wavepick"});
             });
           case "singlepick":
-            return wavepickDetails.data.map((item: any, index: number) => {
+            return singlepickDetails.data.map((item: any, index: number) => {
               return renderItems(item, index, {removeType: "singlepick"});
             });
           case "stg-validate":
-            return stgDetails.data.map((item: any, index: number) => {
+            return singlepickDetails.data.map((item: any, index: number) => {
               return renderItems(item, index, {removeType: "stg-validate"});
             });
         }
@@ -156,6 +162,7 @@ const ItemsList = React.memo((props: Props) => {
           <OutboundItemScanModal
             visible={isOutboundItemScan}
             scanType={subcategory}
+            options={checkOptions()}
           />
         )}
       </>

@@ -65,8 +65,11 @@ interface Outbound {
     data: WavepickItem[] | [];
     status: "idle" | "loading" | "success" | "failed";
   };
-
   stgDetails: {
+    data: WavepickItem[] | [];
+    status: "idle" | "loading" | "success" | "failed";
+  };
+  singlepickDetails: {
     data: WavepickItem[] | [];
     status: "idle" | "loading" | "success" | "failed";
   };
@@ -121,6 +124,10 @@ const initialState: Outbound = {
     status: "idle",
   },
   stgDetails: {
+    data: [],
+    status: "idle",
+  },
+  singlepickDetails: {
     data: [],
     status: "idle",
   },
@@ -232,16 +239,20 @@ const outboundReducer = createSlice({
     builder
       .addCase(getWPTODetails.pending, (state, action) => {
         state.wavepickDetails.status = "loading";
+        state.singlepickDetails.status = "loading";
       })
       .addCase(getWPTODetails.fulfilled, (state, action) => {
         state.wavepickDetails.status = "success";
+        state.singlepickDetails.status = "success";
+
         state.wavepickDetails.data = action.payload.data;
+        state.singlepickDetails.data = action.payload.data;
       })
       .addCase(getWPTODetails.rejected, (state, action) => {
         state.wavepickDetails.status = "failed";
+        state.singlepickDetails.status = "failed";
       });
     //SINGLEPICK
-
     builder
       .addCase(getPKValidate.pending, (state, action) => {
         state.singlepick.pkValidate.status = "loading";
@@ -332,14 +343,14 @@ const outboundReducer = createSlice({
 
     builder
       .addCase(getSTGValidateDetails.pending, (state, action) => {
-        state.stgDetails.status = "loading";
+        state.singlepickDetails.status = "loading";
       })
       .addCase(getSTGValidateDetails.fulfilled, (state, action) => {
-        state.stgDetails.status = "success";
-        state.stgDetails.data = action.payload.data;
+        state.singlepickDetails.status = "success";
+        state.singlepickDetails.data = action.payload.data;
       })
       .addCase(getSTGValidateDetails.rejected, (state, action) => {
-        state.stgDetails.status = "failed";
+        state.singlepickDetails.status = "failed";
       });
   },
 });

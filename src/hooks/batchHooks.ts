@@ -14,6 +14,8 @@ import {
   getPKValidate,
   getINVPosting,
   getSPLPosting,
+  getSTGValidate,
+  getSTGValidateDetails,
 } from "../store/actions/warehouse/warehouseActions";
 import {
   handleToggleAddBatchModal,
@@ -78,6 +80,10 @@ export const useBatchHooks = () => {
         dispatch(getWPTODetails({docnum: selectedDocument.docnum}));
         dispatch(getPKValidate({limit: 10, offset: 0}));
         break;
+      case "stg-validate":
+        dispatch(getSTGValidate({limit: 10, offset: 0}));
+        dispatch(getSTGValidateDetails({docnum: selectedDocument.docnum}));
+        break;
 
       default:
         break;
@@ -92,7 +98,6 @@ export const useBatchHooks = () => {
 
   const checkRemove = async (uses: TypeSelect, item: any) => {
     console.log(uses);
-
     switch (uses) {
       case "pto":
         const ptoEndpoints: Endpoint[] = [
@@ -276,6 +281,30 @@ export const useBatchHooks = () => {
             dispatch(setStatusText(`Scanned Quantity Removed Successfully.`));
           }
         );
+        break;
+      case "stg-validate":
+        const stgEndpoints: Endpoint[] = [
+          {
+            method: "PATCH",
+            url: `lst_tracc/singlepicklistfile2`,
+            payload: {
+              field: {
+                recid: item.recid,
+              },
+              data: {
+                scanqty: 0,
+              },
+            },
+          },
+        ];
+        const stgResponse = await removeScannedQuantityService(
+          stgEndpoints,
+          () => {
+            checkDetailsToReload(uses);
+            dispatch(setStatusText(`Scanned Quantity Removed Successfully.`));
+          }
+        );
+
         break;
       default:
         alert("Remove not supported");
