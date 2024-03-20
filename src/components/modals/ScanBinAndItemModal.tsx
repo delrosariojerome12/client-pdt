@@ -20,7 +20,7 @@ interface ScanModalProps {
 }
 
 const ScanBinAndItemModal = React.memo((props: ScanModalProps) => {
-  const {handleScan} = useDocumentHooks();
+  const {handleScanDocument} = useDocumentHooks();
   const {visible, onClose, placeholder} = props;
   // barcodes
   const [binNo, setBinNo] = useState<string>("");
@@ -247,7 +247,7 @@ const ScanBinAndItemModal = React.memo((props: ScanModalProps) => {
                   <View style={styles.buttonContainer}>
                     <CustomButton
                       onPress={() => {
-                        handleScan();
+                        handleScanDocument();
                         clearValues();
                         onClose();
                       }}

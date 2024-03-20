@@ -15,7 +15,6 @@ interface PutawayDetails {
   limit: number;
   offset: number;
   paginating?: boolean;
-  // category: "PUR" | "WHS" | "SRTO";
 }
 
 // INBOUND //

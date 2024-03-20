@@ -9,6 +9,7 @@ import general from "../reducers/generalReducer";
 // screens
 import inbound from "../reducers/warehouse/inboundReducer";
 import outbound from "../reducers/warehouse/outboundReducer";
+import inventoryTransaction from "../reducers/inventoryManagement/inventoryTransactionReducer";
 
 export const rootReducer = combineReducers({
   auth: authUser,
@@ -20,4 +21,5 @@ export const rootReducer = combineReducers({
   general: general,
   inbound: inbound,
   outbound: outbound,
+  inventoryTransaction: inventoryTransaction,
 });

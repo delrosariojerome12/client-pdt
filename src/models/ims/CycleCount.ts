@@ -1,0 +1,34 @@
+export interface CycleCount {
+  status: string | null;
+  docnum: string;
+  trncde: string;
+  remarks: string;
+  trntot: number;
+  usrnam: string;
+  curcde: string | null;
+  currte: number;
+  logtim: string;
+  warcde: string;
+  wardsc: string | null;
+  cuscde: string | null;
+  cusdsc: string | null;
+  totvaramt: number;
+  trntypcde: string | null;
+  argnum: string | null;
+  comstat: string | null;
+  disinvgl: string | null;
+  doclock: string | null;
+  trndte: string;
+  logdte: string;
+  vardte: string | null;
+  gldepcde: string | null;
+  refnum: string | null;
+  warcdenum: string;
+  warloccde: string;
+  validate: string;
+  binfrom: string | null;
+  binto: string | null;
+  counted: string | null;
+  invmvmnttyp: string | null;
+  recid: number;
+}

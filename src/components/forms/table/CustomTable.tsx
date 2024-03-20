@@ -72,7 +72,7 @@ const CustomTable = (props: TableProps) => {
 
   const renderButtons = (rowData: any) => {
     return (
-      <View style={{gap: 10}}>
+      <View style={{gap: 10, paddingHorizontal: 10}}>
         {onBatchSelect && (
           <TouchableOpacity
             style={styles.buttons}

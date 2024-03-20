@@ -41,7 +41,8 @@ interface Props {
     | "wto-outbound"
     | "wavepick"
     | "singlepick"
-    | "stg-validate";
+    | "stg-validate"
+    | "cyclecount";
 }
 
 const ItemsList = React.memo((props: Props) => {
@@ -57,7 +58,10 @@ const ItemsList = React.memo((props: Props) => {
   const {ptoDetails, srtoDetails, wtoDetails} = useAppSelector(
     (state) => state.inbound
   );
-  const {wtoOutboundDetails, wavepickDetails, stgDetails, singlepickDetails} =
+  const {cycleCountDetails} = useAppSelector(
+    (state) => state.inventoryTransaction
+  );
+  const {wtoOutboundDetails, wavepickDetails, singlepickDetails} =
     useAppSelector((state) => state.outbound);
   const renderItems = (item: any, index: number, options: Options) => {
     switch (uses) {
@@ -70,7 +74,9 @@ const ItemsList = React.memo((props: Props) => {
       case "stockTransfer":
         return <StockTransferDetails item={item} key={index} />;
       case "physicalInventory":
-        return <PhysicalInventoryDetails item={item} key={index} />;
+        return (
+          <PhysicalInventoryDetails item={item} key={index} options={options} />
+        );
       default:
         break;
     }
@@ -88,6 +94,9 @@ const ItemsList = React.memo((props: Props) => {
         return {};
       case "stg-validate":
         return {scanUsage: "barcode", showQuantity: true};
+      case "cyclecount":
+        return {scanUsage: "barcode", showQuantity: true};
+
       default:
         return {};
     }
@@ -142,6 +151,16 @@ const ItemsList = React.memo((props: Props) => {
             return singlepickDetails.data.map((item: any, index: number) => {
               return renderItems(item, index, {removeType: "stg-validate"});
             });
+        }
+        break;
+      case "physicalInventory":
+        switch (subcategory) {
+          case "cyclecount":
+            return cycleCountDetails.data.data.map(
+              (item: any, index: number) => {
+                return renderItems(item, index, {removeType: "cyclecount"});
+              }
+            );
         }
     }
   };

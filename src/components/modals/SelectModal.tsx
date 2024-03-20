@@ -24,6 +24,7 @@ interface SelectModalProps {
   propertiesToShow: {name: string; label: string}[];
   customContent: JSX.Element;
   loadingStatus?: boolean;
+  hasScanButton?: boolean;
 }
 
 const SelectModal = React.memo((props: SelectModalProps) => {

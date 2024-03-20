@@ -20,8 +20,7 @@ const PTODetails = React.memo((props: Items) => {
     useBatchHooks();
   const {item, options} = props;
 
-  console.log(options);
-
+  console.log("hello");
   return (
     <>
       <View style={[styles.container, bgColors.mediumGrayishBG]}>

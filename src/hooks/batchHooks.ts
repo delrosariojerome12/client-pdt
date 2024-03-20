@@ -32,6 +32,7 @@ import {
   setBatchedSaved,
   setBatchPostMode,
 } from "../reducers/generalReducer";
+import {togglePendingAndScan} from "../store/actions/ims/transaction";
 import {useDocumentHooks} from "./documentHooks";
 import {formatDateYYYYMMDD} from "../helper/Date";
 import {setStatusText} from "../reducers/statusReducer";
@@ -306,6 +307,34 @@ export const useBatchHooks = () => {
         );
 
         break;
+      case "cyclecount":
+        const ccEndpoints: Endpoint[] = [
+          {
+            method: "PATCH",
+            url: `lst_tracc/cyclecountfile2`,
+            payload: {
+              field: {
+                recid: item.recid,
+              },
+              data: {
+                stritmqty: "",
+                itmqty: 0,
+                pstritmqty: "0",
+              },
+            },
+          },
+        ];
+        const ccResponse = await removeScannedQuantityService(
+          ccEndpoints,
+          () => {
+            checkDetailsToReload(uses);
+            dispatch(setStatusText(`Scanned Quantity Removed Successfully.`));
+          }
+        );
+        console.log(ccResponse);
+
+        break;
+
       default:
         alert("Remove not supported");
         break;
@@ -412,6 +441,18 @@ export const useBatchHooks = () => {
       ]
     );
   };
+  const handleCheckPendingScan = (
+    showPending: boolean,
+    showScanned: boolean
+  ) => {
+    dispatch(
+      togglePendingAndScan({
+        docnum: selectedDocument.docnum,
+        showPending,
+        showScanned,
+      })
+    );
+  };
 
   // modals
   const handleAddBatchModal = (item: any) => {
@@ -478,5 +519,6 @@ export const useBatchHooks = () => {
     handlePostAnotherBatch,
     handlePostUpdateBatch,
     removeScannedQuantity,
+    handleCheckPendingScan,
   };
 };

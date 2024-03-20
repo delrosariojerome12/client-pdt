@@ -1,7 +1,7 @@
 import {View, Text, TouchableOpacity, StyleSheet} from "react-native";
 import React from "react";
 import CustomButton from "../../forms/buttons/CustomButton";
-
+import {formatDateStringMMDDYYYY} from "../../../helper/Date";
 interface VerticalItemProps {
   item: any;
   propertyLabels: {name: string; label: string}[];
@@ -18,12 +18,18 @@ const VerticalItem: React.FC<VerticalItemProps> = ({
   return (
     <View style={styles.container}>
       <View>
-        {propertyLabels.map(({name, label}, index) => (
-          <View key={index} style={styles.propertyRow}>
-            <Text style={styles.label}>{label}: </Text>
-            <Text>{item[name]}</Text>
-          </View>
-        ))}
+        {propertyLabels.map(({name, label}, index) => {
+          return (
+            <View key={index} style={styles.propertyRow}>
+              <Text style={styles.label}>{label}: </Text>
+              {name.includes("dte") ? (
+                <Text>{formatDateStringMMDDYYYY(item[name])}</Text>
+              ) : (
+                <Text>{item[name]}</Text>
+              )}
+            </View>
+          );
+        })}
       </View>
       <View style={styles.buttonContainer}>
         <CustomButton
@@ -32,12 +38,6 @@ const VerticalItem: React.FC<VerticalItemProps> = ({
           type="regular"
           fontSize={12}
         />
-        {/* <TouchableOpacity
-          style={[styles.button, {backgroundColor: "#28a745"}]}
-          onPress={onSelect}
-        >
-          <Text style={styles.buttonText}>Select</Text>
-        </TouchableOpacity> */}
 
         <CustomButton
           title="VALIDATE"
@@ -45,10 +45,6 @@ const VerticalItem: React.FC<VerticalItemProps> = ({
           type="save"
           fontSize={12}
         />
-
-        {/* <TouchableOpacity style={styles.button} onPress={onValidate}>
-          <Text style={styles.buttonText}>Validate</Text>
-        </TouchableOpacity> */}
       </View>
     </View>
   );

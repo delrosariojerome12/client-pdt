@@ -407,6 +407,7 @@ export const useAPIHooks = () => {
             },
           ]
         );
+        return null;
       }
     } catch (error: any) {
       console.log(error);

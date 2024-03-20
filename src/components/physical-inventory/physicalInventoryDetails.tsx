@@ -1,22 +1,22 @@
 import {View, Text, StyleSheet, TouchableOpacity, Modal} from "react-native";
 import React from "react";
 import {FontAwesome} from "@expo/vector-icons";
-import CustomButton from "../forms/buttons/CustomButton";
 import {bgColors} from "../../styles/styles";
 import {useDocumentHooks} from "../../hooks/documentHooks";
-import {useAppSelector} from "../../store/store";
 import {format} from "../../styles/styles";
-import BinScanModal from "../modals/BinScanModal";
-import ScanModal from "../modals/ScanModal";
+import {useBatchHooks} from "../../hooks/batchHooks";
+import {formatDateStringMMDDYYYY} from "../../helper/Date";
+import {Options} from "../list-holder/ItemsList";
 
 interface PhysicalInventoryProps {
   item: any;
+  options: Options;
 }
 
-const PhysicalInventoryDetails = (props: PhysicalInventoryProps) => {
-  const {isScanItemModal, isScanModal} = useAppSelector((state) => state.modal);
-  const {removeScannedQuantity} = useDocumentHooks();
-  const {item} = props;
+const PhysicalInventoryDetails = React.memo((props: PhysicalInventoryProps) => {
+  const {handleAddBatchModal, handleEditBatchModal, removeScannedQuantity} =
+    useBatchHooks();
+  const {item, options} = props;
 
   return (
     <>
@@ -25,50 +25,48 @@ const PhysicalInventoryDetails = (props: PhysicalInventoryProps) => {
           <View style={styles.leftContainer}>
             <View style={format.twoRowText}>
               <Text style={{fontWeight: "bold"}}>{`Line No:`}</Text>
-              <Text>{`1`}</Text>
+              <Text>{item.linenum}</Text>
             </View>
             <View style={format.twoRowText}>
               <Text style={{fontWeight: "bold"}}>Bin No.:</Text>
-              <Text>{`1234`}</Text>
+              <Text>{item.binnum}</Text>
             </View>
             <View style={format.twoRowText}>
               <Text style={{fontWeight: "bold"}}>Item Code:</Text>
-              <Text>{` ${item.itemCode}`}</Text>
+              <Text>{item.itmcde}</Text>
             </View>
             <View style={format.twoRowText}>
               <Text style={{fontWeight: "bold"}}>Description:</Text>
-              <Text>{` ${item.itemName}`}</Text>
+              <Text>{item.itmdsc}</Text>
             </View>
 
             <View style={format.twoRowText}>
-              <Text style={{fontWeight: "bold"}}>U/M:</Text>
-              <Text>{`PCS`}</Text>
+              <Text style={{fontWeight: "bold"}}>UOM:</Text>
+              <Text>{item.untmea}</Text>
             </View>
           </View>
           <View style={styles.rightContainer}>
-            {/* if validated */}
-            {/* <Text style={{fontWeight: "bold"}}>**VALIDATED**</Text> */}
             <View style={format.twoRowText}>
               <Text style={{fontWeight: "bold"}}>Batch No.:</Text>
-              <Text>{` ${item.batchNumber}`}</Text>
+              <Text>{item.batchnum || "No Batch No."}</Text>
             </View>
             <View style={format.twoRowText}>
               <Text style={{fontWeight: "bold"}}>Mfg. Date:</Text>
-              <Text>{` ${item.expDate}`}</Text>
+              <Text>{formatDateStringMMDDYYYY(item.mfgdte)}</Text>
             </View>
             <View style={format.twoRowText}>
               <Text style={{fontWeight: "bold"}}>Exp. Date:</Text>
-              <Text>{` ${item.mfgDate}`}</Text>
+              <Text>{formatDateStringMMDDYYYY(item.expdte)}</Text>
             </View>
 
             <View style={styles.remove}>
               <View style={format.twoRowText}>
                 <Text style={{fontWeight: "bold"}}>Qty:</Text>
-                <Text>{` ${item.receiveQty}`}</Text>
+                <Text>{item.itmqty}</Text>
               </View>
               <TouchableOpacity
                 onPress={() => {
-                  removeScannedQuantity(item);
+                  removeScannedQuantity(item, options?.removeType);
                 }}
               >
                 <FontAwesome name="remove" size={24} color="black" />
@@ -79,7 +77,7 @@ const PhysicalInventoryDetails = (props: PhysicalInventoryProps) => {
       </View>
     </>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {

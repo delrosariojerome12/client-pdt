@@ -29,6 +29,7 @@ import {
   getINVPosting,
   getSTGValidate,
 } from "../store/actions/warehouse/warehouseActions";
+import {getCycleCountDetails} from "../store/actions/ims/transaction";
 import {handleSetDocument, handleSetItem} from "../reducers/documentReducer";
 import {ScanDocumentParams} from "../store/actions/generalActions";
 import {connectToPHP} from "../store/actions/generalActions";
@@ -72,7 +73,8 @@ export type ScanValidate =
   | "wto-outbound"
   | "wavepick"
   | "singlepick"
-  | "stg-validate";
+  | "stg-validate"
+  | "cyclecount";
 
 export type TypeSelect =
   | "pto"
@@ -81,7 +83,8 @@ export type TypeSelect =
   | "wto-outbound"
   | "wavepick"
   | "singlepick"
-  | "stg-validate";
+  | "stg-validate"
+  | "cyclecount";
 
 export interface SelectProps {
   type: TypeSelect;
@@ -114,6 +117,7 @@ export const useDocumentHooks = () => {
     useAPIHooks();
 
   // start check categories and uses functions
+
   const checkSelectType = ({item, type}: SelectProps) => {
     console.log(type);
     switch (type) {
@@ -135,6 +139,9 @@ export const useDocumentHooks = () => {
         break;
       case "stg-validate":
         dispatch(getSTGValidateDetails({docnum: item.docnum}));
+        break;
+      case "cyclecount":
+        dispatch(getCycleCountDetails({docnum: item.docnum}));
         break;
       default:
         break;
@@ -522,7 +529,6 @@ export const useDocumentHooks = () => {
             usrnam: userDetails?.usrcde,
             barcodelvl2: barcodelvl2,
           });
-          console.log("bato", response);
           if (response && response.data.wto2_data) {
             dispatch(showQuantityField(true));
             !isQuantityFieldShown &&
@@ -578,7 +584,6 @@ export const useDocumentHooks = () => {
             usrnam: userDetails?.usrcde,
             barcodelvl2: barcodelvl2,
           });
-          console.log("bato", wpResponse);
           if (wpResponse && wpResponse.data.wpto2_data) {
             dispatch(showQuantityField(true));
             !isQuantityFieldShown &&
@@ -625,11 +630,13 @@ export const useDocumentHooks = () => {
           }
           break;
         default:
+          alert("no api yet");
           break;
       }
     }
   };
 
+  // search using barcode
   const checkScanBarcode = async (
     uses: ScanValidate,
     {barcode, category}: ScanDocumentParams
@@ -647,6 +654,7 @@ export const useDocumentHooks = () => {
       case "srto":
       case "wto-outbound":
       case "wavepick":
+      case "cyclecount":
         const response = await scanBarcode({barcode, category});
         if (response) {
           handleSelectModal({item: response.data, type: uses});

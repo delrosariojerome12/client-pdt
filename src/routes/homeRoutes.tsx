@@ -5,22 +5,20 @@ import {
   MaterialIcons,
 } from "@expo/vector-icons";
 import {
-  getPTODetails,
-  getSRTODetails,
-  getWTOOutboundDetails,
-  getWPTODetails,
-  getSTGValidateDetails,
   getPTO,
   getWTO,
   getPUR,
   getWHS,
   getWTOOutboundValid,
-  getWTOOutboundPost,
-  getWTODetails,
   getSRTO,
   getPKValidate,
   getWPTOValid,
 } from "../store/actions/warehouse/warehouseActions";
+import {
+  getCycleCount,
+  getSLOCValid,
+  getStockTransferValid,
+} from "../store/actions/ims/transaction";
 import {useAppDispatch} from "../store/store";
 
 export interface RouteItem {
@@ -164,14 +162,23 @@ export const useHomeRoutes = () => {
             {
               title: "CYCLE COUNT",
               path: "cycleCount",
+              onLoad: () => {
+                dispatch(getCycleCount({limit: 10, offset: 0}));
+              },
             },
             {
               title: "S.LOC TO S.LOC",
               path: "slocToSloc",
+              onLoad: () => {
+                dispatch(getSLOCValid({limit: 10, offset: 0}));
+              },
             },
             {
               title: "STOCK TRANSFER (BIN TO BIN)",
               path: "stockTransfer",
+              onLoad: () => {
+                dispatch(getStockTransferValid({limit: 10, offset: 0}));
+              },
             },
           ],
           icon: <FontAwesome5 name="exchange-alt" size={20} color="#808080" />, // Set color to gray
@@ -183,6 +190,9 @@ export const useHomeRoutes = () => {
             {
               title: "DELIVERY TO SUPPLIER",
               path: "deliveryToSupplier",
+              onLoad: () => {
+                alert("test");
+              },
             },
           ],
           icon: <FontAwesome5 name="exchange-alt" size={20} color="#808080" />, // Set color to gray
@@ -194,6 +204,9 @@ export const useHomeRoutes = () => {
             {
               title: "PHYSICAL INVENTORY RECORD",
               path: "physicalInventory",
+              onLoad: () => {
+                alert("test");
+              },
             },
           ],
           icon: (
@@ -207,6 +220,9 @@ export const useHomeRoutes = () => {
             {
               title: "STOCK REPLENISHMENT TO",
               path: "stockReplenish",
+              onLoad: () => {
+                alert("test");
+              },
             },
           ],
           icon: (

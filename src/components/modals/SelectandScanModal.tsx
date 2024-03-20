@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import {
   Modal,
   View,
@@ -6,15 +6,18 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import {FontAwesome5} from "@expo/vector-icons";
 import {shadows} from "../../styles/styles";
 import CustomButton from "../forms/buttons/CustomButton";
 import {useDocumentHooks} from "../../hooks/documentHooks";
-import ScanModal from "./ScanModal";
 import {useAppSelector} from "../../store/store";
 import CustomCheckBox from "../forms/inputs/CustomCheckBox";
-import ScanBinAndItemModal from "./ScanBinAndItemModal";
+import ScanModal from "./ScanModal";
+import MessageToast from "../message-toast/MessageToast";
+import CustomLoadingText from "../load-spinner/CustomLoadingText";
+import {useBatchHooks} from "../../hooks/batchHooks";
 
 interface SelectScanModalProps {
   visible: boolean;
@@ -25,20 +28,9 @@ interface SelectScanModalProps {
   customContent: JSX.Element;
   scanOptions?: {
     scanModal: boolean;
-    showPending: boolean;
-    scanCounted: boolean;
     scanModalDetails?: {title: string; placeholder: string};
   };
-  checkBoxOptions: {
-    pending: {
-      showPending: boolean;
-      togglePending: () => void;
-    };
-    counted: {
-      showCounted: boolean;
-      toggleCounted: () => void;
-    };
-  };
+  loadingStatus?: boolean;
 }
 
 const SelectandScanModal = React.memo((props: SelectScanModalProps) => {
@@ -50,16 +42,38 @@ const SelectandScanModal = React.memo((props: SelectScanModalProps) => {
     propertiesToShow,
     customContent,
     scanOptions,
-    checkBoxOptions,
+    loadingStatus,
   } = props;
   const {isScanModal} = useAppSelector((state) => state.modal);
+  const {status, statusText} = useAppSelector((state) => state.status);
+
+  const {cycleCountDetails} = useAppSelector(
+    (state) => state.inventoryTransaction
+  );
+
   const {handleScanModal} = useDocumentHooks();
+  const {handleCheckPendingScan} = useBatchHooks();
+
+  const [isShowPending, setIsShowPending] = useState<boolean>(true);
+  const [isShowScanned, setIsShowScanned] = useState<boolean>(true);
 
   if (selectedItem) {
     return (
       <Modal visible={visible} onRequestClose={onClose} transparent>
+        {status === "success" && (
+          <MessageToast
+            status="success"
+            text={statusText}
+            speed={2500}
+            customPosition={[-150, -10]}
+          />
+        )}
+
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
+            {status === "loading" && (
+              <CustomLoadingText text="Processing..." visible={true} />
+            )}
             <View style={styles.headerContainer}>
               <TouchableOpacity onPress={onClose}>
                 <FontAwesome5 name="arrow-left" size={24} color="black" />
@@ -67,65 +81,53 @@ const SelectandScanModal = React.memo((props: SelectScanModalProps) => {
               <Text style={styles.headerText}>{title}</Text>
             </View>
 
-            {scanOptions?.scanModal && (
-              <>
-                <CustomButton
-                  title={scanOptions.scanModalDetails?.title || ""}
-                  onPress={handleScanModal}
-                  type="regular"
-                />
+            <CustomButton
+              title={"SCAN BIN NO. / ITEM"}
+              onPress={handleScanModal}
+              type="regular"
+            />
 
-                <ScanBinAndItemModal
-                  visible={isScanModal}
-                  onClose={handleScanModal}
-                  placeholder={scanOptions.scanModalDetails?.placeholder || ""}
-                />
+            {loadingStatus ? (
+              <ActivityIndicator size="large" color="#0000ff" />
+            ) : (
+              <>
+                <View style={[shadows.boxShadow, styles.propertiesContainer]}>
+                  {propertiesToShow.map((propertyObj) => (
+                    <View key={propertyObj.name} style={styles.properties}>
+                      <Text style={styles.label}>{propertyObj.label}: </Text>
+                      <Text>{selectedItem[propertyObj.name]}</Text>
+                    </View>
+                  ))}
+                  <View style={styles.properties}>
+                    <Text style={styles.label}>Scanned/Counted: </Text>
+                    <Text>{`${cycleCountDetails.data.totalscanned}/${cycleCountDetails.data.totalItem}`}</Text>
+                  </View>
+
+                  <View style={{flexDirection: "row"}}>
+                    <CustomCheckBox
+                      label="Show Pending"
+                      isChecked={isShowPending}
+                      onToggle={() => {
+                        handleCheckPendingScan(!isShowPending, isShowScanned);
+                        setIsShowPending(!isShowPending);
+                      }}
+                    />
+                    <CustomCheckBox
+                      label="Show Scanned"
+                      isChecked={isShowScanned}
+                      onToggle={() => {
+                        handleCheckPendingScan(isShowPending, !isShowScanned);
+                        setIsShowScanned(!isShowScanned);
+                      }}
+                    />
+                  </View>
+                </View>
+
+                <ScrollView style={styles.customContainer}>
+                  {customContent}
+                </ScrollView>
               </>
             )}
-
-            <View style={[shadows.boxShadow, styles.propertiesContainer]}>
-              {propertiesToShow.map((propertyObj) => (
-                <View key={propertyObj.name} style={styles.properties}>
-                  <Text style={styles.label}>{propertyObj.label}: </Text>
-                  <Text>{selectedItem[propertyObj.name]}</Text>
-                </View>
-              ))}
-
-              {checkBoxOptions.counted.showCounted && (
-                <View style={styles.properties}>
-                  <Text style={styles.label}>Scanned/Counted: </Text>
-                  <Text>{`0/0`}</Text>
-                </View>
-              )}
-            </View>
-
-            {/* change the values based on the item */}
-            <View
-              style={[
-                {
-                  flexDirection: "row",
-                  borderBlockColor: "#ccc",
-                  alignItems: "center",
-                  height: 80,
-                },
-                shadows.boxShadow,
-              ]}
-            >
-              <CustomCheckBox
-                label="Show Pending"
-                isChecked={checkBoxOptions.pending.showPending}
-                onToggle={checkBoxOptions.pending.togglePending}
-              />
-              <CustomCheckBox
-                label="Show Scanned/Counted"
-                isChecked={checkBoxOptions.counted.showCounted}
-                onToggle={checkBoxOptions?.counted.toggleCounted}
-              />
-            </View>
-
-            <ScrollView style={styles.customContainer}>
-              {customContent}
-            </ScrollView>
           </View>
         </View>
       </Modal>
