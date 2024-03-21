@@ -1,4 +1,4 @@
-import {createSlice} from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 
 interface UserDetails {
   token: string;
@@ -25,8 +25,8 @@ interface AuthUser {
 }
 
 const initialState: AuthUser = {
-  user: {status: "logged-out", userDetails: null, sesid: ""},
-  server: {ipAddress: "192.168.100.4", port: 5901, protocol: "http"},
+  user: { status: "logged-out", userDetails: null, sesid: "" },
+  server: { ipAddress: "192.168.1.10", port: 5901, protocol: "http" },
   phpServer: {
     traccDirectory: "",
     traccDomain: "",
@@ -38,7 +38,7 @@ const authUser = createSlice({
   initialState,
   reducers: {
     onLogin: (state, action) => {
-      const {userData, sesidData} = action.payload;
+      const { userData, sesidData } = action.payload;
       console.log(action.payload);
       state.user.status = "logged-in";
       state.user.userDetails = userData;
@@ -59,7 +59,7 @@ const authUser = createSlice({
   extraReducers(builder) {},
 });
 
-export const {onLogin, onLogout, handleUpdateProtocol, setPhpServer} =
+export const { onLogin, onLogout, handleUpdateProtocol, setPhpServer } =
   authUser.actions;
 
 export default authUser.reducer;

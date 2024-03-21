@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import {
   ScrollView,
   View,
@@ -6,9 +6,10 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
-import {DataTable} from "react-native-paper";
-import {PaperProvider} from "react-native-paper";
-import {FontAwesome} from "@expo/vector-icons";
+import { DataTable } from "react-native-paper";
+import { PaperProvider } from "react-native-paper";
+import { FontAwesome } from "@expo/vector-icons";
+import { formatDateStringMMDDYYYY } from "../../../helper/Date";
 
 interface TableProps {
   tableHeaders: string[];
@@ -37,7 +38,7 @@ const ReactPaperTable = (props: TableProps) => {
 
   const [page, setPage] = useState<number>(0);
   const [numberOfItemsPerPage, onItemsPerPageChange] = useState<number>(
-    5 // Default value
+    10 // Default value
   );
 
   const from = page * numberOfItemsPerPage;
@@ -49,7 +50,7 @@ const ReactPaperTable = (props: TableProps) => {
 
   const renderButtons = (rowData: any) => {
     return (
-      <View style={{gap: 5, flexDirection: "row"}}>
+      <View style={{ gap: 5, flexDirection: "row" }}>
         {!isSelectDisable && (
           <TouchableOpacity
             style={styles.buttons}
@@ -73,8 +74,8 @@ const ReactPaperTable = (props: TableProps) => {
 
   const tableheader = (header: string, index: number) => (
     <DataTable.Title
-      style={{width: 100, backgroundColor: "#ccc"}}
-      textStyle={{fontWeight: "bold", fontSize: 14, textAlign: "center"}}
+      style={{ width: 100, backgroundColor: "#ccc" }}
+      textStyle={{ fontWeight: "bold", fontSize: 14, textAlign: "center" }}
       key={index}
     >
       {header}
@@ -91,12 +92,14 @@ const ReactPaperTable = (props: TableProps) => {
           key={propIndex}
           onPress={() => onSelectRow && onSelectRow(item)}
         >
-          {item[prop]}
+          {prop.includes("dte")
+            ? item[prop] && formatDateStringMMDDYYYY(item[prop])
+            : item[prop]}
         </DataTable.Cell>
       ))}
 
       {!disableActions && (
-        <DataTable.Cell style={{width: 100, justifyContent: "center"}}>
+        <DataTable.Cell style={{ width: 100, justifyContent: "center" }}>
           {renderButtons(item)}
         </DataTable.Cell>
       )}
@@ -110,13 +113,13 @@ const ReactPaperTable = (props: TableProps) => {
           <ScrollView
             showsHorizontalScrollIndicator
             horizontal={tableData.length === 0 ? false : true}
-            contentContainerStyle={{flexDirection: "column"}}
+            contentContainerStyle={{ flexDirection: "column" }}
           >
             <DataTable style={styles.table}>
               <ScrollView
                 showsHorizontalScrollIndicator
                 horizontal={tableData.length === 0 ? false : true}
-                contentContainerStyle={{flexDirection: "column"}}
+                contentContainerStyle={{ flexDirection: "column" }}
               >
                 <DataTable.Header style={{}}>
                   {tableHeaders.map((header, index) =>
@@ -124,7 +127,7 @@ const ReactPaperTable = (props: TableProps) => {
                   )}
                   {!disableActions && (
                     <DataTable.Title
-                      style={{width: 100, backgroundColor: "#ccc"}}
+                      style={{ width: 100, backgroundColor: "#ccc" }}
                       textStyle={{
                         fontWeight: "bold",
                         fontSize: 14,
@@ -162,7 +165,7 @@ const ReactPaperTable = (props: TableProps) => {
                       numberOfItemsPerPageList={[5, 10, 15]}
                       onItemsPerPageChange={onItemsPerPageChange}
                       selectPageDropdownLabel={"Rows per page"}
-                      style={{alignSelf: "center"}}
+                      style={{ alignSelf: "center" }}
                     />
                   </>
                 )}

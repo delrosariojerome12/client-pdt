@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import {
   Modal,
   View,
@@ -8,152 +8,51 @@ import {
   ScrollView,
   TouchableOpacity,
 } from "react-native";
-import {FontAwesome5} from "@expo/vector-icons";
+import { FontAwesome5, FontAwesome } from "@expo/vector-icons";
 import CustomInputs from "../forms/inputs/CustomInputs";
-import {useAppSelector, useAppDispatch} from "../../store/store";
-import {handleToggleSearchModal} from "../../reducers/modalReducer";
-import ReactPaperTable from "../forms/table/ReactPaperTable";
+import { useAppSelector, useAppDispatch } from "../../store/store";
+import { handleToggleSearchModal } from "../../reducers/modalReducer";
 import {
   handleSetWarehouse,
   handleSetBinText,
   handleSetItemText,
 } from "../../reducers/searchReducer";
+import CustomTable from "../forms/table/CustomTable";
+
 interface SearchModalProps {
   visible: boolean;
 }
 
-const data = [
-  {
-    warehouse: "Warehouse A",
-    whsNo: "WH001",
-    date: "2024-02-17",
-    ccrNo: "CCR001",
-    sLoc: "good",
-    pirNo: "123ANC",
-    items: [
-      {
-        itemCode: "ABC123",
-        itemName: "Item 1",
-        pieces: 5,
-        receiveQty: 5,
-        LPNNumber: "LPN123",
-        batchNumber: "BATCH001",
-        mfgDate: "2023-01-01",
-        expDate: "2024-12-31",
-      },
-      {
-        itemCode: "DEF456",
-        itemName: "Item 2",
-        pieces: 10,
-        receiveQty: 10,
-        LPNNumber: "LPN456",
-        batchNumber: "BATCH002",
-        mfgDate: "2023-02-01",
-        expDate: "2024-12-31",
-      },
-      {
-        itemCode: "GHI789",
-        itemName: "Item 3",
-        pieces: 15,
-        receiveQty: 15,
-        LPNNumber: "LPN789",
-        batchNumber: "BATCH003",
-        mfgDate: "2023-03-01",
-        expDate: "2024-12-31",
-      },
-    ],
-  },
-  {
-    warehouse: "Warehouse B",
-    whsNo: "WH002",
-    date: "2024-02-17",
-    ccrNo: "CCR002",
-    sLoc: "bad",
-    pirNo: "123ANC",
-
-    items: [
-      {
-        itemCode: "ABC123",
-        itemName: "Item 1",
-        pieces: 5,
-        receiveQty: 5,
-        LPNNumber: "LPN123",
-        batchNumber: "BATCH001",
-        mfgDate: "2023-01-01",
-        expDate: "2024-12-31",
-      },
-    ],
-  },
-  {
-    warehouse: "Warehouse C",
-    whsNo: "WH003",
-    date: "2024-02-17",
-    ccrNo: "CCR003",
-    sLoc: "good",
-  },
-  {
-    warehouse: "Warehouse D",
-    whsNo: "WH003",
-    date: "2024-02-17",
-    ccrNo: "CCR003",
-    sLoc: "good",
-    pirNo: "123ANC",
-    items: [
-      {
-        itemCode: "ABC123",
-        itemName: "Item 1",
-        pieces: 5,
-        receiveQty: 5,
-        LPNNumber: "LPN123",
-        batchNumber: "BATCH001",
-        mfgDate: "2023-01-01",
-        expDate: "2024-12-31",
-      },
-      {
-        itemCode: "DEF456",
-        itemName: "Item 2",
-        pieces: 10,
-        receiveQty: 10,
-        LPNNumber: "LPN456",
-        batchNumber: "BATCH002",
-        mfgDate: "2023-02-01",
-        expDate: "2024-12-31",
-      },
-    ],
-  },
-];
-
-const items = [
-  {
-    itemCode: "ABC123",
-    itemName: "Item 1",
-    pieces: 5,
-    receiveQty: 5,
-    LPNNumber: "LPN123",
-    batchNumber: "BATCH001",
-    mfgDate: "2023-01-01",
-    expDate: "2024-12-31",
-  },
-  {
-    itemCode: "DEF456",
-    itemName: "Item 2",
-    pieces: 10,
-    receiveQty: 10,
-    LPNNumber: "LPN456",
-    batchNumber: "BATCH002",
-    mfgDate: "2023-02-01",
-    expDate: "2024-12-31",
-  },
-];
-
 const SearchModal = (props: SearchModalProps) => {
-  const {searchModalContent} = useAppSelector((state) => state.modal);
+  const { searchModalContent } = useAppSelector((state) => state.modal);
+  const { data: warehouseData } = useAppSelector(
+    (state) => state.search.warehouse
+  );
+  const { data: itemData } = useAppSelector((state) => state.search.item);
+  const { data: binData } = useAppSelector((state) => state.search.binnum);
   const dispatch = useAppDispatch();
-  const {visible} = props;
+  const { visible } = props;
   const [searchText, setSearchText] = useState("");
 
   const handleOnChange = (key: string, value: string | number) => {
     setSearchText(String(value));
+  };
+
+  const handleSearchModal = async () => {
+    console.log("pumasok?", searchModalContent);
+    switch (searchModalContent) {
+      case "warehouse":
+        warehouseData.filter(
+          (e) =>
+            e.warcde?.indexOf(searchText) ||
+            e.warcdenum?.indexOf(searchText) ||
+            e.warloccde?.indexOf(searchText)
+        );
+        break;
+
+      default:
+        break;
+    }
   };
 
   const handleCloseModal = () => {
@@ -163,47 +62,56 @@ const SearchModal = (props: SearchModalProps) => {
   const renderTable = () => {
     switch (searchModalContent) {
       case "warehouse":
-        return (
-          <ReactPaperTable
-            tableHeaders={["Warehouse", "Whs No.", "S.Loc."]}
-            tableData={data}
-            visibleProperties={["warehouse", "whsNo", "sLoc"]}
-            disableActions={true}
-            onSelectRow={(item) => {
-              dispatch(handleSetWarehouse(item));
-              handleCloseModal();
-            }}
-          />
-        );
+        if (warehouseData) {
+          return (
+            <CustomTable
+              tableHeaders={["Warehouse", "Whs No.", "S.Loc.", "Action"]}
+              tableData={warehouseData}
+              visibleProperties={["warcde", "warcdenum", "warloccde"]}
+              isSelectDisable={true}
+              isPostDisable={true}
+              buttonUses=""
+              onSelectRow={(item) => {
+                dispatch(handleSetWarehouse(item));
+                handleCloseModal();
+              }}
+            />
+          );
+        }
       case "bin":
-        return (
-          <ReactPaperTable
-            tableHeaders={["Bin No."]}
-            tableData={data}
-            visibleProperties={["ccrNo"]}
-            disableActions={true}
-            onSelectRow={(item) => {
-              // change the extension name
-              dispatch(handleSetBinText(item.ccrNo));
-              handleCloseModal();
-            }}
-          />
-        );
+        if (binData) {
+          return (
+            <CustomTable
+              tableHeaders={["Bin No.", "Action"]}
+              tableData={binData}
+              visibleProperties={["binnum"]}
+              isSelectDisable={true}
+              isPostDisable={true}
+              buttonUses=""
+              onSelectRow={(item) => {
+                dispatch(handleSetBinText(item.binnum));
+                handleCloseModal();
+              }}
+            />
+          );
+        }
       case "item":
-        return (
-          <ReactPaperTable
-            tableHeaders={["Description", "Mfg. Date", "Exp. Date"]}
-            tableData={items}
-            visibleProperties={["itemName", "mfgDate", "expDate"]}
-            disableActions={true}
-            onSelectRow={(item) => {
-              // change the extension name
-              dispatch(handleSetItemText(item.itemName));
-              handleCloseModal();
-            }}
-          />
-        );
-
+        if (itemData) {
+          return (
+            <CustomTable
+              tableHeaders={["Item Code", "Item Description", "Action"]}
+              tableData={itemData}
+              visibleProperties={["itmcde", "itmdsc"]}
+              isSelectDisable={true}
+              isPostDisable={true}
+              buttonUses=""
+              onSelectRow={(item) => {
+                dispatch(handleSetItemText(item.itmcde));
+                handleCloseModal();
+              }}
+            />
+          );
+        }
       default:
         break;
     }
@@ -221,16 +129,29 @@ const SearchModal = (props: SearchModalProps) => {
             </TouchableOpacity>
             <Text style={styles.headerText}>
               {searchModalContent &&
-                `Search:${searchModalContent.toUpperCase()}`}
+                `Search: ${searchModalContent.toUpperCase()}`}
             </Text>
           </View>
-          <CustomInputs
-            placeHolder="Search"
-            inputKey="search"
-            inputValue={searchText}
-            onInputChange={handleOnChange}
-            type="text"
-          />
+          <View style={styles.searchContainer}>
+            <CustomInputs
+              placeHolder="Search"
+              inputKey="search"
+              inputValue={searchText}
+              onInputChange={handleOnChange}
+              type="text"
+              useFlex={true}
+            />
+            <TouchableOpacity
+              style={{
+                backgroundColor: "#ccc",
+                padding: 20,
+                borderRadius: 10,
+              }}
+              onPress={() => handleSearchModal}
+            >
+              <FontAwesome name="search" size={20} color="black" />
+            </TouchableOpacity>
+          </View>
           {renderTable()}
         </View>
       </View>
@@ -261,6 +182,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 10,
     justifyContent: "space-evenly",
+  },
+  searchContainer: {
+    paddingHorizontal: 20,
+    flexDirection: "row",
+    gap: 10,
+    alignItems: "center",
   },
   headerText: {
     fontWeight: "bold",
