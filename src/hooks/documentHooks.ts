@@ -8,6 +8,7 @@ import {
   handleSetSearchModalContent,
   handleToggleAddBatchModal,
   handleToggleOutboundItemScan,
+  handleToggleScanBinModal,
 } from "../reducers/modalReducer";
 import {
   getPTODetails,
@@ -29,14 +30,28 @@ import {
   getINVPosting,
   getSTGValidate,
 } from "../store/actions/warehouse/warehouseActions";
-import {getCycleCountDetails} from "../store/actions/ims/transaction";
-import {handleSetDocument, handleSetItem} from "../reducers/documentReducer";
+import {
+  getCycleCountDetails,
+  getCycleCount,
+} from "../store/actions/ims/transaction";
+import {
+  handleSetDocument,
+  handleSetItem,
+  handleBinItemDetails,
+} from "../reducers/documentReducer";
 import {ScanDocumentParams} from "../store/actions/generalActions";
 import {connectToPHP} from "../store/actions/generalActions";
 import {resetStatus, setStatus} from "../reducers/statusReducer";
 import {formatDateYYYYMMDD} from "../helper/Date";
-import {clearBatchDetails} from "../reducers/generalReducer";
+import {
+  clearBatchDetails,
+  setBatchNo,
+  setBatchedSaved,
+  setExpDate,
+  setMfgDate,
+} from "../reducers/generalReducer";
 import {useAPIHooks} from "./apiHooks";
+import {useModalHooks} from "./modalHooks";
 import {setStatusText, showQuantityField} from "../reducers/statusReducer";
 
 export type ButtonUses =
@@ -62,7 +77,8 @@ export type TypePost =
   | "wto-outbound"
   | "wavepick"
   | "inv-singlepick"
-  | "spl-singlepick";
+  | "spl-singlepick"
+  | "cyclecount";
 
 export type ScanValidate =
   | "pto"
@@ -104,7 +120,7 @@ export const useDocumentHooks = () => {
   const {
     user: {userDetails},
   } = useAppSelector((state) => state.auth);
-  const {selectedDocument, selectedItem} = useAppSelector(
+  const {selectedDocument, selectedItem, selectedBinDetails} = useAppSelector(
     (state) => state.document
   );
   const {isQuantityFieldShown} = useAppSelector((state) => state.status);
@@ -113,8 +129,14 @@ export const useDocumentHooks = () => {
   } = useAppSelector((state) => state.general);
 
   const dispatch = useAppDispatch();
-  const {scanBarcode, getLPN, getBinAndValidate, connectToPHPNotDispatch} =
-    useAPIHooks();
+  const {
+    scanBarcode,
+    getLPN,
+    getBinAndValidate,
+    connectToPHPNotDispatch,
+    getCycleCount2,
+  } = useAPIHooks();
+  const {toggleEditBatchModal} = useModalHooks();
 
   // start check categories and uses functions
 
@@ -149,6 +171,8 @@ export const useDocumentHooks = () => {
   };
 
   const checkPostType = async (item: any, type: TypePost) => {
+    console.log("wat", item);
+
     switch (type) {
       case "pto":
         dispatch(
@@ -413,19 +437,50 @@ export const useDocumentHooks = () => {
           })
         );
         break;
-
+      case "cyclecount":
+        dispatch(
+          connectToPHP({
+            recid: item.recid,
+            docnum: item.docnum,
+            type: "CC",
+            onSuccess: async () => {
+              console.log("dafaq");
+              // dispatch(setStatus("loading"));
+              dispatch(getCycleCount({limit: 10, offset: 0}));
+              // dispatch(setStatus("success"));
+            },
+            onFailure: (e) => {
+              dispatch(resetStatus());
+              Alert.alert("Transaction Posting Fail", `${e}`, [
+                {
+                  text: "Ok",
+                  onPress: () => {},
+                  style: "destructive",
+                },
+              ]);
+            },
+          })
+        );
+        break;
       default:
         alert("No api yet.");
         break;
     }
   };
+
   // scanning item
   const checkScanType = async (
     {
       barcode,
       receiveQty,
       barcodelvl2,
-    }: {barcode: string; receiveQty: number; barcodelvl2?: string},
+      scanlevel,
+    }: {
+      barcode: string;
+      receiveQty: number;
+      barcodelvl2?: string;
+      scanlevel?: string;
+    },
     scanUsage: ScanValidate
   ) => {
     if (selectedItem) {
@@ -629,6 +684,71 @@ export const useDocumentHooks = () => {
             }
           }
           break;
+        case "cyclecount":
+          const ccResponse = await scanBarcode({
+            barcode,
+            category: "cc_item",
+            recid: selectedBinDetails?.recid.toString(),
+            docnum: selectedDocument.docnum,
+            // scanlevel: selectedBinDetails ? "2" : "1",
+            scanlevel: scanlevel,
+            pdtmanualqtyoutbound: receiveQty.toString(),
+            usrnam: userDetails?.usrcde,
+            barcodelvl2: barcodelvl2,
+            scanneditem:
+              scanlevel === "2.1"
+                ? JSON.stringify({
+                    itmcde: selectedBinDetails.itmcde,
+                    itmdsc: selectedBinDetails.itmdsc,
+                    untmea: selectedBinDetails.untmea,
+                    itmtyp: selectedBinDetails.itmtyp,
+                    binnum: selectedBinDetails.binnum,
+                    batchnum: selectedBinDetails.batchnum,
+                    mfgdte: selectedBinDetails.mfgdte,
+                    expdte: selectedBinDetails.expdte,
+                  })
+                : "",
+          });
+          console.log("cc res", ccResponse);
+          console.log("sana", selectedBinDetails);
+
+          if (ccResponse) {
+            if (ccResponse.data.item_match === false) {
+              Alert.alert("Notification", `Item Barcode not Matched`, [
+                {
+                  text: "OK",
+                },
+              ]);
+            }
+            if (ccResponse.data.item_match) {
+              toggleEditBatchModal();
+            }
+            if (ccResponse.data.scanned_item) {
+              dispatch(setBatchedSaved(true));
+              dispatch(setBatchNo(ccResponse.data.scanned_item.batchnum));
+              dispatch(
+                setExpDate(new Date(ccResponse.data.scanned_item.expdte))
+              );
+              dispatch(
+                setMfgDate(new Date(ccResponse.data.scanned_item.mfgdte))
+              );
+            }
+
+            if (ccResponse.data.cc2_data) {
+              if (ccResponse.data.cc2_data[0]) {
+                dispatch(handleBinItemDetails(ccResponse.data.cc2_data[0]));
+              }
+              if (ccResponse.data.cc2_data.length === 0) {
+                dispatch(
+                  getCycleCountDetails({docnum: selectedDocument.docnum})
+                );
+                dispatch(setStatusText(`Item Successfully Scanned.`));
+                // dispatch(handleToggleScanBinModal());
+              }
+            }
+          }
+
+          break;
         default:
           alert("no api yet");
           break;
@@ -787,13 +907,23 @@ export const useDocumentHooks = () => {
       barcode,
       receiveQty,
       barcodelvl2,
-    }: {barcode: string; receiveQty: number; barcodelvl2?: string},
+      customMessage,
+      scanlevel,
+    }: {
+      barcode: string;
+      receiveQty: number;
+      barcodelvl2?: string;
+      customMessage?: string;
+      scanlevel?: string;
+    },
     scanUsage: ScanValidate
   ) => {
+    console.log("wat", barcode, receiveQty, scanUsage);
+
     if (!barcode || receiveQty === 0) {
       Alert.alert(
         "Empty Field",
-        "Please make sure barcode and quantity is filled.",
+        customMessage || "Please make sure barcode and quantity is filled.",
         [
           {
             text: "OK",
@@ -802,7 +932,7 @@ export const useDocumentHooks = () => {
       );
       return;
     }
-    checkScanType({barcode, receiveQty, barcodelvl2}, scanUsage);
+    checkScanType({barcode, receiveQty, barcodelvl2, scanlevel}, scanUsage);
   };
 
   // subject to change
@@ -864,8 +994,17 @@ export const useDocumentHooks = () => {
     }
   };
 
-  const validateCycleCount = (item: any) => {
-    alert("No api yet");
+  const validateCycleCount = async (item: any) => {
+    const cyclecount = await getCycleCount2(item.docnum, item.recid);
+
+    Alert.alert("Validation", `Do you want to validate '${item.docnum}'`, [
+      {
+        text: "Yes",
+        onPress: () => checkPostType(cyclecount[0], "cyclecount"),
+        style: "destructive",
+      },
+      {text: "No", style: "cancel"}, // Just close the alert without any action
+    ]);
   };
 
   const validatePhysicalRecord = (item: any) => {

@@ -40,10 +40,7 @@ export const useInventoryTransactionHooks = ({page}: InventoryTransaction) => {
             offset: cycleOffset,
             paginating: true,
           })
-        ).then(() => {
-          ToastMessage("Table updated.", 1000);
-          setPaginating(false);
-        });
+        );
         break;
       case "sloc":
         switch (activeIndex) {

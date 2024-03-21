@@ -11,13 +11,14 @@ import {
 import {FontAwesome5} from "@expo/vector-icons";
 import {shadows} from "../../styles/styles";
 import CustomButton from "../forms/buttons/CustomButton";
-import {useDocumentHooks} from "../../hooks/documentHooks";
 import {useAppSelector} from "../../store/store";
 import CustomCheckBox from "../forms/inputs/CustomCheckBox";
 import ScanModal from "./ScanModal";
 import MessageToast from "../message-toast/MessageToast";
 import CustomLoadingText from "../load-spinner/CustomLoadingText";
 import {useBatchHooks} from "../../hooks/batchHooks";
+import {useModalHooks} from "../../hooks/modalHooks";
+import ScanBinAndItemModal from "./ScanBinAndItemModal";
 
 interface SelectScanModalProps {
   visible: boolean;
@@ -44,15 +45,14 @@ const SelectandScanModal = React.memo((props: SelectScanModalProps) => {
     scanOptions,
     loadingStatus,
   } = props;
-  const {isScanModal} = useAppSelector((state) => state.modal);
   const {status, statusText} = useAppSelector((state) => state.status);
 
   const {cycleCountDetails} = useAppSelector(
     (state) => state.inventoryTransaction
   );
 
-  const {handleScanModal} = useDocumentHooks();
   const {handleCheckPendingScan} = useBatchHooks();
+  const {toggleScanBinModal, isScanBinModal} = useModalHooks();
 
   const [isShowPending, setIsShowPending] = useState<boolean>(true);
   const [isShowScanned, setIsShowScanned] = useState<boolean>(true);
@@ -83,9 +83,21 @@ const SelectandScanModal = React.memo((props: SelectScanModalProps) => {
 
             <CustomButton
               title={"SCAN BIN NO. / ITEM"}
-              onPress={handleScanModal}
+              onPress={() => toggleScanBinModal(selectedItem)}
               type="regular"
             />
+
+            {isScanBinModal && (
+              <ScanBinAndItemModal
+                onClose={() => {
+                  toggleScanBinModal();
+                }}
+                placeholder="Waiting to Scan Bin No. Barcode..."
+                visible={isScanBinModal}
+                scanParams="cc_item"
+                typeForFetching="cyclecount"
+              />
+            )}
 
             {loadingStatus ? (
               <ActivityIndicator size="large" color="#0000ff" />

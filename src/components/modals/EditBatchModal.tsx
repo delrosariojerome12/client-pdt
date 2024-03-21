@@ -1,5 +1,12 @@
 import React from "react";
-import {Modal, View, Text, StyleSheet, TouchableOpacity} from "react-native";
+import {
+  Modal,
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import CustomButton from "../forms/buttons/CustomButton";
 import {FontAwesome5, FontAwesome} from "@expo/vector-icons";
 import {useAppSelector} from "../../store/store";
@@ -14,7 +21,9 @@ const EditBatchModal = React.memo(() => {
     (state) => state.modal
   );
   const {status} = useAppSelector((state) => state.status);
-  const {batchPostMode} = useAppSelector((state) => state.general);
+  const {batchPostMode, batchDetails} = useAppSelector(
+    (state) => state.general
+  );
   const {
     handleSearchBatchModal,
     handleCloseSearchBatchModal,
@@ -42,13 +51,26 @@ const EditBatchModal = React.memo(() => {
   console.log("edit batch modal");
 
   const handleEditSave = () => {
-    console.log(batchPostMode);
     switch (batchPostMode) {
       case "postUpdateBatch":
         handlePostUpdateBatch();
         break;
       case "updateBatch":
-        handleSaveUpdateBatch();
+        Alert.alert(
+          "Notification",
+          `Do you want to use this Batch Number: '${batchDetails.batchNo}' ?`,
+          [
+            {
+              text: "Yes",
+              onPress: () => {
+                handleSaveUpdateBatch();
+              },
+            },
+            {
+              text: "No",
+            },
+          ]
+        );
         break;
       default:
         break;

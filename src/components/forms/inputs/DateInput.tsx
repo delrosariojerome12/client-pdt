@@ -15,10 +15,11 @@ interface DateInputProps {
   inputPlaceholder?: string;
   date: Date;
   onChangeDate: (newDate: Date) => void;
+  disabled?: boolean;
 }
 
 const DateInput: React.FC<DateInputProps> = React.memo(
-  ({inputPlaceholder = "Select Date", date, onChangeDate}) => {
+  ({inputPlaceholder = "Select Date", date, onChangeDate, disabled}) => {
     const [showPicker, setShowPicker] = useState(false);
 
     const toggleDatePicker = () => {
@@ -42,10 +43,17 @@ const DateInput: React.FC<DateInputProps> = React.memo(
     return (
       <View>
         <Pressable
-          style={{flexDirection: "row", alignItems: "center", gap: 10}}
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 10,
+          }}
           onPress={toggleDatePicker}
+          disabled={true} // Pass disabled prop to Pressable
         >
-          <Text style={{fontWeight: "500"}}>{inputPlaceholder}</Text>
+          <Text style={{fontWeight: "500", opacity: 0.6}}>
+            {inputPlaceholder}
+          </Text>
 
           <TextInput
             value={date.toLocaleDateString(undefined, {
@@ -79,7 +87,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 5,
     backgroundColor: "#fff",
-    color: "#000",
+    color: "gray",
     flex: 1,
   },
 });

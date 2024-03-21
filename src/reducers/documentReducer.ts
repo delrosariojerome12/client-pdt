@@ -5,12 +5,14 @@ interface Document {
   selectedDocument: any | null;
   selectedItem: ProductData | null;
   selectedBatchItem: any | null;
+  selectedBinDetails: any | null; //for cc and physical inventory
 }
 
 const initialState: Document = {
   selectedDocument: null,
   selectedItem: null,
   selectedBatchItem: null,
+  selectedBinDetails: null,
 };
 
 const documentReducer = createSlice({
@@ -22,9 +24,16 @@ const documentReducer = createSlice({
     },
     handleClearDocument: (state) => {
       state.selectedDocument = null;
+      state.selectedBinDetails = null;
+    },
+    handleClearBin: (state) => {
+      state.selectedBinDetails = null;
     },
     handleSetItem: (state, action) => {
       state.selectedItem = action.payload;
+    },
+    handleBinItemDetails: (state, action) => {
+      state.selectedBinDetails = action.payload;
     },
     handleSetBatchItem: (state, action) => {
       state.selectedBatchItem = action.payload;
@@ -38,6 +47,8 @@ export const {
   handleClearDocument,
   handleSetItem,
   handleSetBatchItem,
+  handleBinItemDetails,
+  handleClearBin,
 } = documentReducer.actions;
 
 export default documentReducer.reducer;

@@ -14,8 +14,7 @@ interface PhysicalInventoryProps {
 }
 
 const PhysicalInventoryDetails = React.memo((props: PhysicalInventoryProps) => {
-  const {handleAddBatchModal, handleEditBatchModal, removeScannedQuantity} =
-    useBatchHooks();
+  const {removeScannedQuantity} = useBatchHooks();
   const {item, options} = props;
 
   return (

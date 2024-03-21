@@ -444,7 +444,7 @@ export const useAPIHooks = () => {
       const response = await axios.get(url);
       if (response.data.bool) {
         !disableStatus && dispatch(setStatus("success"));
-        console.log("tae", response.data);
+        console.log("sukli", response.data);
         return response.data;
       } else {
         console.log("mali", response.data);
@@ -620,11 +620,21 @@ export const useAPIHooks = () => {
     return results;
   };
 
+  const getCycleCount2 = async (docnum: string, recid: number) => {
+    const response = await handleGet({
+      url: `lst_tracc/cyclecountfile1?recid=${recid}&docnum=${docnum}&_limit=1`,
+      disableToast: true,
+    });
+
+    return response;
+  };
+
   return {
     scanBarcode,
     connectToPHPNotDispatch,
     getLPN,
     getBinAndValidate,
     removeScannedQuantityService,
+    getCycleCount2,
   };
 };

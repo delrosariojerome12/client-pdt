@@ -6,14 +6,20 @@ import {
   handleSetSearchModalContent,
   handleToggleAddBatchModal,
   handleToggleOutboundItemScan,
+  handleToggleScanBinModal,
+  handleToggleEditBatchModal,
 } from "../reducers/modalReducer";
-import {handleSetItem} from "../reducers/documentReducer";
+import {
+  handleSetItem,
+  handleBinItemDetails,
+  handleClearBin,
+} from "../reducers/documentReducer";
 import {showQuantityField, setStatus} from "../reducers/statusReducer";
 
 import {useAppDispatch, useAppSelector} from "../store/store";
 
 export const useModalHooks = () => {
-  const {isAddBatchModal} = useAppSelector((state) => state.modal);
+  const {isScanBinModal} = useAppSelector((state) => state.modal);
   const dispatch = useAppDispatch();
 
   const toggleOutboundItemScan = (item?: any) => {
@@ -25,5 +31,25 @@ export const useModalHooks = () => {
     dispatch(handleToggleOutboundItemScan());
   };
 
-  return {toggleOutboundItemScan};
+  const toggleScanBinModal = (item?: any) => {
+    if (item) {
+      dispatch(handleSetItem(item));
+    } else {
+      dispatch(handleClearBin());
+    }
+    dispatch(showQuantityField(false));
+    dispatch(setStatus("idle"));
+    dispatch(handleToggleScanBinModal());
+  };
+
+  const toggleEditBatchModal = () => {
+    dispatch(handleToggleEditBatchModal());
+  };
+
+  return {
+    toggleOutboundItemScan,
+    toggleScanBinModal,
+    toggleEditBatchModal,
+    isScanBinModal,
+  };
 };

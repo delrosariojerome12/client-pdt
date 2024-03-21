@@ -1,4 +1,10 @@
-import {View, Text, ScrollView, ActivityIndicator} from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  ActivityIndicator,
+  RefreshControl,
+} from "react-native";
 import React, {useEffect, useState} from "react";
 import CustomButton from "../../../../src/components/forms/buttons/CustomButton";
 import CustomTable from "../../../../src/components/forms/table/CustomTable";
@@ -40,43 +46,7 @@ const CycleCount = React.memo(() => {
     validateCycleCount,
   } = useDocumentHooks();
 
-  const [isSelectModalChange, setSelectModalChange] = useState(false);
-
-  // gumamit ng ibang modal sa baba
-  const renderSelectModal = () => {
-    if (isSelectModalChange) {
-      return (
-        <ScanModal
-          visible={isScanModal}
-          onClose={() => {
-            handleScanModal();
-            setSelectModalChange(false);
-          }}
-          placeholder="Waiting to Scan Bin No. Barcode..."
-          typeForFetching="cyclecount"
-          scanParams="cc_item"
-          usage="scanning"
-          isNextBtn={true}
-        />
-      );
-    }
-    return (
-      <ScanModal
-        visible={isScanModal}
-        onClose={() => {
-          handleScanModal();
-          setSelectModalChange(false);
-        }}
-        placeholder="Waiting to Scan CRR NO. ..."
-        typeForFetching="cyclecount"
-        scanParams="cc"
-        usage="searching"
-      />
-    );
-  };
-
   console.log("cycle count");
-  console.log("why,", isScanModal);
 
   return (
     <>
@@ -99,7 +69,18 @@ const CycleCount = React.memo(() => {
           <CustomLoadingText text="Posting..." visible={true} />
         )}
 
-        {isScanModal && renderSelectModal()}
+        {isScanModal && (
+          <ScanModal
+            visible={isScanModal}
+            onClose={() => {
+              handleScanModal();
+            }}
+            placeholder="Waiting to Scan CRR NO. ..."
+            typeForFetching="cyclecount"
+            scanParams="cc"
+            usage="searching"
+          />
+        )}
 
         {isSelectModal && (
           <SelectandScanModal
@@ -107,7 +88,6 @@ const CycleCount = React.memo(() => {
             visible={isSelectModal}
             onClose={() => {
               closeSelectModal();
-              setSelectModalChange(false);
             }}
             selectedItem={selectedDocument}
             title="Cycle Count Details"
@@ -129,26 +109,29 @@ const CycleCount = React.memo(() => {
             }}
           />
         )}
-
-        <VerticalList
-          onEndReached={checkPageToPaginate}
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          onValidate={validateCycleCount}
-          onSelect={handleSelectModal}
-          onPress={() => {
-            setSelectModalChange(!isSelectModalChange);
-          }}
-          data={cycle.data}
-          selectType="cyclecount"
-          propertiesToShow={[
-            {name: "trndte", label: "Date"},
-            {name: "docnum", label: "CCR Number"},
-            {name: "warcde", label: "Warehouse"},
-            {name: "warcdenum", label: "Warehouse Number"},
-            {name: "warloccde", label: "Storage Location"},
-          ]}
-        />
+        <ScrollView
+          style={generalStyles.innerContainer}
+          contentContainerStyle={{flexGrow: 1}}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          onScroll={handleScroll}
+          scrollEventThrottle={150}
+        >
+          <VerticalList
+            onValidate={validateCycleCount}
+            onSelect={handleSelectModal}
+            data={cycle.data}
+            selectType="cyclecount"
+            propertiesToShow={[
+              {name: "trndte", label: "Date"},
+              {name: "docnum", label: "CCR Number"},
+              {name: "warcde", label: "Warehouse"},
+              {name: "warcdenum", label: "Warehouse Number"},
+              {name: "warloccde", label: "Storage Location"},
+            ]}
+          />
+        </ScrollView>
 
         {isPaginating && (
           <View

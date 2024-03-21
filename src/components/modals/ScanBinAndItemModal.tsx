@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  Alert,
 } from "react-native";
 import CustomInputs from "../forms/inputs/CustomInputs";
 import CustomButton from "../forms/buttons/CustomButton";
@@ -13,35 +14,39 @@ import {useDocumentHooks} from "../../hooks/documentHooks";
 import {FontAwesome5} from "@expo/vector-icons";
 import {format} from "../../styles/styles";
 import BatchDetails from "./BatchDetails";
+import {ScanCategory} from "../../models/generic/ScanCategory";
+import {ScanValidate} from "../../hooks/documentHooks";
+import {useAppSelector, useAppDispatch} from "../../store/store";
+import {
+  formatDateDDMMYYYY,
+  formatDateMMDDYYYY,
+  formatDateStringMMDDYYYY,
+} from "../../helper/Date";
+import {clearBatchDetails} from "../../reducers/generalReducer";
+import {handleBinItemDetails} from "../../reducers/documentReducer";
+import MessageToast from "../message-toast/MessageToast";
+
 interface ScanModalProps {
   visible: boolean;
   onClose: () => void;
   placeholder: string;
+  scanParams: ScanCategory;
+  typeForFetching: ScanValidate;
 }
 
 const ScanBinAndItemModal = React.memo((props: ScanModalProps) => {
-  const {handleScanDocument} = useDocumentHooks();
-  const {visible, onClose, placeholder} = props;
-  // barcodes
+  const {visible, onClose, placeholder, scanParams, typeForFetching} = props;
+  const {handleScanItem} = useDocumentHooks();
+  const {selectedBinDetails} = useAppSelector((state) => state.document);
+  const {batchDetails} = useAppSelector((state) => state.general);
+  const {status, statusText} = useAppSelector((state) => state.status);
+
+  const dispatch = useAppDispatch();
+
   const [binNo, setBinNo] = useState<string>("");
   const [itemBarcode, setItemBarcode] = useState<string>("");
 
-  // item from the barcodes
-  const [binItemDetails, setBinItemDetails] = useState<any | null>(null);
-  const [scanItemDetails, setScanItemDetails] = useState<any | null>(null);
   const [quantityField, setQuantityField] = useState<number>(1);
-  const [isBatchDetailsOpen, setBatchDetailsOpen] = useState(false);
-
-  // {
-  // itemCode: "ABC123",
-  // itemName: "Item 1",
-  // pieces: 5,
-  // receiveQty: 5,
-  // LPNNumber: "LPN123",
-  // batchNumber: "BATCH001",
-  // mfgDate: "2023-01-01",
-  // expDate: "2024-12-31",
-  // }
 
   const handleItemBarcodeChange = (key: string, value: string | number) => {
     setItemBarcode(String(value));
@@ -57,27 +62,76 @@ const ScanBinAndItemModal = React.memo((props: ScanModalProps) => {
 
   const clearValues = () => {
     setQuantityField(1);
-    setBinItemDetails(null);
-    setScanItemDetails(null);
     setBinNo("");
     setItemBarcode("");
-    setBatchDetailsOpen(false);
+    dispatch(clearBatchDetails());
+    dispatch(handleBinItemDetails(null));
   };
 
-  const handleSetBatchNum = (batchnum: string, item: any) => {
-    setBatchDetailsOpen(false);
-    setItemBarcode(batchnum);
-    setScanItemDetails(item);
+  const submit = (scanLevel: string, customMessage: string) => {
+    if (!itemBarcode && scanLevel === "2") {
+      Alert.alert("Empty Field", "Please make sure barcode is not empty.", [
+        {
+          text: "OK",
+        },
+      ]);
+      return;
+    }
+    if (quantityField == 0 && scanLevel === "2.1") {
+      Alert.alert(
+        "Empty Field",
+        "Please make sure Quantity is not less than 1.",
+        [
+          {
+            text: "OK",
+          },
+        ]
+      );
+      return;
+    }
+    if (scanLevel === "2.1") {
+      clearValues();
+    }
+    handleScanItem(
+      {
+        barcode: binNo,
+        receiveQty: quantityField,
+        customMessage: customMessage,
+        barcodelvl2: itemBarcode,
+        scanlevel: scanLevel,
+      },
+      typeForFetching
+    );
   };
 
   return (
     <>
-      <Modal visible={visible} onRequestClose={onClose} transparent>
+      <Modal
+        visible={visible}
+        onRequestClose={() => {
+          onClose();
+          clearValues();
+        }}
+        transparent
+      >
+        {status === "success" && (
+          <MessageToast
+            status="success"
+            text={"Item Successfully Scanned."}
+            speed={2500}
+            customPosition={[-150, -10]}
+          />
+        )}
         <View style={styles.centeredView}>
           <ScrollView contentContainerStyle={styles.scrollViewContent}>
             <View style={styles.modalView}>
               <View style={styles.headerContainer}>
-                <TouchableOpacity onPress={onClose}>
+                <TouchableOpacity
+                  onPress={() => {
+                    onClose();
+                    clearValues();
+                  }}
+                >
                   <FontAwesome5 name="arrow-left" size={24} color="black" />
                 </TouchableOpacity>
                 <Text style={styles.headerText}>Scan Barcode</Text>
@@ -89,32 +143,32 @@ const ScanBinAndItemModal = React.memo((props: ScanModalProps) => {
                 type="text"
                 placeHolder={placeholder}
                 inputKey="binNo"
+                onSubmit={() => {
+                  submit("1", "Please Make sure Bin No. Barcode is not empty.");
+                }}
+                isEditable={selectedBinDetails ? false : true}
+                isFocus={true}
               />
 
-              {/* buttons */}
-              {!binItemDetails && (
+              {!selectedBinDetails && (
                 <View style={styles.buttonContainer}>
                   <CustomButton
-                    // onPress={handleScan}
-                    onPress={() =>
-                      setBinItemDetails({
-                        itemCode: "ABC123",
-                        itemName: "Item 1",
-                        pieces: 5,
-                        receiveQty: 5,
-                        LPNNumber: "LPN123",
-                        batchNumber: "BATCH001",
-                        mfgDate: "2023-01-01",
-                        expDate: "2024-12-31",
-                      })
-                    }
+                    onPress={() => {
+                      submit(
+                        "1",
+                        "Please Make sure Bin No. Barcode is not empty."
+                      );
+                    }}
                     title="Next"
                     type="save"
                     isWidthNotFull={true}
                     useFlex={true}
                   />
                   <CustomButton
-                    onPress={onClose}
+                    onPress={() => {
+                      onClose();
+                      clearValues();
+                    }}
                     title="Close"
                     type="delete"
                     isWidthNotFull={true}
@@ -124,47 +178,54 @@ const ScanBinAndItemModal = React.memo((props: ScanModalProps) => {
               )}
 
               {/* bin details */}
-              {binItemDetails && (
+              {selectedBinDetails && (
                 <>
                   <View style={styles.itemContainer}>
                     <Text style={styles.floatingText}>Bin Item Details</Text>
                     <View style={format.twoRowText}>
                       <Text style={{fontWeight: "bold"}}>Line No. :</Text>
-                      <Text>{binItemDetails.itemCode}</Text>
+                      <Text>{selectedBinDetails.linenum}</Text>
                     </View>
                     <View style={format.twoRowText}>
                       <Text style={{fontWeight: "bold"}}>Item Code:</Text>
-                      <Text>{binItemDetails.itemCode}</Text>
+                      <Text>{selectedBinDetails.itmcde}</Text>
                     </View>
                     <View style={format.twoRowText}>
                       <Text style={{fontWeight: "bold"}}>Description:</Text>
-                      <Text>{binItemDetails.itemName}</Text>
+                      <Text>{selectedBinDetails.itmdsc}</Text>
                     </View>
 
                     <View style={format.twoRowText}>
                       <Text style={{fontWeight: "bold"}}>Batch No.:</Text>
-                      <Text>{binItemDetails.batchNumber}</Text>
+                      <Text>{selectedBinDetails.batchnum}</Text>
                     </View>
                     <View style={format.twoRowText}>
                       <Text style={{fontWeight: "bold"}}>Mfg. Date:</Text>
-                      <Text>{binItemDetails.expDate}</Text>
+                      <Text>
+                        {formatDateStringMMDDYYYY(selectedBinDetails.mfgdte)}
+                      </Text>
                     </View>
                     <View style={format.twoRowText}>
                       <Text style={{fontWeight: "bold"}}>Exp. Date:</Text>
-                      <Text>{binItemDetails.mfgDate}</Text>
+                      <Text>
+                        {formatDateStringMMDDYYYY(selectedBinDetails.expdte)}
+                      </Text>
                     </View>
                     <View style={format.twoRowText}>
                       <Text style={{fontWeight: "bold"}}>Bin No.:</Text>
-                      <Text>{binItemDetails.batchNumber}</Text>
+                      <Text>{selectedBinDetails.binnum}</Text>
                     </View>
 
                     <View style={format.twoRowText}>
                       <Text style={{fontWeight: "bold"}}>Qty:</Text>
-                      <Text>{binItemDetails.pieces}</Text>
+                      <Text>{selectedBinDetails.itmqty}</Text>
+                    </View>
+                    <View style={format.twoRowText}>
+                      <Text style={{fontWeight: "bold"}}>UOM:</Text>
+                      <Text>{selectedBinDetails.untmea}</Text>
                     </View>
                     <View style={format.twoRowText}>
                       <Text style={{fontWeight: "bold"}}>Scanned Qty:</Text>
-                      <Text>{0}</Text>
                     </View>
                   </View>
 
@@ -174,20 +235,30 @@ const ScanBinAndItemModal = React.memo((props: ScanModalProps) => {
                     type="text"
                     placeHolder={"Waiting to Scan Item Barcode..."}
                     inputKey="bin"
+                    onSubmit={() => {
+                      submit(
+                        "2",
+                        "Please Make sure Item Barcode is not empty."
+                      );
+                    }}
+                    isEditable={batchDetails.batchNo ? false : true}
                   />
 
-                  {/* buttons */}
-                  {!scanItemDetails && (
+                  {!batchDetails.batchNo && (
                     <View style={styles.buttonContainer}>
                       <CustomButton
-                        onPress={() => setBatchDetailsOpen(!isBatchDetailsOpen)}
+                        onPress={() => {
+                          submit(
+                            "2",
+                            "Please Make sure Item Barcode is not empty."
+                          );
+                        }}
                         title="Next"
                         type="save"
                         isWidthNotFull={true}
                         useFlex={true}
                       />
                       <CustomButton
-                        // onPress={onClose}
                         onPress={() => {
                           onClose();
                           clearValues();
@@ -203,7 +274,7 @@ const ScanBinAndItemModal = React.memo((props: ScanModalProps) => {
               )}
 
               {/* scan item details */}
-              {scanItemDetails && (
+              {batchDetails.batchNo && (
                 <>
                   <View style={styles.itemContainer}>
                     <Text style={styles.floatingText}>
@@ -211,28 +282,28 @@ const ScanBinAndItemModal = React.memo((props: ScanModalProps) => {
                     </Text>
                     <View style={format.twoRowText}>
                       <Text style={{fontWeight: "bold"}}>Item Code:</Text>
-                      <Text>{binItemDetails.itemCode}</Text>
+                      <Text>{selectedBinDetails.itmcde}</Text>
                     </View>
                     <View style={format.twoRowText}>
                       <Text style={{fontWeight: "bold"}}>Description:</Text>
-                      <Text>{binItemDetails.itemName}</Text>
+                      <Text>{selectedBinDetails.itmdsc}</Text>
                     </View>
 
                     <View style={format.twoRowText}>
                       <Text style={{fontWeight: "bold"}}>Batch No.:</Text>
-                      <Text>{binItemDetails.batchNumber}</Text>
+                      <Text>{batchDetails.batchNo}</Text>
                     </View>
                     <View style={format.twoRowText}>
                       <Text style={{fontWeight: "bold"}}>Mfg. Date:</Text>
-                      <Text>{binItemDetails.expDate}</Text>
+                      <Text>{formatDateMMDDYYYY(batchDetails.mfgDate)}</Text>
                     </View>
                     <View style={format.twoRowText}>
                       <Text style={{fontWeight: "bold"}}>Exp. Date:</Text>
-                      <Text>{binItemDetails.mfgDate}</Text>
+                      <Text>{formatDateMMDDYYYY(batchDetails.mfgDate)}</Text>
                     </View>
                     <View style={format.twoRowText}>
                       <Text style={{fontWeight: "bold"}}>Bin No.:</Text>
-                      <Text>{binItemDetails.batchNumber}</Text>
+                      <Text>{selectedBinDetails.binnum}</Text>
                     </View>
                   </View>
 
@@ -247,9 +318,11 @@ const ScanBinAndItemModal = React.memo((props: ScanModalProps) => {
                   <View style={styles.buttonContainer}>
                     <CustomButton
                       onPress={() => {
-                        handleScanDocument();
-                        clearValues();
-                        onClose();
+                        submit(
+                          "2.1",
+                          "Please Make sure Bin No. Barcode is not empty."
+                        );
+                        // onClose();
                       }}
                       title="Continue"
                       type="save"
@@ -273,16 +346,6 @@ const ScanBinAndItemModal = React.memo((props: ScanModalProps) => {
           </ScrollView>
         </View>
       </Modal>
-
-      {/* batch modals */}
-      {isBatchDetailsOpen && (
-        <BatchDetails
-          visible={isBatchDetailsOpen}
-          item={binItemDetails}
-          onClose={() => setBatchDetailsOpen(false)}
-          onSave={handleSetBatchNum}
-        />
-      )}
     </>
   );
 });

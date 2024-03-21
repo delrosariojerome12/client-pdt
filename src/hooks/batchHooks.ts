@@ -32,19 +32,22 @@ import {
   setBatchedSaved,
   setBatchPostMode,
 } from "../reducers/generalReducer";
-import {togglePendingAndScan} from "../store/actions/ims/transaction";
+import {
+  togglePendingAndScan,
+  getCycleCountDetails,
+  getCycleCount,
+} from "../store/actions/ims/transaction";
 import {useDocumentHooks} from "./documentHooks";
 import {formatDateYYYYMMDD} from "../helper/Date";
-import {setStatusText} from "../reducers/statusReducer";
+import {setStatus, setStatusText} from "../reducers/statusReducer";
 import {useAPIHooks} from "./apiHooks";
 import {TypeSelect} from "./documentHooks";
 
 type Uses = "update" | "create";
 
 export const useBatchHooks = () => {
-  const {selectedBatchItem, selectedDocument} = useAppSelector(
-    (state) => state.document
-  );
+  const {selectedBatchItem, selectedDocument, selectedBinDetails} =
+    useAppSelector((state) => state.document);
   const {
     batchDetails: {batchNo, expDate, mfgDate, batchedSaved},
   } = useAppSelector((state) => state.general);
@@ -84,6 +87,10 @@ export const useBatchHooks = () => {
       case "stg-validate":
         dispatch(getSTGValidate({limit: 10, offset: 0}));
         dispatch(getSTGValidateDetails({docnum: selectedDocument.docnum}));
+        break;
+      case "cyclecount":
+        dispatch(getCycleCount({limit: 10, offset: 0}));
+        dispatch(getCycleCountDetails({docnum: selectedDocument.docnum}));
         break;
 
       default:
@@ -358,7 +365,9 @@ export const useBatchHooks = () => {
   const handleSaveUpdateBatch = () => {
     dispatch(setBatchedSaved(true));
     dispatch(handleToggleEditBatchModal());
+    dispatch(setStatus("idle"));
   };
+
   const handlePostAnotherBatch = () => {
     if (!batchNo) {
       Alert.alert(`Cannot Save!`, `Please fill Batch number first.`, [
@@ -489,8 +498,15 @@ export const useBatchHooks = () => {
     dispatch(clearBatchDetails());
   };
   const handleSearchBatchModal = () => {
+    console.log("nyare", selectedBinDetails.itmcde);
+    console.log(selectedBatchItem);
+
     dispatch(
-      getBatch({limit: 10, offset: 0, itmcde: selectedBatchItem.itmcde})
+      getBatch({
+        limit: 10,
+        offset: 0,
+        itmcde: selectedBinDetails.itmcde || selectedBatchItem.itmcde,
+      })
     );
     dispatch(handleToggleSearchBatchModal());
   };

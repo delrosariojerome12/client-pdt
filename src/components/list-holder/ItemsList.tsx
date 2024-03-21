@@ -11,6 +11,7 @@ import EditBatchModal from "../modals/EditBatchModal";
 import ItemScanModal from "../modals/ItemScanModal";
 import OutboundItemScanModal from "../modals/outbound/OutboundItemScanModal";
 import {TypeSelect} from "../../hooks/documentHooks";
+import {Feather} from "@expo/vector-icons"; // Import Feather icon from expo/vector-icons
 
 export type Options = {
   removeEdit?: boolean;
@@ -51,6 +52,7 @@ const ItemsList = React.memo((props: Props) => {
     isAddBatchModal,
     isEditBatchModal,
     isOutboundItemScan,
+    isScanBinModal,
   } = useAppSelector((state) => state.modal);
 
   const {uses, subcategory} = props;
@@ -63,7 +65,22 @@ const ItemsList = React.memo((props: Props) => {
   );
   const {wtoOutboundDetails, wavepickDetails, singlepickDetails} =
     useAppSelector((state) => state.outbound);
-  const renderItems = (item: any, index: number, options: Options) => {
+  const renderItems = (
+    item: any,
+    index: number,
+    options: Options,
+    isEmpty?: true
+  ) => {
+    if (isEmpty) {
+      return (
+        <View style={{flex: 1, alignItems: "center", justifyContent: "center"}}>
+          <Feather name="alert-circle" size={30} color="black" />
+          <Text style={{marginTop: 10, fontSize: 18, fontWeight: "bold"}}>
+            No data available
+          </Text>
+        </View>
+      );
+    }
     switch (uses) {
       case "inbound":
         return <PTODetails item={item} key={index} options={options} />;
@@ -156,6 +173,9 @@ const ItemsList = React.memo((props: Props) => {
       case "physicalInventory":
         switch (subcategory) {
           case "cyclecount":
+            if (cycleCountDetails.data.data.length === 0) {
+              return renderItems({}, 0, {removeType: "cyclecount"}, true);
+            }
             return cycleCountDetails.data.data.map(
               (item: any, index: number) => {
                 return renderItems(item, index, {removeType: "cyclecount"});

@@ -11,7 +11,9 @@ interface PaginateProps {
 export const usePaginateRefreshHooks = ({uses}: PaginateProps) => {
   const [refreshing, setRefreshing] = useState(false);
   const [isPaginating, setPaginating] = useState(false);
-  const {selectedBatchItem} = useAppSelector((state) => state.document);
+  const {selectedBatchItem, selectedBinDetails} = useAppSelector(
+    (state) => state.document
+  );
   const {batch} = useAppSelector((state) => state.general);
   const dispatch = useAppDispatch();
 
@@ -25,7 +27,7 @@ export const usePaginateRefreshHooks = ({uses}: PaginateProps) => {
           getBatch({
             limit: 10,
             offset: batchOffset,
-            itmcde: selectedBatchItem.itmcde,
+            itmcde: selectedBinDetails.itmcde || selectedBatchItem.itmcde,
             paginating: true,
           })
         ).then(() => {
@@ -45,7 +47,7 @@ export const usePaginateRefreshHooks = ({uses}: PaginateProps) => {
           getBatch({
             limit: 10,
             offset: 0,
-            itmcde: selectedBatchItem.itmcde,
+            itmcde: selectedBinDetails.itmcde || selectedBatchItem.itmcde,
           })
         ).then(() => {
           setRefreshing(false);

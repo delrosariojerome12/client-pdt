@@ -2,7 +2,6 @@ import {createAsyncThunk} from "@reduxjs/toolkit";
 import axios from "axios";
 import {RootState} from "../store";
 import {ScanCategory} from "../../models/generic/ScanCategory";
-
 export interface ScanDocumentParams {
   barcode: string;
   category: ScanCategory;
@@ -138,6 +137,7 @@ export const connectToPHP = createAsyncThunk(
     const {
       user: {userDetails, sesid},
       phpServer: {traccDomain, traccDirectory},
+      server: {ipAddress, port, protocol},
     } = state.auth;
 
     const {
@@ -174,6 +174,8 @@ export const connectToPHP = createAsyncThunk(
     formData.append("asdfglmiwms", sesid);
     formData.append("pdt_usrcde", userDetails.usrcde);
     formData.append("from_pdt", "true");
+
+    const baseURl = `${protocol}://${ipAddress}:${port}`;
 
     let targerPPHP = "",
       event_action = "";
@@ -301,26 +303,34 @@ export const connectToPHP = createAsyncThunk(
         targerPPHP = "trn_cyclecount_ajax.php";
         event_action = "validate_item";
 
-        // let arr_data = [];
-        // let cc_item = await this.CycleCountFile2Service.getAll({
-        //   docnum: docnum,
-        //   _includes: "recid,uncounted,stritmqty",
-        // });
-        // for (let value of cc_item) {
-        //   let temp_obj = {};
-        //   if (value.recid > 0) {
-        //     temp_obj.recid = value.recid.toString();
-        //     temp_obj.uncounted = value.uncounted.toString();
-        //     temp_obj.itmqty = value.stritmqty;
-        //     if (value.stritmqty == "") temp_obj.uncounted = "1";
-        //     arr_data.push(temp_obj);
-        //   }
-        // }
+        let arr_data = [];
+        const cc_item: any = await axios.get(
+          `${baseURl}/api/lst_tracc/cyclecountfile2?docnum=${docnum}&_includes=recid,uncounted,stritmqty`
+        );
+        console.log("owww", cc_item.data);
+        console.log(recid);
+
+        for (let value of cc_item.data) {
+          let temp_obj: any = {};
+
+          if (value.recid > 0) {
+            temp_obj.recid = value.recid.toString();
+            temp_obj.uncounted = value.uncounted.toString();
+            temp_obj.itmqty = value.stritmqty;
+
+            if (value.stritmqty === "") temp_obj.uncounted = "1";
+
+            arr_data.push(temp_obj);
+          }
+        }
+
+        console.log("eyy", arr_data);
 
         formData.append("xparams[event_action]", event_action);
         formData.append("xparams[docnum]", docnum);
         formData.append("xparams[source]", "PDT");
-        // formData.append("xarr_data", JSON.stringify(arr_data));
+        formData.append("xarr_data", JSON.stringify(arr_data));
+
         break;
 
       case "VALIDATE_SLOC":
