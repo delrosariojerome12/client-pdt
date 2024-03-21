@@ -1,9 +1,9 @@
-import {useAppSelector, useAppDispatch} from "../store/store";
-import {ScanDocumentParams} from "../store/actions/generalActions";
-import axios, {AxiosResponse} from "axios";
-import {Alert} from "react-native";
-import {setStatus} from "../reducers/statusReducer";
-import {useServiceHooks} from "./serviceHooks";
+import { useAppSelector, useAppDispatch } from "../store/store";
+import { ScanDocumentParams } from "../store/actions/generalActions";
+import axios, { AxiosResponse } from "axios";
+import { Alert } from "react-native";
+import { setStatus } from "../reducers/statusReducer";
+import { useServiceHooks } from "./serviceHooks";
 import {
   handleToggleNotificationModal,
   handleSetNotificationText,
@@ -48,14 +48,14 @@ interface Result {
 
 export const useAPIHooks = () => {
   const {
-    user: {userDetails, sesid},
-    phpServer: {traccDomain, traccDirectory},
-    server: {ipAddress, port, protocol},
+    user: { userDetails, sesid },
+    phpServer: { traccDomain, traccDirectory },
+    server: { ipAddress, port, protocol },
   } = useAppSelector((state) => state.auth);
-  const {selectedDocument} = useAppSelector((state) => state.document);
+  const { selectedDocument } = useAppSelector((state) => state.document);
 
   const dispatch = useAppDispatch();
-  const {handleGet, handlePost, handlePatch} = useServiceHooks();
+  const { handleGet, handlePost, handlePatch } = useServiceHooks();
 
   const baseUrl = `${protocol}://${ipAddress}:${port}`;
 
@@ -421,7 +421,7 @@ export const useAPIHooks = () => {
   ) => {
     dispatch(setStatus("loading"));
     try {
-      const {barcode, category, ...restParams} = queryParams;
+      const { barcode, category, ...restParams } = queryParams;
       const searchParams = new URLSearchParams();
       searchParams.append("barcode", barcode);
       searchParams.append("category", category);
@@ -467,7 +467,7 @@ export const useAPIHooks = () => {
     }
   };
 
-  const getLPN = async ({lpnnum, usage}: GetLPN) => {
+  const getLPN = async ({ lpnnum, usage }: GetLPN) => {
     try {
       dispatch(setStatus("loading"));
       let response;
@@ -526,7 +526,11 @@ export const useAPIHooks = () => {
     }
   };
 
-  const getBinAndValidate = async ({binnum, lpnnum, patchUrl}: ValidateBin) => {
+  const getBinAndValidate = async ({
+    binnum,
+    lpnnum,
+    patchUrl,
+  }: ValidateBin) => {
     try {
       const binDetails = await handleGet({
         url: `lst_tracc/binfile1?binnum=${binnum}`,
@@ -585,7 +589,7 @@ export const useAPIHooks = () => {
     dispatch(setStatus("loading"));
 
     const promises = endpoints.map(async (endpoint) => {
-      const {url, method, payload} = endpoint;
+      const { url, method, payload } = endpoint;
 
       const completeUrl = `${baseUrl}/api/${url}`;
 
@@ -608,9 +612,9 @@ export const useAPIHooks = () => {
           default:
             throw new Error(`Unsupported method: ${method}`);
         }
-        results.push({success: true, data: response.data});
+        results.push({ success: true, data: response.data });
       } catch (error: any) {
-        results.push({success: false, error: error.message});
+        results.push({ success: false, error: error.message });
       }
     });
 
@@ -628,6 +632,72 @@ export const useAPIHooks = () => {
 
     return response;
   };
+  const getBatchAndBinInquiry = async (filter: string) => {
+    try {
+      let response: any = await handleGet({
+        url: `lst_tracc/binfile2?${filter}`,
+        disableToast: true,
+      });
+
+      if (response) {
+        if (response.length === 0) {
+          dispatch(setStatus("idle"));
+          Alert.alert("No Record Found", "No Record Found", [
+            {
+              text: "OK",
+            },
+          ]);
+          return;
+        }
+
+        dispatch(setStatus("idle"));
+        return response;
+      }
+      return null;
+    } catch (error) {
+      Alert.alert("Something Went Wrong", "Server error", [
+        {
+          text: "OK",
+        },
+      ]);
+    }
+  };
+
+  const getStockOnHand = async (filter: any) => {
+    try {
+      let params = "";
+      Object.keys(filter).map((item) => {
+        params += params ? "&" : "";
+        params += `${item}=${filter[item]}`;
+      });
+      let response: any = await handleGet({
+        url: `getStockOnHand?${params}`,
+        disableToast: true,
+      });
+
+      if (response) {
+        if (response.length === 0) {
+          dispatch(setStatus("idle"));
+          Alert.alert("No Record Found", "No Record Found", [
+            {
+              text: "OK",
+            },
+          ]);
+          return;
+        }
+
+        dispatch(setStatus("idle"));
+        return response.data;
+      }
+      return null;
+    } catch (error) {
+      Alert.alert("Something Went Wrong", "Server error", [
+        {
+          text: "OK",
+        },
+      ]);
+    }
+  };
 
   return {
     scanBarcode,
@@ -636,5 +706,7 @@ export const useAPIHooks = () => {
     getBinAndValidate,
     removeScannedQuantityService,
     getCycleCount2,
+    getBatchAndBinInquiry,
+    getStockOnHand,
   };
 };

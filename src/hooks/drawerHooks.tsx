@@ -1,28 +1,29 @@
-import {useState, useEffect} from "react";
-import {useRouter} from "expo-router";
-import {homeRoutes, drawerScreens} from "../routes/homeRoutes";
-import {View, Text, TouchableOpacity} from "react-native";
-import {Drawer} from "expo-router/drawer";
-import {DrawerItem} from "@react-navigation/drawer";
-import {FontAwesome5, FontAwesome} from "@expo/vector-icons";
-import {useAppSelector, useAppDispatch} from "../store/store";
+import { useState, useEffect } from "react";
+import { useRouter } from "expo-router";
+import { homeRoutes, drawerScreens } from "../routes/homeRoutes";
+import { View, Text, TouchableOpacity } from "react-native";
+import { Drawer } from "expo-router/drawer";
+import { DrawerItem } from "@react-navigation/drawer";
+import { FontAwesome5, FontAwesome } from "@expo/vector-icons";
+import { useAppSelector, useAppDispatch } from "../store/store";
 import {
   handleRemovePreviousRoute,
   handlePreviousRoute,
   handleClearRoutes,
 } from "../reducers/routerReducer";
-import {resetStatus} from "../reducers/statusReducer";
+import { resetStatus } from "../reducers/statusReducer";
+import { resetSearch } from "../reducers/searchReducer";
 
 interface customDrawers {
   title: string;
   routePath: string;
-  children: {title: string; path: string; icon?: any; children: any[]}[];
+  children: { title: string; path: string; icon?: any; children: any[] }[];
   isDropdownOpen: boolean;
   icon: string;
 }
 
 export const useDrawerHooks = () => {
-  const {previousRoutes} = useAppSelector((state) => state.router);
+  const { previousRoutes } = useAppSelector((state) => state.router);
 
   const dispatch = useAppDispatch();
 
@@ -74,9 +75,9 @@ export const useDrawerHooks = () => {
           name={drawer.name}
           options={{
             headerTitle: drawer.title,
-            drawerItemStyle: {display: drawer.isVisible ? "flex" : "none"},
+            drawerItemStyle: { display: drawer.isVisible ? "flex" : "none" },
             headerRight: () => (
-              <View style={{flexDirection: "row", gap: 10, marginRight: 10}}>
+              <View style={{ flexDirection: "row", gap: 10, marginRight: 10 }}>
                 <TouchableOpacity
                   style={{
                     backgroundColor: "#eee",
@@ -85,8 +86,7 @@ export const useDrawerHooks = () => {
                   }}
                   onPress={() => {
                     dispatch(resetStatus());
-                    console.log(previousRoutes);
-                    console.log(previousRoutes.length);
+                    dispatch(resetSearch());
 
                     if (previousRoutes.length === 1) {
                       dispatch(
@@ -122,11 +122,11 @@ export const useDrawerHooks = () => {
   const renderCustomDrawers = () => {
     return customDrawers.map((drawerItem, index) => {
       return (
-        <View key={index} style={{flex: 1}}>
+        <View key={index} style={{ flex: 1 }}>
           <DrawerItem
             focused={drawerItem.title === focusedItem ? true : false}
             key={index}
-            label={({color}) => (
+            label={({ color }) => (
               <View
                 style={{
                   flexDirection: "row",
@@ -146,7 +146,7 @@ export const useDrawerHooks = () => {
                 {renderArrows(drawerItem, color, index)}
               </View>
             )}
-            labelStyle={{fontSize: 18}}
+            labelStyle={{ fontSize: 18 }}
             onPress={() => {
               const completeRoute = `${drawerItem.routePath}`;
               const parentPath = completeRoute.substring(
@@ -163,7 +163,7 @@ export const useDrawerHooks = () => {
               }
               dispatch(handlePreviousRoute(parentPath));
             }}
-            icon={({size, color}) => (
+            icon={({ size, color }) => (
               <FontAwesome5
                 name={`${drawerItem.icon}`}
                 size={size}
@@ -171,7 +171,7 @@ export const useDrawerHooks = () => {
               />
             )}
           />
-          <View style={{paddingLeft: 25}}>
+          <View style={{ paddingLeft: 25 }}>
             {drawerItem.isDropdownOpen &&
               drawerItem.children.map((drawerItemChild, index) => {
                 return (

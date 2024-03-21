@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import {
   Modal,
   View,
@@ -9,19 +9,20 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
-import {FontAwesome5} from "@expo/vector-icons";
-import {shadows} from "../../styles/styles";
+import { FontAwesome5 } from "@expo/vector-icons";
+import { shadows } from "../../styles/styles";
 import LoadingSpinner from "../load-spinner/LoadingSpinner";
-import {useAppSelector} from "../../store/store";
+import { useAppSelector } from "../../store/store";
 import MessageToast from "../message-toast/MessageToast";
 import CustomLoadingText from "../load-spinner/CustomLoadingText";
+import { formatDateStringMMDDYYYY } from "../../helper/Date";
 
 interface SelectModalProps {
   visible: boolean;
   onClose: () => void;
   selectedItem: any;
   title: string;
-  propertiesToShow: {name: string; label: string}[];
+  propertiesToShow: { name: string; label: string }[];
   customContent: JSX.Element;
   loadingStatus?: boolean;
   hasScanButton?: boolean;
@@ -37,7 +38,49 @@ const SelectModal = React.memo((props: SelectModalProps) => {
     customContent,
     loadingStatus,
   } = props;
-  const {status, statusText} = useAppSelector((state) => state.status);
+  const { status, statusText } = useAppSelector((state) => state.status);
+
+  const binInquiryHeader = (propertyObj: any) => {
+    switch (propertyObj.name) {
+      case "header":
+      case "header1":
+        return (
+          <View key={propertyObj.name} style={styles.properties}>
+            <Text
+              style={
+                propertyObj.name == "header" ? styles.headerText : styles.label
+              }
+            >
+              {propertyObj.label}
+            </Text>
+          </View>
+        );
+      case "itmdsc":
+        return (
+          <View
+            key={propertyObj.name}
+            style={{ flexWrap: "wrap", flexDirection: "row", gap: 2 }}
+          >
+            <Text style={styles.label}>{propertyObj.label}:</Text>
+            <Text style={styles.textWrap}>
+              {selectedItem[propertyObj.name]}
+            </Text>
+          </View>
+        );
+      default:
+        break;
+    }
+    return (
+      <View key={propertyObj.name} style={styles.properties}>
+        <Text style={styles.label}>{propertyObj.label}:</Text>
+        <Text>
+          {propertyObj.name.includes("dte")
+            ? formatDateStringMMDDYYYY(selectedItem[propertyObj.name])
+            : selectedItem[propertyObj.name]}
+        </Text>
+      </View>
+    );
+  };
 
   if (selectedItem) {
     return (
@@ -63,22 +106,30 @@ const SelectModal = React.memo((props: SelectModalProps) => {
               <CustomLoadingText text="Processing..." visible={true} />
             )}
 
-            <View style={[shadows.boxShadow, styles.propertiesContainer]}>
-              {propertiesToShow.map((propertyObj) => (
-                <View key={propertyObj.name} style={styles.properties}>
-                  <Text style={styles.label}>{propertyObj.label}: </Text>
-                  <Text>{selectedItem[propertyObj.name]}</Text>
-                </View>
-              ))}
-            </View>
-
-            {loadingStatus && (
-              <ActivityIndicator size="large" color="#0000ff" />
+            {title == "BIN Inquiry Details" ? (
+              <View style={{ padding: 5 }}>
+                {propertiesToShow.map((propertyObj) =>
+                  binInquiryHeader(propertyObj)
+                )}
+              </View>
+            ) : (
+              <View style={[shadows.boxShadow, styles.propertiesContainer]}>
+                {propertiesToShow.map((propertyObj) => (
+                  <View key={propertyObj.name} style={styles.properties}>
+                    <Text style={styles.label}>{propertyObj.label}:</Text>
+                    <Text>{selectedItem[propertyObj.name]}</Text>
+                  </View>
+                ))}
+              </View>
             )}
 
-            <ScrollView style={styles.customContainer}>
-              {customContent}
-            </ScrollView>
+            {loadingStatus ? (
+              <ActivityIndicator size="large" color="#0000ff" />
+            ) : (
+              <ScrollView style={styles.customContainer}>
+                {customContent}
+              </ScrollView>
+            )}
           </View>
         </View>
       </Modal>
@@ -137,6 +188,10 @@ const styles = StyleSheet.create({
   },
   label: {
     fontWeight: "bold",
+  },
+  textWrap: {
+    flexWrap: "wrap",
+    paddingLeft: 15,
   },
 });
 

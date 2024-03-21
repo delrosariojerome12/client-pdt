@@ -1,7 +1,7 @@
-import {createAsyncThunk} from "@reduxjs/toolkit";
+import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import {RootState} from "../store";
-import {ScanCategory} from "../../models/generic/ScanCategory";
+import { RootState } from "../store";
+import { ScanCategory } from "../../models/generic/ScanCategory";
 export interface ScanDocumentParams {
   barcode: string;
   category: ScanCategory;
@@ -32,6 +32,7 @@ export interface ScanDocumentParams {
   linenum?: string;
   [key: string]: string | number | undefined;
 }
+
 interface BatchPayload {
   limit: number;
   offset: number;
@@ -87,15 +88,33 @@ interface BatchUpdate {
   onSuccess: () => void;
 }
 
+interface WarehousePayload {
+  limit: number;
+  offset: number;
+  paginating?: boolean;
+}
+
+interface ItemPayload {
+  limit: number;
+  offset: number;
+  paginating?: boolean;
+}
+
+interface BinNumPayload {
+  limit: number;
+  offset: number;
+  paginating?: boolean;
+}
+
 export const getDocument = createAsyncThunk(
   "general/getDocument",
   async (
-    {barcode, category}: ScanDocumentParams,
-    {rejectWithValue, getState}
+    { barcode, category }: ScanDocumentParams,
+    { rejectWithValue, getState }
   ) => {
     try {
       const state = getState() as RootState;
-      const {ipAddress, port, protocol} = state.auth.server;
+      const { ipAddress, port, protocol } = state.auth.server;
 
       const url = `${protocol}://${ipAddress}:${port}/api/scanBarcode/?barcode=${barcode}&category=${category}`;
 
@@ -112,12 +131,12 @@ export const getDocument = createAsyncThunk(
 export const getPutaway = createAsyncThunk(
   "general/getPutaway",
   async (
-    {category, limit, offset}: PutawayDetails,
-    {rejectWithValue, getState}
+    { category, limit, offset }: PutawayDetails,
+    { rejectWithValue, getState }
   ) => {
     try {
       const state = getState() as RootState;
-      const {ipAddress, port, protocol} = state.auth.server;
+      const { ipAddress, port, protocol } = state.auth.server;
 
       const url = `${protocol}://${ipAddress}:${port}/api/getPutawayTO/?category=${category}&limit=${limit}&offset=${offset}}`;
 
@@ -132,12 +151,12 @@ export const getPutaway = createAsyncThunk(
 
 export const connectToPHP = createAsyncThunk(
   "general/connectToPHP",
-  async (props: ConnectToPHPParams, {rejectWithValue, getState}) => {
+  async (props: ConnectToPHPParams, { rejectWithValue, getState }) => {
     const state = getState() as RootState;
     const {
-      user: {userDetails, sesid},
-      phpServer: {traccDomain, traccDirectory},
-      server: {ipAddress, port, protocol},
+      user: { userDetails, sesid },
+      phpServer: { traccDomain, traccDirectory },
+      server: { ipAddress, port, protocol },
     } = state.auth;
 
     const {
@@ -480,7 +499,7 @@ export const connectToPHP = createAsyncThunk(
 
       if (formattedResult.bool) {
         onSuccess();
-        return {formattedResult, dontShowSuccess};
+        return { formattedResult, dontShowSuccess };
       } else {
         if (formattedResult.msg) {
           function stripHtmlTags(html: any) {
@@ -527,12 +546,12 @@ export const connectToPHP = createAsyncThunk(
 export const getBatch = createAsyncThunk(
   "general/getBatch",
   async (
-    {limit, offset, paginating, itmcde}: BatchPayload,
-    {rejectWithValue, getState}
+    { limit, offset, paginating, itmcde }: BatchPayload,
+    { rejectWithValue, getState }
   ) => {
     try {
       const state = getState() as RootState;
-      const {ipAddress, port, protocol} = state.auth.server;
+      const { ipAddress, port, protocol } = state.auth.server;
 
       const url = `${protocol}://${ipAddress}:${port}/api/lst_tracc/batchfile?itmcde=${itmcde}&_limit=${limit}&_offset=${offset}`;
 
@@ -554,12 +573,12 @@ export const getBatch = createAsyncThunk(
 export const updateBatch = createAsyncThunk(
   "general/updateBatch",
   async (
-    {document, item, onSuccess}: BatchUpdate,
-    {rejectWithValue, getState}
+    { document, item, onSuccess }: BatchUpdate,
+    { rejectWithValue, getState }
   ) => {
     try {
       const state = getState() as RootState;
-      const {ipAddress, port, protocol} = state.auth.server;
+      const { ipAddress, port, protocol } = state.auth.server;
 
       const url1 = `${protocol}://${ipAddress}:${port}/api/lst_tracc/purchasetofile1`;
       const url2 = `${protocol}://${ipAddress}:${port}/api/lst_tracc/purchasetofile2`;
@@ -587,6 +606,77 @@ export const updateBatch = createAsyncThunk(
       };
     } catch (error: any) {
       console.log("mali:", error);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const getWarehouse = createAsyncThunk(
+  "general/getWarehouse",
+  async (
+    { limit, offset, paginating }: WarehousePayload,
+    { rejectWithValue, getState }
+  ) => {
+    try {
+      const state = getState() as RootState;
+      const { ipAddress, port, protocol } = state.auth.server;
+      const url = `${protocol}://${ipAddress}:${port}/api/lst_tracc/warehousefile2?warcde=nev2:%20null&warcdenum=nev2:%20null&warloccde=nev2:%20null&_limit=${limit}&_offset=${offset}`;
+      const response = await axios.get(url);
+
+      return {
+        data: response.data,
+        paginating: paginating,
+      };
+    } catch (error: any) {
+      console.log("error", error);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const getItem = createAsyncThunk(
+  "general/getItem",
+  async (
+    { limit, offset, paginating }: ItemPayload,
+    { rejectWithValue, getState }
+  ) => {
+    try {
+      const state = getState() as RootState;
+      const { ipAddress, port, protocol } = state.auth.server;
+
+      const url = `${protocol}://${ipAddress}:${port}/api/lst_tracc/itemfile?itmcde=nev2:%20null&_limit=${limit}&_offset=${offset}`;
+      const response = await axios.get(url);
+
+      return {
+        data: response.data,
+        paginating: paginating,
+      };
+    } catch (error: any) {
+      console.log("error", error);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const getBinNum = createAsyncThunk(
+  "general/getBinNum",
+  async (
+    { limit, offset, paginating }: BinNumPayload,
+    { rejectWithValue, getState }
+  ) => {
+    try {
+      const state = getState() as RootState;
+      const { ipAddress, port, protocol } = state.auth.server;
+
+      const url = `${protocol}://${ipAddress}:${port}/api/lst_tracc/binfile1?binnum=nev2:%20null&_limit=${limit}&_offset=${offset}`;
+      const response = await axios.get(url);
+
+      return {
+        data: response.data,
+        paginating: paginating,
+      };
+    } catch (error: any) {
+      console.log("error", error);
       return rejectWithValue(error.message);
     }
   }
