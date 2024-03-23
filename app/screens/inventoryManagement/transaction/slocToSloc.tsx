@@ -98,8 +98,6 @@ const SlocToSloc = React.memo(() => {
     return undefined;
   };
 
-  checkStatus();
-
   return (
     <>
       {status === "success" && !isSelectModal && !isScanModal && (
@@ -151,7 +149,6 @@ const SlocToSloc = React.memo(() => {
 
         {isSelectModal && (
           <SelectModal
-            // loadingStatus={slocDetails.status === "loading" && true}
             loadingStatus={checkStatus()}
             visible={isSelectModal}
             onClose={closeSelectModal}

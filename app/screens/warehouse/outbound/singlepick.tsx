@@ -36,7 +36,7 @@ const SinglePick = () => {
     singlepick,
     status,
     singlepickDetails,
-    isNotificationModal,
+    isScanItemModal,
   } = useOutboundHooks({
     page: "singlepick",
   });
@@ -57,6 +57,11 @@ const SinglePick = () => {
             onSelect={handleSelectModal}
             selectType="singlepick"
             buttonUses=""
+            loadingStatus={
+              singlepick.pkValidate.status === "loading" &&
+              !isScanItemModal &&
+              true
+            }
           />
         );
       case 1:
@@ -69,6 +74,7 @@ const SinglePick = () => {
             onPost={handlePost}
             buttonUses=""
             postType="inv-singlepick"
+            loadingStatus={singlepick.invPosting.status === "loading" && true}
           />
         );
       case 2:
@@ -81,6 +87,11 @@ const SinglePick = () => {
             onSelect={handleSelectModal}
             selectType="stg-validate"
             buttonUses=""
+            loadingStatus={
+              singlepick.stgValidate.status === "loading" &&
+              !isScanItemModal &&
+              true
+            }
           />
         );
       case 3:
@@ -93,6 +104,7 @@ const SinglePick = () => {
             onPost={handlePost}
             buttonUses=""
             postType="spl-singlepick"
+            loadingStatus={singlepick.splPosting.status === "loading" && true}
           />
         );
     }
@@ -109,8 +121,6 @@ const SinglePick = () => {
           speed={2500}
         />
       )}
-
-      {/* {isNotificationModal && <NotificationModal />} */}
 
       <View style={generalStyles.outerContainer}>
         <CustomButton
@@ -157,7 +167,11 @@ const SinglePick = () => {
 
           {isSelectModal && (
             <SelectModal
-              loadingStatus={singlepickDetails.status === "loading" && true}
+              loadingStatus={
+                singlepickDetails.status === "loading" &&
+                !isScanItemModal &&
+                true
+              }
               visible={isSelectModal}
               onClose={closeSelectModal}
               selectedItem={selectedDocument}

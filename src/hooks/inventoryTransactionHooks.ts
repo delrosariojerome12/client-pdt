@@ -20,8 +20,13 @@ export const useInventoryTransactionHooks = ({
     useAppSelector((state) => state.inventoryTransaction);
   const { status, statusText } = useAppSelector((state) => state.status);
   const { selectedDocument } = useAppSelector((state) => state.document);
-  const { isScanModal, isSelectModal, isTargetScanning, isSourceScanning } =
-    useAppSelector((state) => state.modal);
+  const {
+    isScanModal,
+    isSelectModal,
+    isTargetScanning,
+    isSourceScanning,
+    isScanBinModal,
+  } = useAppSelector((state) => state.modal);
 
   const dispatch = useAppDispatch();
   const [refreshing, setRefreshing] = useState(false);
@@ -294,5 +299,6 @@ export const useInventoryTransactionHooks = ({
     slocDetails,
     isSourceScanning,
     isTargetScanning,
+    isScanBinModal,
   };
 };

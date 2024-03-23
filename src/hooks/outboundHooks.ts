@@ -1,6 +1,6 @@
-import {useAppDispatch, useAppSelector} from "../store/store";
-import {useState, useEffect} from "react";
-import {ToastMessage} from "../helper/Toast";
+import { useAppDispatch, useAppSelector } from "../store/store";
+import { useState, useEffect } from "react";
+import { ToastMessage } from "../helper/Toast";
 import {
   getWTOOutboundPost,
   getWTOOutboundValid,
@@ -16,7 +16,7 @@ interface OutboundUse {
   page: "singlepick" | "wavepick" | "wto";
 }
 
-export const useOutboundHooks = ({page}: OutboundUse) => {
+export const useOutboundHooks = ({ page }: OutboundUse) => {
   const {
     singlepick,
     wavepick,
@@ -26,11 +26,10 @@ export const useOutboundHooks = ({page}: OutboundUse) => {
     stgDetails,
     singlepickDetails,
   } = useAppSelector((state) => state.outbound);
-  const {isScanModal, isSelectModal, isNotificationModal} = useAppSelector(
-    (state) => state.modal
-  );
-  const {selectedDocument} = useAppSelector((state) => state.document);
-  const {status, statusText} = useAppSelector((state) => state.status);
+  const { isScanModal, isSelectModal, isNotificationModal, isScanItemModal } =
+    useAppSelector((state) => state.modal);
+  const { selectedDocument } = useAppSelector((state) => state.document);
+  const { status, statusText } = useAppSelector((state) => state.status);
 
   const dispatch = useAppDispatch();
 
@@ -42,13 +41,13 @@ export const useOutboundHooks = ({page}: OutboundUse) => {
   const checkPageToLoad = () => {
     switch (page) {
       case "wto":
-        dispatch(getWTOOutboundValid({limit: 10, offset: 0}));
+        dispatch(getWTOOutboundValid({ limit: 10, offset: 0 }));
         break;
       case "wavepick":
-        dispatch(getWPTOValid({limit: 10, offset: 0}));
+        dispatch(getWPTOValid({ limit: 10, offset: 0 }));
         break;
       case "singlepick":
-        dispatch(getPKValidate({limit: 10, offset: 0}));
+        dispatch(getPKValidate({ limit: 10, offset: 0 }));
       // break;
     }
   };
@@ -226,13 +225,13 @@ export const useOutboundHooks = ({page}: OutboundUse) => {
         switch (activeIndex) {
           case 0:
           case null:
-            dispatch(getWTOOutboundValid({limit: 10, offset: 0})).then(() => {
+            dispatch(getWTOOutboundValid({ limit: 10, offset: 0 })).then(() => {
               setRefreshing(false);
               ToastMessage("Refresh Success", 1000);
             });
             break;
           case 1:
-            dispatch(getWTOOutboundPost({limit: 10, offset: 0})).then(() => {
+            dispatch(getWTOOutboundPost({ limit: 10, offset: 0 })).then(() => {
               setRefreshing(false);
               ToastMessage("Refresh Success", 1000);
             });
@@ -243,13 +242,13 @@ export const useOutboundHooks = ({page}: OutboundUse) => {
         switch (activeIndex) {
           case 0:
           case null:
-            dispatch(getWPTOValid({limit: 10, offset: 0})).then(() => {
+            dispatch(getWPTOValid({ limit: 10, offset: 0 })).then(() => {
               setRefreshing(false);
               ToastMessage("Refresh Success", 1000);
             });
             break;
           case 1:
-            dispatch(getWPTOPost({limit: 10, offset: 0})).then(() => {
+            dispatch(getWPTOPost({ limit: 10, offset: 0 })).then(() => {
               setRefreshing(false);
               ToastMessage("Refresh Success", 1000);
             });
@@ -260,25 +259,25 @@ export const useOutboundHooks = ({page}: OutboundUse) => {
         switch (activeIndex) {
           case 0:
           case null:
-            dispatch(getPKValidate({limit: 10, offset: 0})).then(() => {
+            dispatch(getPKValidate({ limit: 10, offset: 0 })).then(() => {
               setRefreshing(false);
               ToastMessage("Refresh Success", 1000);
             });
             break;
           case 1:
-            dispatch(getINVPosting({limit: 10, offset: 0})).then(() => {
+            dispatch(getINVPosting({ limit: 10, offset: 0 })).then(() => {
               setRefreshing(false);
               ToastMessage("Refresh Success", 1000);
             });
             break;
           case 2:
-            dispatch(getSTGValidate({limit: 10, offset: 0})).then(() => {
+            dispatch(getSTGValidate({ limit: 10, offset: 0 })).then(() => {
               setRefreshing(false);
               ToastMessage("Refresh Success", 1000);
             });
             break;
           case 3:
-            dispatch(getSPLPosting({limit: 10, offset: 0})).then(() => {
+            dispatch(getSPLPosting({ limit: 10, offset: 0 })).then(() => {
               setRefreshing(false);
               ToastMessage("Refresh Success", 1000);
             });
@@ -298,36 +297,36 @@ export const useOutboundHooks = ({page}: OutboundUse) => {
       case "wto":
         switch (activeIndex) {
           case 0:
-            dispatch(getWTOOutboundValid({limit: 10, offset: 0}));
+            dispatch(getWTOOutboundValid({ limit: 10, offset: 0 }));
             break;
           case 1:
-            dispatch(getWTOOutboundPost({limit: 10, offset: 0}));
+            dispatch(getWTOOutboundPost({ limit: 10, offset: 0 }));
             break;
         }
         break;
       case "wavepick":
         switch (activeIndex) {
           case 0:
-            dispatch(getWPTOValid({limit: 10, offset: 0}));
+            dispatch(getWPTOValid({ limit: 10, offset: 0 }));
             break;
           case 1:
-            dispatch(getWPTOPost({limit: 10, offset: 0}));
+            dispatch(getWPTOPost({ limit: 10, offset: 0 }));
             break;
         }
         break;
       case "singlepick":
         switch (activeIndex) {
           case 0:
-            dispatch(getPKValidate({limit: 10, offset: 0}));
+            dispatch(getPKValidate({ limit: 10, offset: 0 }));
             break;
           case 1:
-            dispatch(getINVPosting({limit: 10, offset: 0}));
+            dispatch(getINVPosting({ limit: 10, offset: 0 }));
             break;
           case 2:
-            dispatch(getSTGValidate({limit: 10, offset: 0}));
+            dispatch(getSTGValidate({ limit: 10, offset: 0 }));
             break;
           case 3:
-            dispatch(getSPLPosting({limit: 10, offset: 0}));
+            dispatch(getSPLPosting({ limit: 10, offset: 0 }));
             break;
         }
     }
@@ -345,7 +344,7 @@ export const useOutboundHooks = ({page}: OutboundUse) => {
   }, [activeIndex]);
 
   const handleScroll = (event: any) => {
-    const {layoutMeasurement, contentOffset, contentSize} = event.nativeEvent;
+    const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
 
     const bottomOffset = contentSize.height - layoutMeasurement.height;
     const currentOffset = contentOffset.y;
@@ -384,5 +383,6 @@ export const useOutboundHooks = ({page}: OutboundUse) => {
     handleIndexChange,
     wavepickDetails,
     singlepickDetails,
+    isScanItemModal,
   };
 };

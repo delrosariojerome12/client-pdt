@@ -86,6 +86,7 @@ const PTO = () => {
             selectType="pto"
             postType="pto"
             buttonUses="pto"
+            loadingStatus={pto.status === "loading" && !isScanItemModal && true}
           />
 
           {isScanModal && (
@@ -101,10 +102,12 @@ const PTO = () => {
 
           {isSelectModal && (
             <SelectModal
+              loadingStatus={
+                ptoDetails.status === "loading" && !isScanItemModal && true
+              }
               visible={isSelectModal}
               onClose={closeSelectModal}
               selectedItem={selectedDocument}
-              loadingStatus={ptoDetails.status === "loading" && true}
               title="Purchase Transfer Order Details"
               propertiesToShow={[
                 { name: "docnum", label: "Document Number" },

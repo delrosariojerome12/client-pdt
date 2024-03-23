@@ -9,12 +9,12 @@ import React from "react";
 import CustomButton from "../../../../src/components/forms/buttons/CustomButton";
 import CustomTable from "../../../../src/components/forms/table/CustomTable";
 import ScanModal from "../../../../src/components/modals/ScanModal";
-import {useDocumentHooks} from "../../../../src/hooks/documentHooks";
-import {generalStyles} from "../../../../src/styles/styles";
+import { useDocumentHooks } from "../../../../src/hooks/documentHooks";
+import { generalStyles } from "../../../../src/styles/styles";
 import SelectModal from "../../../../src/components/modals/SelectModal";
 import ItemsList from "../../../../src/components/list-holder/ItemsList";
 import SwitchButton from "../../../../src/components/forms/buttons/SwitchButton";
-import {useOutboundHooks} from "../../../../src/hooks/outboundHooks";
+import { useOutboundHooks } from "../../../../src/hooks/outboundHooks";
 import LoadingSpinner from "../../../../src/components/load-spinner/LoadingSpinner";
 import CustomLoadingText from "../../../../src/components/load-spinner/CustomLoadingText";
 import MessageToast from "../../../../src/components/message-toast/MessageToast";
@@ -36,11 +36,12 @@ const WavePick = () => {
     handleIndexChange,
     wavepickDetails,
     status,
+    isScanItemModal,
   } = useOutboundHooks({
     page: "wavepick",
   });
 
-  const {handleScanModal, handleSelectModal, closeSelectModal, handlePost} =
+  const { handleScanModal, handleSelectModal, closeSelectModal, handlePost } =
     useDocumentHooks();
 
   console.log("wave pick");
@@ -72,7 +73,7 @@ const WavePick = () => {
 
         <ScrollView
           style={generalStyles.innerContainer}
-          contentContainerStyle={{flexGrow: 1}}
+          contentContainerStyle={{ flexGrow: 1 }}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
@@ -88,6 +89,11 @@ const WavePick = () => {
               onSelect={handleSelectModal}
               selectType="wavepick"
               buttonUses="wavepick"
+              loadingStatus={
+                wavepick.validation.status === "loading" &&
+                !isScanItemModal &&
+                true
+              }
             />
           ) : (
             <CustomTable
@@ -98,6 +104,7 @@ const WavePick = () => {
               onPost={handlePost}
               buttonUses="wavepick"
               postType="wavepick"
+              loadingStatus={wavepick.forPosting.status === "loading" && true}
             />
           )}
 
@@ -114,12 +121,14 @@ const WavePick = () => {
 
           {isSelectModal && (
             <SelectModal
-              loadingStatus={wavepickDetails.status === "loading" && true}
+              loadingStatus={
+                wavepickDetails.status === "loading" && !isScanItemModal && true
+              }
               visible={isSelectModal}
               onClose={closeSelectModal}
               selectedItem={selectedDocument}
               title="Wave Pick List Details"
-              propertiesToShow={[{name: "docnum", label: "TO Number"}]}
+              propertiesToShow={[{ name: "docnum", label: "TO Number" }]}
               customContent={
                 <ItemsList uses="outbound" subcategory="wavepick" />
               }

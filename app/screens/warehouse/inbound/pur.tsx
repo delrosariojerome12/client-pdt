@@ -5,13 +5,13 @@ import {
   RefreshControl,
   ActivityIndicator,
 } from "react-native";
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import CustomButton from "../../../../src/components/forms/buttons/CustomButton";
 import CustomTable from "../../../../src/components/forms/table/CustomTable";
 import ScanModal from "../../../../src/components/modals/ScanModal";
-import {useDocumentHooks} from "../../../../src/hooks/documentHooks";
-import {generalStyles} from "../../../../src/styles/styles";
-import {useInboundHooks} from "../../../../src/hooks/inboundHooks";
+import { useDocumentHooks } from "../../../../src/hooks/documentHooks";
+import { generalStyles } from "../../../../src/styles/styles";
+import { useInboundHooks } from "../../../../src/hooks/inboundHooks";
 import LoadingSpinner from "../../../../src/components/load-spinner/LoadingSpinner";
 import MessageToast from "../../../../src/components/message-toast/MessageToast";
 import CustomLoadingText from "../../../../src/components/load-spinner/CustomLoadingText";
@@ -33,11 +33,7 @@ const PUR = () => {
     page: "pur",
   });
 
-  const {handleScanModal, handlePost} = useDocumentHooks();
-
-  // if (pur.status === "loading" && !refreshing && !isPaginating) {
-  //   return <LoadingSpinner />;
-  // }
+  const { handleScanModal, handlePost } = useDocumentHooks();
 
   console.log("PUR");
 
@@ -64,7 +60,7 @@ const PUR = () => {
 
         <ScrollView
           style={generalStyles.innerContainer}
-          contentContainerStyle={{flexGrow: 1}}
+          contentContainerStyle={{ flexGrow: 1 }}
           refreshControl={
             <RefreshControl refreshing={false} onRefresh={onRefresh} />
           }
@@ -79,6 +75,7 @@ const PUR = () => {
             isSelectDisable={true}
             postType="pur"
             buttonUses="pur"
+            loadingStatus={pur.status === "loading" && true}
           />
 
           {isScanModal && (

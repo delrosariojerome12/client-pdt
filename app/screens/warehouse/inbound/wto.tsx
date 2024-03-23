@@ -5,15 +5,15 @@ import {
   RefreshControl,
   ActivityIndicator,
 } from "react-native";
-import React, {useEffect} from "react";
+import React, { useEffect } from "react";
 import CustomButton from "../../../../src/components/forms/buttons/CustomButton";
 import CustomTable from "../../../../src/components/forms/table/CustomTable";
 import ScanModal from "../../../../src/components/modals/ScanModal";
-import {useDocumentHooks} from "../../../../src/hooks/documentHooks";
-import {generalStyles} from "../../../../src/styles/styles";
+import { useDocumentHooks } from "../../../../src/hooks/documentHooks";
+import { generalStyles } from "../../../../src/styles/styles";
 import SelectModal from "../../../../src/components/modals/SelectModal";
 import ItemsList from "../../../../src/components/list-holder/ItemsList";
-import {useInboundHooks} from "../../../../src/hooks/inboundHooks";
+import { useInboundHooks } from "../../../../src/hooks/inboundHooks";
 import LoadingSpinner from "../../../../src/components/load-spinner/LoadingSpinner";
 import CustomLoadingText from "../../../../src/components/load-spinner/CustomLoadingText";
 import MessageToast from "../../../../src/components/message-toast/MessageToast";
@@ -38,7 +38,7 @@ const WTO = () => {
     page: "wto",
   });
 
-  const {handleScanModal, handleSelectModal, closeSelectModal, handlePost} =
+  const { handleScanModal, handleSelectModal, closeSelectModal, handlePost } =
     useDocumentHooks();
 
   console.log("WTO");
@@ -69,7 +69,7 @@ const WTO = () => {
 
         <ScrollView
           style={generalStyles.innerContainer}
-          contentContainerStyle={{flexGrow: 1}}
+          contentContainerStyle={{ flexGrow: 1 }}
           refreshControl={
             <RefreshControl refreshing={false} onRefresh={onRefresh} />
           }
@@ -85,6 +85,7 @@ const WTO = () => {
             selectType="wto-inbound"
             postType="wto-inbound"
             buttonUses="wto-inbound"
+            loadingStatus={wto.status === "loading" && !isScanItemModal && true}
           />
 
           {isScanModal && (
@@ -103,11 +104,13 @@ const WTO = () => {
               visible={isSelectModal}
               onClose={closeSelectModal}
               selectedItem={selectedDocument}
-              loadingStatus={wtoDetails.status === "loading"}
+              loadingStatus={
+                wtoDetails.status === "loading" && !isScanItemModal && true
+              }
               title="Warehouse Transfer Order Details"
               propertiesToShow={[
-                {name: "docnum", label: "Document Number"},
-                {name: "intnum", label: "Intransit Number"},
+                { name: "docnum", label: "Document Number" },
+                { name: "intnum", label: "Intransit Number" },
               ]}
               customContent={
                 <ItemsList uses="inbound" subcategory="wto-inbound" />

@@ -9,9 +9,9 @@ import React from "react";
 import CustomButton from "../../../../src/components/forms/buttons/CustomButton";
 import CustomTable from "../../../../src/components/forms/table/CustomTable";
 import ScanModal from "../../../../src/components/modals/ScanModal";
-import {useDocumentHooks} from "../../../../src/hooks/documentHooks";
-import {generalStyles} from "../../../../src/styles/styles";
-import {useInboundHooks} from "../../../../src/hooks/inboundHooks";
+import { useDocumentHooks } from "../../../../src/hooks/documentHooks";
+import { generalStyles } from "../../../../src/styles/styles";
+import { useInboundHooks } from "../../../../src/hooks/inboundHooks";
 import LoadingSpinner from "../../../../src/components/load-spinner/LoadingSpinner";
 import MessageToast from "../../../../src/components/message-toast/MessageToast";
 import CustomLoadingText from "../../../../src/components/load-spinner/CustomLoadingText";
@@ -20,16 +20,12 @@ const tableHeaders = ["Date", "Document No.", "Intransit No.", ""];
 const tableVisibleProps = ["trndte", "docnum", "intnum"];
 
 const WHS = () => {
-  const {handleScroll, isPaginating, onRefresh, status, whs, isScanModal} =
+  const { handleScroll, isPaginating, onRefresh, status, whs, isScanModal } =
     useInboundHooks({
       page: "whs",
     });
 
-  const {handleScanModal, handlePost} = useDocumentHooks();
-
-  // if (whs.status === "loading" && !refreshing && !isPaginating) {
-  //   return <LoadingSpinner />;
-  // }
+  const { handleScanModal, handlePost } = useDocumentHooks();
 
   console.log("WHS");
 
@@ -51,7 +47,7 @@ const WHS = () => {
         />
         <ScrollView
           style={generalStyles.innerContainer}
-          contentContainerStyle={{flexGrow: 1}}
+          contentContainerStyle={{ flexGrow: 1 }}
           refreshControl={
             <RefreshControl refreshing={false} onRefresh={onRefresh} />
           }
@@ -66,6 +62,7 @@ const WHS = () => {
             isSelectDisable={true}
             buttonUses="whs"
             postType="whs"
+            loadingStatus={whs.status === "loading" && true}
           />
 
           {isScanModal && (

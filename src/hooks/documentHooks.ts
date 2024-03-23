@@ -817,8 +817,6 @@ export const useDocumentHooks = () => {
             usrnam: userDetails?.usrcde,
           });
 
-          console.log("uy nagana", slocResponse);
-
           if (slocResponse && slocResponse.data.sloc2_data) {
             dispatch(showQuantityField(true));
             !isQuantityFieldShown &&
@@ -855,7 +853,6 @@ export const useDocumentHooks = () => {
             fromspl: undefined,
             usrnam: userDetails?.usrcde,
           });
-          console.log("huy", slocBinResponse);
 
           if (slocBinResponse) {
             if (slocBinResponse.bool) {

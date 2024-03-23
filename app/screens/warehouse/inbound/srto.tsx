@@ -5,15 +5,15 @@ import {
   RefreshControl,
   ActivityIndicator,
 } from "react-native";
-import React, {useEffect} from "react";
+import React, { useEffect } from "react";
 import CustomButton from "../../../../src/components/forms/buttons/CustomButton";
 import CustomTable from "../../../../src/components/forms/table/CustomTable";
 import ScanModal from "../../../../src/components/modals/ScanModal";
-import {useDocumentHooks} from "../../../../src/hooks/documentHooks";
-import {generalStyles} from "../../../../src/styles/styles";
+import { useDocumentHooks } from "../../../../src/hooks/documentHooks";
+import { generalStyles } from "../../../../src/styles/styles";
 import SelectModal from "../../../../src/components/modals/SelectModal";
 import ItemsList from "../../../../src/components/list-holder/ItemsList";
-import {useInboundHooks} from "../../../../src/hooks/inboundHooks";
+import { useInboundHooks } from "../../../../src/hooks/inboundHooks";
 import LoadingSpinner from "../../../../src/components/load-spinner/LoadingSpinner";
 import CustomLoadingText from "../../../../src/components/load-spinner/CustomLoadingText";
 import MessageToast from "../../../../src/components/message-toast/MessageToast";
@@ -33,16 +33,13 @@ const SRTO = () => {
     selectedDocument,
     isScanItemModal,
     status,
+    srtoDetails,
   } = useInboundHooks({
     page: "srto",
   });
 
-  const {handleScanModal, handleSelectModal, closeSelectModal, handlePost} =
+  const { handleScanModal, handleSelectModal, closeSelectModal, handlePost } =
     useDocumentHooks();
-
-  // if (srto.status === "loading" && !refreshing && !isPaginating) {
-  //   return <LoadingSpinner />;
-  // }
 
   console.log("SRTO");
 
@@ -67,7 +64,7 @@ const SRTO = () => {
         />
         <ScrollView
           style={generalStyles.innerContainer}
-          contentContainerStyle={{flexGrow: 1}}
+          contentContainerStyle={{ flexGrow: 1 }}
           refreshControl={
             <RefreshControl refreshing={false} onRefresh={onRefresh} />
           }
@@ -82,6 +79,9 @@ const SRTO = () => {
             onSelect={handleSelectModal}
             selectType="srto"
             buttonUses="srto"
+            loadingStatus={
+              srto.status === "loading" && !isScanItemModal && true
+            }
           />
 
           {isScanModal && (
@@ -97,13 +97,16 @@ const SRTO = () => {
 
           {isSelectModal && (
             <SelectModal
+              loadingStatus={
+                srtoDetails.status === "loading" && !isScanItemModal && true
+              }
               visible={isSelectModal}
               onClose={closeSelectModal}
               selectedItem={selectedDocument}
               title="Sales Return Transfer Order Details"
               propertiesToShow={[
-                {name: "docnum", label: "TO Number"},
-                {name: "srtdocnum", label: "SRT Number"},
+                { name: "docnum", label: "TO Number" },
+                { name: "srtdocnum", label: "SRT Number" },
               ]}
               customContent={<ItemsList uses="inbound" subcategory="srto" />}
             />

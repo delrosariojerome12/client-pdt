@@ -34,6 +34,7 @@ const CycleCount = React.memo(() => {
     selectedDocument,
     cycleCountDetails,
     handleScroll,
+    isScanBinModal,
   } = useInventoryTransactionHooks({
     page: "cycleCount",
   });
@@ -47,6 +48,13 @@ const CycleCount = React.memo(() => {
   } = useDocumentHooks();
 
   console.log("cycle count");
+
+  const checkStatus = () => {
+    if (!isScanBinModal && cycleCountDetails.status === "loading") {
+      return true;
+    }
+    return undefined;
+  };
 
   return (
     <>
@@ -84,7 +92,7 @@ const CycleCount = React.memo(() => {
 
         {isSelectModal && (
           <SelectandScanModal
-            loadingStatus={cycleCountDetails.status === "loading" && true}
+            loadingStatus={checkStatus()}
             visible={isSelectModal}
             onClose={() => {
               closeSelectModal();
