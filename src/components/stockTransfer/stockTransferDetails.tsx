@@ -1,25 +1,25 @@
-import { View, Text, StyleSheet, TouchableOpacity, Modal } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import React from "react";
 import { FontAwesome } from "@expo/vector-icons";
 import CustomButton from "../forms/buttons/CustomButton";
 import { bgColors } from "../../styles/styles";
-import { useDocumentHooks } from "../../hooks/documentHooks";
-import { useAppSelector } from "../../store/store";
 import { format } from "../../styles/styles";
-import BinScanModal from "../modals/BinScanModal";
-import ScanModal from "../modals/ScanModal";
+import { Options } from "../list-holder/ItemsList";
+import { SLOCDetails } from "../../models/ims/SLOC";
+import { useBatchHooks } from "../../hooks/batchHooks";
+import { useModalHooks } from "../../hooks/modalHooks";
 
-interface SubConProps {
-  item: any;
+interface Items {
+  item: SLOCDetails;
+  options: Options;
 }
 
-const StockTransferDetails = (props: SubConProps) => {
-  const { isScanItemModal, isScanModal } = useAppSelector(
-    (state) => state.modal
-  );
-  const { handleItemScanModal, closeItemScanModal, handleScanModal } =
-    useDocumentHooks();
-  const { item } = props;
+const StockTransferDetails = React.memo((props: Items) => {
+  const { item, options } = props;
+  const { toggleSourceScanning, toggleTargetScanning } = useModalHooks();
+  const { removeScannedQuantity } = useBatchHooks();
+
+  console.log("stock tansfer details");
 
   return (
     <>
@@ -28,90 +28,92 @@ const StockTransferDetails = (props: SubConProps) => {
           <View style={styles.leftContainer}>
             <View style={format.twoRowText}>
               <Text style={{ fontWeight: "bold" }}>{`Line No:`}</Text>
-              <Text>{`1`}</Text>
+              <Text>{item.linenum}</Text>
             </View>
             <View style={format.twoRowText}>
               <Text style={{ fontWeight: "bold" }}>Item Code:</Text>
-              <Text>{` ${item.itemCode}`}</Text>
+              <Text>{`${item.itmcde}`}</Text>
             </View>
             <View style={format.twoRowText}>
               <Text style={{ fontWeight: "bold" }}>Description:</Text>
-              <Text>{` ${item.itemName}`}</Text>
+              <Text>{`${item.itmdsc}`}</Text>
             </View>
             <View style={format.twoRowText}>
               <Text style={{ fontWeight: "bold" }}>Source Bin No.:</Text>
-              <Text>{`1234`}</Text>
+              <Text>{`${item.binnum}`}</Text>
             </View>
             <View style={format.twoRowText}>
               <Text style={{ fontWeight: "bold" }}>Qty:</Text>
-              <Text>{` ${item.pieces}`}</Text>
+              <Text>{`${item.itmqty}`}</Text>
             </View>
             <View style={styles.remove}>
               <View style={format.twoRowText}>
                 <Text style={{ fontWeight: "bold" }}>Scanned Qty:</Text>
-                <Text>{` ${item.receiveQty}`}</Text>
+                <Text>{`${item.scanqty}`}</Text>
               </View>
               <TouchableOpacity
+                disabled={item.validate === 1 ? true : false}
+                style={item.validate === 1 ? { opacity: 0.5 } : {}}
                 onPress={() => {
-                  // removeScannedQuantity(item);
+                  removeScannedQuantity(item, "sloc");
                 }}
               >
                 <FontAwesome name="remove" size={24} color="black" />
               </TouchableOpacity>
             </View>
           </View>
+
           <View style={styles.rightContainer}>
-            {/* if validated */}
-            {/* <Text style={{fontWeight: "bold"}}>**VALIDATED**</Text> */}
+            {item.validate === 1 && (
+              <Text style={{ color: "red", fontWeight: "bold" }}>
+                **VALIDATED**
+              </Text>
+            )}
             <View style={format.twoRowText}>
               <Text style={{ fontWeight: "bold" }}>Batch No.:</Text>
-              <Text>{` ${item.batchNumber}`}</Text>
+              <Text>{`${item.batchnum || ""}`}</Text>
             </View>
             <View style={format.twoRowText}>
               <Text style={{ fontWeight: "bold" }}>Mfg. Date:</Text>
-              <Text>{` ${item.expDate}`}</Text>
+              <Text>{`${item.mfgdte || ""}`}</Text>
             </View>
             <View style={format.twoRowText}>
               <Text style={{ fontWeight: "bold" }}>Exp. Date:</Text>
-              <Text>{` ${item.mfgDate}`}</Text>
+              <Text>{`${item.expdte || ""}`}</Text>
             </View>
             <View style={format.twoRowText}>
               <Text style={{ fontWeight: "bold" }}>Target Bin No.:</Text>
-              <Text>{` ${item.mfgDate}`}</Text>
+              <Text>{`${item.binnum2 || ""}`}</Text>
             </View>
           </View>
         </View>
 
         <View style={styles.bottomContainer}>
-          {/* disable this two after using */}
           <CustomButton
-            onPress={() => handleItemScanModal(item)}
+            onPress={() => toggleSourceScanning(item)}
             title="SOURCE SCANNING"
             type="regular"
             isWidthNotFull={true}
             fontSize={12}
+            isDisable={
+              item.validate === 1 ? true : item.sourcescan ? false : true
+            }
           />
           <CustomButton
-            onPress={handleScanModal}
+            onPress={() => toggleTargetScanning(item)}
             title="TARGET SCANNING"
             type="regular"
             isWidthNotFull={true}
             fontSize={12}
+            isDisable={
+              item.validate === 1 ? true : item.targetscan ? false : true
+            }
           />
         </View>
       </View>
-      <BinScanModal visible={isScanItemModal} onClose={closeItemScanModal} />
-      <ScanModal
-        visible={isScanModal}
-        onClose={handleScanModal}
-        placeholder="Waiting to Scan Target Bin No. Barcode..."
-        scanParams="sloc"
-        typeForFetching="sloc"
-        usage="scanning"
-      />
     </>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -122,10 +124,8 @@ const styles = StyleSheet.create({
   topContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
     gap: 10,
     flex: 1,
-    // borderWidth: 1,
   },
   leftContainer: {
     gap: 5,

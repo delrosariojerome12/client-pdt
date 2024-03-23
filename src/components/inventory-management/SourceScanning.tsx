@@ -72,6 +72,8 @@ const OutboundItemScanModal = React.memo((props: ScanModalProps) => {
   };
 
   if (item) {
+    console.log("bkait", isQuantityFieldShown);
+
     return (
       <Modal
         visible={visible}

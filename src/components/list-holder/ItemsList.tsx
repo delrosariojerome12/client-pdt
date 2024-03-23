@@ -36,9 +36,10 @@ interface Props {
     | "inbound"
     | "outbound"
     | "subcon"
-    | "stockTransfer"
+    | "stock-transfer"
     | "physicalInventory"
     | "sloc";
+
   subcategory:
     | "pto"
     | "wto-inbound"
@@ -48,7 +49,8 @@ interface Props {
     | "singlepick"
     | "stg-validate"
     | "cyclecount"
-    | "sloc";
+    | "sloc"
+    | "stock-transfer";
 }
 
 const ItemsList = React.memo((props: Props) => {
@@ -66,11 +68,11 @@ const ItemsList = React.memo((props: Props) => {
   const { ptoDetails, srtoDetails, wtoDetails } = useAppSelector(
     (state) => state.inbound
   );
-  const { cycleCountDetails, slocDetails } = useAppSelector(
-    (state) => state.inventoryTransaction
-  );
+  const { cycleCountDetails, slocDetails, stockTransferDetails } =
+    useAppSelector((state) => state.inventoryTransaction);
   const { wtoOutboundDetails, wavepickDetails, singlepickDetails } =
     useAppSelector((state) => state.outbound);
+
   const renderItems = (
     item: any,
     index: number,
@@ -89,6 +91,7 @@ const ItemsList = React.memo((props: Props) => {
         </View>
       );
     }
+
     switch (uses) {
       case "inbound":
         return <PTODetails item={item} key={index} options={options} />;
@@ -96,14 +99,16 @@ const ItemsList = React.memo((props: Props) => {
         return <WTODetails item={item} key={index} options={options} />;
       case "subcon":
         return <SubConBinDetails item={item} key={index} />;
-      case "stockTransfer":
-        return <StockTransferDetails item={item} key={index} />;
       case "physicalInventory":
         return (
           <PhysicalInventoryDetails item={item} key={index} options={options} />
         );
       case "sloc":
         return <SlocDetails item={item} key={index} options={options} />;
+      case "stock-transfer":
+        return (
+          <StockTransferDetails item={item} key={index} options={options} />
+        );
       default:
         break;
     }
@@ -193,6 +198,10 @@ const ItemsList = React.memo((props: Props) => {
       case "sloc":
         return slocDetails.data.map((item: any, index: number) => {
           return renderItems(item, index, { removeType: "stg-validate" });
+        });
+      case "stock-transfer":
+        return stockTransferDetails.data.map((item: any, index: number) => {
+          return renderItems(item, index, { removeType: "stock-transfer" });
         });
     }
   };

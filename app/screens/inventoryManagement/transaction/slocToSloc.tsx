@@ -60,7 +60,10 @@ const SlocToSloc = React.memo(() => {
             buttonUses=""
             selectType="sloc"
             loadingStatus={
-              sloc.validation.status === "loading" && !refreshing && true
+              sloc.validation.status === "loading" &&
+              !refreshing &&
+              !isPaginating &&
+              true
             }
           />
         );
@@ -75,7 +78,10 @@ const SlocToSloc = React.memo(() => {
             buttonUses=""
             postType="sloc"
             loadingStatus={
-              sloc.validation.status === "loading" && !refreshing && true
+              sloc.forPosting.status === "loading" &&
+              !refreshing &&
+              !isPaginating &&
+              true
             }
           />
         );
@@ -156,7 +162,7 @@ const SlocToSloc = React.memo(() => {
             title="S.LOC to S.LOC Details"
             propertiesToShow={[
               { name: "docnum", label: "TO No." },
-              { name: "warcde", label: "DC-Marilao" },
+              { name: "warcde", label: "Warehouse" },
               { name: "warloccde2", label: "S.Loc To" },
               { name: "refnum", label: "SLOC Trans. No." },
               { name: "warcdenum", label: "Whs No. From" },

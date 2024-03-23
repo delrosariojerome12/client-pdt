@@ -36,6 +36,9 @@ const StockTransfer = React.memo(() => {
     handleIndexChange,
     handleScroll,
     stockTransfer,
+    stockTransferDetails,
+    isSourceScanning,
+    isTargetScanning,
   } = useInventoryTransactionHooks({
     page: "stockTransfer",
   });
@@ -57,9 +60,12 @@ const StockTransfer = React.memo(() => {
             onSelect={handleSelectModal}
             isPostDisable={true}
             buttonUses=""
-            selectType="pto"
+            selectType="stock-transfer"
             loadingStatus={
-              stockTransfer.validation.status === "loading" && true
+              stockTransfer.validation.status === "loading" &&
+              !refreshing &&
+              !isPaginating &&
+              true
             }
           />
         );
@@ -72,9 +78,12 @@ const StockTransfer = React.memo(() => {
             onPost={handlePost}
             isSelectDisable={true}
             buttonUses=""
-            postType="pto"
+            postType="stock-transfer"
             loadingStatus={
-              stockTransfer.forPosting.status === "loading" && true
+              stockTransfer.forPosting.status === "loading" &&
+              !refreshing &&
+              !isPaginating &&
+              true
             }
           />
         );
@@ -84,8 +93,17 @@ const StockTransfer = React.memo(() => {
     }
   };
 
-  console.log("Stock transfer");
-
+  console.log("Stock transfer", stockTransferDetails);
+  const checkStatus = () => {
+    if (
+      !isTargetScanning &&
+      !isSourceScanning &&
+      stockTransferDetails.status === "loading"
+    ) {
+      return true;
+    }
+    return undefined;
+  };
   return (
     <>
       {status === "success" && !isSelectModal && !isScanModal && (
@@ -131,25 +149,32 @@ const StockTransfer = React.memo(() => {
             onClose={handleScanModal}
             placeholder="Waiting to Scan TO. No."
             scanParams="bnt"
-            typeForFetching="pto"
+            typeForFetching="stock-transfer"
             usage="searching"
           />
         )}
 
         {isSelectModal && (
           <SelectModal
+            loadingStatus={checkStatus()}
             visible={isSelectModal}
             onClose={closeSelectModal}
             selectedItem={selectedDocument}
             title="Stock Transfer (BIN to BIN) Details"
             propertiesToShow={[
-              { name: "docnum", label: "Document Number" },
-              { name: "warehouse", label: "Warehouse" },
-              { name: "whsNo", label: "WHS No." },
-              { name: "btbNo", label: "BTB No." },
-              { name: "sLoc", label: "S.Loc" },
+              { name: "docnum", label: "TO No." },
+              { name: "warcde", label: "Warehouse" },
+              { name: "refnum", label: "SLOC Trans. No." },
+              { name: "warcdenum", label: "Whs No." },
+              { name: "btbnum", label: "BTB No." },
+              {
+                name: "warloccde",
+                label: "S.Loc.",
+              },
             ]}
-            customContent={<ItemsList uses="stockTransfer" subcategory="pto" />}
+            customContent={
+              <ItemsList uses="stock-transfer" subcategory="stock-transfer" />
+            }
           />
         )}
 

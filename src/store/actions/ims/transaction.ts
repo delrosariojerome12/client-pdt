@@ -192,3 +192,19 @@ export const getStockTransferPosting = createAsyncThunk(
     }
   }
 );
+export const getStockTransferDetails = createAsyncThunk(
+  "ims/getStockTransferDetails",
+  async ({ docnum }: FetchDocnumDetails, { rejectWithValue, getState }) => {
+    try {
+      const state = getState() as RootState;
+      const { ipAddress, port, protocol } = state.auth.server;
+      const url = `${protocol}://${ipAddress}:${port}/api/getBNTOutboundDetails?docnum=${docnum}&showpending=true&showscanned=true`;
+
+      const response = await axios.get(url);
+
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);

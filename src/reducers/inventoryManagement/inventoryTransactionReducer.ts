@@ -11,6 +11,7 @@ import {
   getCycleCountDetails,
   togglePendingAndScan,
   getSLOCDetails,
+  getStockTransferDetails,
 } from "../../store/actions/ims/transaction";
 
 interface Transaction {
@@ -46,6 +47,10 @@ interface Transaction {
     data: any[];
     status: "idle" | "loading" | "success" | "failed";
   };
+  stockTransferDetails: {
+    data: any[];
+    status: "idle" | "loading" | "success" | "failed";
+  };
 }
 
 const initialState: Transaction = {
@@ -69,6 +74,10 @@ const initialState: Transaction = {
     status: "idle",
   },
   slocDetails: {
+    data: [],
+    status: "idle",
+  },
+  stockTransferDetails: {
     data: [],
     status: "idle",
   },
@@ -224,6 +233,18 @@ const inventoryTransactionReducer = createSlice({
       })
       .addCase(getStockTransferPosting.rejected, (state, action) => {
         state.stockTransfer.forPosting.status = "failed";
+      });
+
+    builder
+      .addCase(getStockTransferDetails.pending, (state, action) => {
+        state.stockTransferDetails.status = "loading";
+      })
+      .addCase(getStockTransferDetails.fulfilled, (state, action) => {
+        state.stockTransferDetails.status = "success";
+        state.stockTransferDetails.data = action.payload.data;
+      })
+      .addCase(getStockTransferDetails.rejected, (state, action) => {
+        state.stockTransferDetails.status = "failed";
       });
   },
 });

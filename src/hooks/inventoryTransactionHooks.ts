@@ -16,8 +16,14 @@ interface InventoryTransaction {
 export const useInventoryTransactionHooks = ({
   page,
 }: InventoryTransaction) => {
-  const { cycle, sloc, stockTransfer, cycleCountDetails, slocDetails } =
-    useAppSelector((state) => state.inventoryTransaction);
+  const {
+    cycle,
+    sloc,
+    stockTransfer,
+    cycleCountDetails,
+    slocDetails,
+    stockTransferDetails,
+  } = useAppSelector((state) => state.inventoryTransaction);
   const { status, statusText } = useAppSelector((state) => state.status);
   const { selectedDocument } = useAppSelector((state) => state.document);
   const {
@@ -300,5 +306,6 @@ export const useInventoryTransactionHooks = ({
     isSourceScanning,
     isTargetScanning,
     isScanBinModal,
+    stockTransferDetails,
   };
 };

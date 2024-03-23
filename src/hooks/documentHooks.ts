@@ -38,6 +38,9 @@ import {
   getSLOCDetails,
   getSLOCValid,
   getSLOCPosting,
+  getStockTransferDetails,
+  getStockTransferPosting,
+  getStockTransferValid,
 } from "../store/actions/ims/transaction";
 import {
   handleBinItemDetails,
@@ -88,7 +91,8 @@ export type TypePost =
   | "inv-singlepick"
   | "spl-singlepick"
   | "cyclecount"
-  | "sloc";
+  | "sloc"
+  | "stock-transfer";
 
 export type ScanValidate =
   | "pto"
@@ -102,7 +106,8 @@ export type ScanValidate =
   | "stg-validate"
   | "cyclecount"
   | "sloc"
-  | "sloc-bin";
+  | "sloc-bin"
+  | "stock-transfer";
 
 export type TypeSelect =
   | "pto"
@@ -113,7 +118,8 @@ export type TypeSelect =
   | "singlepick"
   | "stg-validate"
   | "cyclecount"
-  | "sloc";
+  | "sloc"
+  | "stock-transfer";
 
 export interface SelectProps {
   type: TypeSelect;
@@ -181,6 +187,10 @@ export const useDocumentHooks = () => {
       case "sloc":
         dispatch(getSLOCDetails({ docnum: item.docnum }));
         break;
+      case "stock-transfer":
+        dispatch(getStockTransferDetails({ docnum: item.docnum }));
+        break;
+
       default:
         break;
     }
@@ -512,6 +522,9 @@ export const useDocumentHooks = () => {
           })
         );
         break;
+      case "stock-transfer":
+        break;
+
       default:
         alert("No api yet.");
         break;
@@ -869,6 +882,49 @@ export const useDocumentHooks = () => {
           }
 
           break;
+        case "stock-transfer":
+          const stResponse = await scanBarcode({
+            barcode,
+            category: "bnt_item",
+            scanlevel: scanlevel,
+            recid: selectedItem?.recid.toString(),
+            barcodelvl2: barcodelvl2,
+            docnum: selectedDocument.docnum,
+            pdtmanualqtyoutbound: receiveQty.toString(),
+            spl_docnum: undefined,
+            fromspl: undefined,
+            usrnam: userDetails?.usrcde,
+          });
+          console.log("eyuy", stResponse);
+          console.log(stResponse.data.btn2_data);
+
+          if (stResponse && stResponse.data.bnt2_data) {
+            dispatch(showQuantityField(true));
+            console.log("pumasok?");
+
+            !isQuantityFieldShown &&
+              dispatch(setStatusText(`Bin No. Successfully Scanned.`));
+            if (isQuantityFieldShown) {
+              dispatch(
+                getStockTransferValid({
+                  limit: 10,
+                  offset: 0,
+                })
+              );
+              dispatch(
+                getStockTransferDetails({ docnum: selectedDocument.docnum })
+              );
+              dispatch(setStatusText(`Item Successfully Scanned.`));
+              if (stResponse.data.sloc2_data[0]) {
+                dispatch(handleSetItem(stResponse.data.bnt2_data[0]));
+              }
+              if (stResponse.data.bnt2_data.length === 0) {
+                dispatch(setStatusText(`Item Successfully Scanned.`));
+                dispatch(handleSourceScanning());
+              }
+            }
+          }
+          break;
 
         default:
           alert("no api yet");
@@ -942,6 +998,8 @@ export const useDocumentHooks = () => {
             handleSelectModal({ item: slocResponse.data, type: uses });
           }
         }
+        break;
+      case "stock-transfer":
         break;
 
       default:
