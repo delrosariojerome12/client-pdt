@@ -5,17 +5,17 @@ import {
   ActivityIndicator,
   RefreshControl,
 } from "react-native";
-import React, {useEffect, useState} from "react";
-import {useAppSelector} from "../../../../src/store/store";
+import React, { useEffect, useState } from "react";
+import { useAppSelector } from "../../../../src/store/store";
 import CustomButton from "../../../../src/components/forms/buttons/CustomButton";
 import CustomTable from "../../../../src/components/forms/table/CustomTable";
 import ScanModal from "../../../../src/components/modals/ScanModal";
 import SelectModal from "../../../../src/components/modals/SelectModal";
-import {useDocumentHooks} from "../../../../src/hooks/documentHooks";
-import {generalStyles} from "../../../../src/styles/styles";
+import { useDocumentHooks } from "../../../../src/hooks/documentHooks";
+import { generalStyles } from "../../../../src/styles/styles";
 import ItemsList from "../../../../src/components/list-holder/ItemsList";
 import SwitchButton from "../../../../src/components/forms/buttons/SwitchButton";
-import {useInventoryTransactionHooks} from "../../../../src/hooks/inventoryTransactionHooks";
+import { useInventoryTransactionHooks } from "../../../../src/hooks/inventoryTransactionHooks";
 import MessageToast from "../../../../src/components/message-toast/MessageToast";
 import CustomLoadingText from "../../../../src/components/load-spinner/CustomLoadingText";
 
@@ -36,11 +36,14 @@ const SlocToSloc = React.memo(() => {
     handleIndexChange,
     handleScroll,
     selectedDocument,
+    slocDetails,
+    isSourceScanning,
+    isTargetScanning,
   } = useInventoryTransactionHooks({
     page: "sloc",
   });
 
-  const {handleScanModal, handleSelectModal, closeSelectModal, handlePost} =
+  const { handleScanModal, handleSelectModal, closeSelectModal, handlePost } =
     useDocumentHooks();
 
   const renderTables = () => {
@@ -54,8 +57,11 @@ const SlocToSloc = React.memo(() => {
             visibleProperties={tableVisibleProps}
             onSelect={handleSelectModal}
             isPostDisable={true}
-            buttonUses="pto"
-            selectType="pto"
+            buttonUses=""
+            selectType="sloc"
+            loadingStatus={
+              sloc.validation.status === "loading" && !refreshing && true
+            }
           />
         );
       case 1:
@@ -66,8 +72,11 @@ const SlocToSloc = React.memo(() => {
             visibleProperties={tableVisibleProps}
             onPost={handlePost}
             isSelectDisable={true}
-            buttonUses="pto"
-            postType="pto"
+            buttonUses=""
+            postType="sloc"
+            loadingStatus={
+              sloc.validation.status === "loading" && !refreshing && true
+            }
           />
         );
 
@@ -77,6 +86,19 @@ const SlocToSloc = React.memo(() => {
   };
 
   console.log("SLOC");
+
+  const checkStatus = () => {
+    if (
+      !isTargetScanning &&
+      !isSourceScanning &&
+      slocDetails.status === "loading"
+    ) {
+      return true;
+    }
+    return undefined;
+  };
+
+  checkStatus();
 
   return (
     <>
@@ -106,7 +128,7 @@ const SlocToSloc = React.memo(() => {
 
         <ScrollView
           style={generalStyles.innerContainer}
-          contentContainerStyle={{flexGrow: 1}}
+          contentContainerStyle={{ flexGrow: 1 }}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
@@ -122,22 +144,28 @@ const SlocToSloc = React.memo(() => {
             onClose={handleScanModal}
             placeholder="Waiting to Scan TO. No."
             scanParams="sloc"
-            typeForFetching="pto"
+            typeForFetching="sloc"
             usage="searching"
           />
         )}
 
         {isSelectModal && (
           <SelectModal
+            // loadingStatus={slocDetails.status === "loading" && true}
+            loadingStatus={checkStatus()}
             visible={isSelectModal}
             onClose={closeSelectModal}
             selectedItem={selectedDocument}
             title="S.LOC to S.LOC Details"
             propertiesToShow={[
-              {name: "docnum", label: "Document Number"},
-              {name: "intnum", label: "Other Number"},
+              { name: "docnum", label: "TO No." },
+              { name: "warcde", label: "DC-Marilao" },
+              { name: "warloccde2", label: "S.Loc To" },
+              { name: "refnum", label: "SLOC Trans. No." },
+              { name: "warcdenum", label: "Whs No. From" },
+              { name: "warcdenum2", label: "Whs To. From" },
             ]}
-            customContent={<ItemsList uses="inbound" subcategory="pto" />}
+            customContent={<ItemsList uses="sloc" subcategory="sloc" />}
           />
         )}
         {isPaginating && (

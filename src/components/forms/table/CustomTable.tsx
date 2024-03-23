@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   Text,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
 import { Table, Row, Rows } from "react-native-reanimated-table";
 import { generalStyles } from "../../../styles/styles";
@@ -25,6 +26,7 @@ interface TableProps {
   selectType?: TypeSelect;
   postType?: TypePost;
   buttonUses: ButtonUses;
+  loadingStatus?: boolean;
 }
 
 const CustomTable = (props: TableProps) => {
@@ -41,6 +43,7 @@ const CustomTable = (props: TableProps) => {
     selectType,
     postType,
     buttonUses,
+    loadingStatus,
   } = props;
 
   const correctButtonStatus = (rowData: any, buttonType: "post" | "select") => {
@@ -136,21 +139,6 @@ const CustomTable = (props: TableProps) => {
     );
   };
 
-  // const renderDataRows = () => {
-  //   const rowDataArray = tableData.map((rowData) => [
-  //     ...visibleProperties.map((prop) => rowData[prop]),
-  //     renderButtons(rowData),
-  //   ]);
-
-  //   return (
-  //     <Rows
-  //       data={rowDataArray}
-  //       style={styles.rows}
-  //       textStyle={styles.rowText}
-  //     />
-  //   );
-  // };
-
   const renderDataRows = () => {
     const rowDataArray = tableData.map((rowData) => {
       const formattedRowData = visibleProperties.map((prop) => {
@@ -174,6 +162,9 @@ const CustomTable = (props: TableProps) => {
 
   const renderTable = () => {
     if (tableData) {
+      if (loadingStatus) {
+        return <ActivityIndicator size="large" color="#0000ff" />;
+      }
       if (tableData.length > 0) {
         return (
           <Table borderStyle={{ borderWidth: 1, borderColor: "#C1C0B9" }}>

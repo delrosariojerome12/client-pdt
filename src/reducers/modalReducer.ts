@@ -1,4 +1,4 @@
-import {createSlice} from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 
 interface Modal {
   isScanModal: boolean;
@@ -13,6 +13,10 @@ interface Modal {
   isNotificationModal: boolean;
   notificationText: string;
   isScanBinModal: boolean;
+
+  // isSourceOps
+  isSourceScanning: boolean;
+  isTargetScanning: boolean;
 }
 
 const initialState: Modal = {
@@ -31,12 +35,21 @@ const initialState: Modal = {
 
   isSearchModal: false,
   searchModalContent: null,
+  isSourceScanning: false,
+  isTargetScanning: false,
 };
 
 const modalReducer = createSlice({
   name: "modal",
   initialState,
   reducers: {
+    handleTargetScanning: (state) => {
+      state.isTargetScanning = !state.isTargetScanning;
+    },
+    handleSourceScanning: (state) => {
+      state.isSourceScanning = !state.isSourceScanning;
+    },
+
     handleToggleNotificationModal: (state) => {
       state.isNotificationModal = !state.isNotificationModal;
     },
@@ -97,6 +110,8 @@ export const {
   handleToggleSearchBatchModal,
   handleToggleOutboundItemScan,
   handleToggleScanBinModal,
+  handleSourceScanning,
+  handleTargetScanning,
 } = modalReducer.actions;
 
 export default modalReducer.reducer;

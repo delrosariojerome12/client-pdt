@@ -1,26 +1,27 @@
-import {View, Text, StyleSheet, TouchableOpacity} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import React from "react";
-import {FontAwesome} from "@expo/vector-icons";
+import { FontAwesome } from "@expo/vector-icons";
 import CustomButton from "../forms/buttons/CustomButton";
-import {bgColors} from "../../styles/styles";
-import {useDocumentHooks} from "../../hooks/documentHooks";
-import {format} from "../../styles/styles";
-import {ProductData} from "../../models/generic/ProductData";
-import {useBatchHooks} from "../../hooks/batchHooks";
-import {formatDateStringMMDDYYYY} from "../../helper/Date";
-import {Options} from "../list-holder/ItemsList";
+import { bgColors } from "../../styles/styles";
+import { useDocumentHooks } from "../../hooks/documentHooks";
+import { format } from "../../styles/styles";
+import { ProductData } from "../../models/generic/ProductData";
+import { useBatchHooks } from "../../hooks/batchHooks";
+import { formatDateStringMMDDYYYY } from "../../helper/Date";
+import { Options } from "../list-holder/ItemsList";
 
 interface Items {
   item: ProductData;
   options: Options;
 }
 const PTODetails = React.memo((props: Items) => {
-  const {handleItemScanModal} = useDocumentHooks();
-  const {handleAddBatchModal, handleEditBatchModal, removeScannedQuantity} =
+  const { handleItemScanModal } = useDocumentHooks();
+  const { handleAddBatchModal, handleEditBatchModal, removeScannedQuantity } =
     useBatchHooks();
-  const {item, options} = props;
+  const { item, options } = props;
 
-  console.log("hello");
+  console.log("pto details");
+
   return (
     <>
       <View style={[styles.container, bgColors.mediumGrayishBG]}>
@@ -66,8 +67,8 @@ const PTODetails = React.memo((props: Items) => {
 
         <View style={styles.rightContainer}>
           {!options?.removeLpn && (
-            <View style={{flexDirection: "row", gap: 5}}>
-              <Text style={{fontWeight: "bold"}}>LPN: </Text>
+            <View style={{ flexDirection: "row", gap: 5 }}>
+              <Text style={{ fontWeight: "bold" }}>LPN: </Text>
               <Text>{`${item.lpnnum}`}</Text>
             </View>
           )}
@@ -76,22 +77,22 @@ const PTODetails = React.memo((props: Items) => {
             <View
               style={
                 options.receivedQty
-                  ? {flexWrap: "wrap"}
-                  : {flexWrap: "wrap", width: "80%"}
+                  ? { flexWrap: "wrap" }
+                  : { flexWrap: "wrap", width: "80%" }
               }
             >
               <View style={format.twoRowText}>
-                <Text style={{fontWeight: "bold"}}>Batch No.:</Text>
+                <Text style={{ fontWeight: "bold" }}>Batch No.:</Text>
                 <Text>{` ${item.batchnum || "No BatchNo."}`}</Text>
               </View>
               <View style={format.twoRowText}>
-                <Text style={{fontWeight: "bold"}}>Mfg. Date:</Text>
+                <Text style={{ fontWeight: "bold" }}>Mfg. Date:</Text>
                 <Text>{` ${
                   formatDateStringMMDDYYYY(item.mfgdte as string) || "No Date"
                 } `}</Text>
               </View>
               <View style={format.twoRowText}>
-                <Text style={{fontWeight: "bold"}}>Exp. Date:</Text>
+                <Text style={{ fontWeight: "bold" }}>Exp. Date:</Text>
                 <Text>{` ${
                   formatDateStringMMDDYYYY(item.expdte as string) || "No Date"
                 }`}</Text>

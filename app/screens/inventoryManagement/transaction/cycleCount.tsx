@@ -5,20 +5,20 @@ import {
   ActivityIndicator,
   RefreshControl,
 } from "react-native";
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import CustomButton from "../../../../src/components/forms/buttons/CustomButton";
 import CustomTable from "../../../../src/components/forms/table/CustomTable";
 import ScanModal from "../../../../src/components/modals/ScanModal";
-import {useDocumentHooks} from "../../../../src/hooks/documentHooks";
-import {useAppSelector} from "../../../../src/store/store";
-import {generalStyles} from "../../../../src/styles/styles";
+import { useDocumentHooks } from "../../../../src/hooks/documentHooks";
+import { useAppSelector } from "../../../../src/store/store";
+import { generalStyles } from "../../../../src/styles/styles";
 import VerticalList from "../../../../src/components/list/verticalList";
 import ItemsList from "../../../../src/components/list-holder/ItemsList";
 import SelectModal from "../../../../src/components/modals/SelectModal";
 import SelectandScanModal from "../../../../src/components/modals/SelectandScanModal";
 import MessageToast from "../../../../src/components/message-toast/MessageToast";
 import CustomLoadingText from "../../../../src/components/load-spinner/CustomLoadingText";
-import {useInventoryTransactionHooks} from "../../../../src/hooks/inventoryTransactionHooks";
+import { useInventoryTransactionHooks } from "../../../../src/hooks/inventoryTransactionHooks";
 
 const CycleCount = React.memo(() => {
   const {
@@ -92,10 +92,10 @@ const CycleCount = React.memo(() => {
             selectedItem={selectedDocument}
             title="Cycle Count Details"
             propertiesToShow={[
-              {name: "docnum", label: "CCR No."},
-              {name: "warcde", label: "Warehouse"},
-              {name: "warcdenum", label: "Warehouse No."},
-              {name: "warloccde", label: "Storage Location"},
+              { name: "docnum", label: "CCR No." },
+              { name: "warcde", label: "Warehouse" },
+              { name: "warcdenum", label: "Warehouse No." },
+              { name: "warloccde", label: "Storage Location" },
             ]}
             customContent={
               <ItemsList uses="physicalInventory" subcategory="cyclecount" />
@@ -111,7 +111,7 @@ const CycleCount = React.memo(() => {
         )}
         <ScrollView
           style={generalStyles.innerContainer}
-          contentContainerStyle={{flexGrow: 1}}
+          contentContainerStyle={{ flexGrow: 1 }}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
@@ -124,12 +124,13 @@ const CycleCount = React.memo(() => {
             data={cycle.data}
             selectType="cyclecount"
             propertiesToShow={[
-              {name: "trndte", label: "Date"},
-              {name: "docnum", label: "CCR Number"},
-              {name: "warcde", label: "Warehouse"},
-              {name: "warcdenum", label: "Warehouse Number"},
-              {name: "warloccde", label: "Storage Location"},
+              { name: "trndte", label: "Date" },
+              { name: "docnum", label: "CCR Number" },
+              { name: "warcde", label: "Warehouse" },
+              { name: "warcdenum", label: "Warehouse Number" },
+              { name: "warloccde", label: "Storage Location" },
             ]}
+            loadingStatus={cycle.status === "loading" && true}
           />
         </ScrollView>
 

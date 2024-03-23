@@ -326,8 +326,6 @@ export const connectToPHP = createAsyncThunk(
         const cc_item: any = await axios.get(
           `${baseURl}/api/lst_tracc/cyclecountfile2?docnum=${docnum}&_includes=recid,uncounted,stritmqty`
         );
-        console.log("owww", cc_item.data);
-        console.log(recid);
 
         for (let value of cc_item.data) {
           let temp_obj: any = {};
@@ -342,8 +340,6 @@ export const connectToPHP = createAsyncThunk(
             arr_data.push(temp_obj);
           }
         }
-
-        console.log("eyy", arr_data);
 
         formData.append("xparams[event_action]", event_action);
         formData.append("xparams[docnum]", docnum);
@@ -517,8 +513,10 @@ export const connectToPHP = createAsyncThunk(
             .map((item, index) => `• Item Line ${index + 1}: ${item}`)
             .join("\n");
 
-          onFailure(formattedList);
-          return rejectWithValue(formattedList);
+          onFailure(formattedList || stripHtmlTags(formattedResult.msg));
+          return rejectWithValue(
+            formattedList || stripHtmlTags(formattedResult.msg)
+          );
         }
         if (formattedResult.errmsg) {
           onFailure(formattedResult.errmsg);
@@ -531,6 +529,11 @@ export const connectToPHP = createAsyncThunk(
             const errorMessages = formattedResult.pdtmsg[key];
             errorMessage += `\n${errorMessages.join(", ")}`;
           });
+          onFailure(errorMessage || formattedResult.msg);
+          return rejectWithValue(errorMessage);
+        }
+        if (formattedResult.msg) {
+          let errorMessage = "Something Went Wrong";
           onFailure(errorMessage || formattedResult.msg);
           return rejectWithValue(errorMessage);
         }

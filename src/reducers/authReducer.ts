@@ -26,7 +26,7 @@ interface AuthUser {
 
 const initialState: AuthUser = {
   user: { status: "logged-out", userDetails: null, sesid: "" },
-  server: { ipAddress: "192.168.1.10", port: 5901, protocol: "http" },
+  server: { ipAddress: "192.168.100.4", port: 5901, protocol: "http" },
   phpServer: {
     traccDirectory: "",
     traccDomain: "",

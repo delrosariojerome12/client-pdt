@@ -32,3 +32,23 @@ export interface SLOC {
   invmvmnttyp: string | null;
   recid: number;
 }
+export interface SLOCDetails {
+  batchnum: string | null;
+  binnum: string;
+  binnum2: string;
+  docnum: string;
+  expdte: string | null; // Assuming date format, change if needed
+  itmcde: string;
+  itmdsc: string;
+  itmqty: number;
+  linenum: number;
+  mfgdte: string | null; // Assuming date format, change if needed
+  recid: number;
+  reqbatchnum: boolean;
+  scanqty: number;
+  showscanqty: boolean;
+  sourcescan: boolean;
+  targetscan: boolean;
+  untmea: string;
+  validate: number;
+}

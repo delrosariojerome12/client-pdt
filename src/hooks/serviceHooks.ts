@@ -1,7 +1,7 @@
 import axios from "axios";
-import {useState} from "react";
-import {ToastMessage} from "../helper/Toast";
-import {useAppSelector} from "../store/store";
+import { useState } from "react";
+import { ToastMessage } from "../helper/Toast";
+import { useAppSelector } from "../store/store";
 
 interface ToastMessage {
   loading: string;
@@ -26,7 +26,7 @@ interface SendProps {
 
 export const useServiceHooks = () => {
   const {
-    server: {ipAddress, port, protocol},
+    server: { ipAddress, port, protocol },
   } = useAppSelector((state) => state.auth);
 
   const baseURl = `${protocol}://${ipAddress}:${port}`;

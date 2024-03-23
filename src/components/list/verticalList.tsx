@@ -72,44 +72,60 @@
 // });
 
 // export default VerticalList;
-import React, {useState} from "react";
-import {View, Text, RefreshControl} from "react-native";
+
+import React, { useState } from "react";
+import { View, Text, ActivityIndicator } from "react-native";
 import VerticalItem from "./item/verticalItem";
-import {TypeSelect} from "../../hooks/documentHooks";
-import {SelectProps} from "../../hooks/documentHooks";
-import {Feather} from "@expo/vector-icons"; // Import Feather icon from expo/vector-icons
+import { TypeSelect } from "../../hooks/documentHooks";
+import { SelectProps } from "../../hooks/documentHooks";
+import { Feather } from "@expo/vector-icons"; // Import Feather icon from expo/vector-icons
 
 interface VerticalListProps {
   data: any[];
-  propertiesToShow: {name: string; label: string}[]; // Array of property names and labels
-  onSelect?: ({item, type}: SelectProps) => void;
+  propertiesToShow: { name: string; label: string }[]; // Array of property names and labels
+  onSelect?: ({ item, type }: SelectProps) => void;
   onValidate: (item: any) => void;
   selectType?: TypeSelect;
+  loadingStatus?: boolean;
 }
 
 const VerticalList = React.memo((props: VerticalListProps) => {
-  const {data, propertiesToShow, onSelect, onValidate, selectType} = props;
+  const {
+    data,
+    propertiesToShow,
+    onSelect,
+    onValidate,
+    selectType,
+    loadingStatus,
+  } = props;
 
   const renderEmptyList = () => {
     return (
-      <View style={{flex: 1, alignItems: "center", justifyContent: "center"}}>
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
         <Feather name="alert-circle" size={30} color="black" />
-        <Text style={{marginTop: 10, fontSize: 18, fontWeight: "bold"}}>
+        <Text style={{ marginTop: 10, fontSize: 18, fontWeight: "bold" }}>
           No data available
         </Text>
       </View>
     );
   };
 
+  if (loadingStatus) {
+    return <ActivityIndicator size="large" color="#0000ff" />;
+  }
+
   return (
     <View>
       {data.length === 0
         ? renderEmptyList()
         : data.map((item, index) => {
-            const filteredItem = propertiesToShow.reduce((obj: any, {name}) => {
-              obj[name] = item[name];
-              return obj;
-            }, {});
+            const filteredItem = propertiesToShow.reduce(
+              (obj: any, { name }) => {
+                obj[name] = item[name];
+                return obj;
+              },
+              {}
+            );
 
             return (
               <VerticalItem
@@ -120,7 +136,7 @@ const VerticalList = React.memo((props: VerticalListProps) => {
                 onSelect={() => {
                   onSelect &&
                     selectType &&
-                    onSelect({item: item, type: selectType});
+                    onSelect({ item: item, type: selectType });
                 }}
               />
             );

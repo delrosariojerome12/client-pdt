@@ -1,7 +1,7 @@
-import {createSlice} from "@reduxjs/toolkit";
-import {CycleCount} from "../../models/ims/CycleCount";
-import {SLOC} from "../../models/ims/SLOC";
-import {StockTransfer} from "../../models/ims/StockTransfer";
+import { createSlice } from "@reduxjs/toolkit";
+import { CycleCount } from "../../models/ims/CycleCount";
+import { SLOC } from "../../models/ims/SLOC";
+import { StockTransfer } from "../../models/ims/StockTransfer";
 import {
   getCycleCount,
   getSLOCValid,
@@ -10,6 +10,7 @@ import {
   getStockTransferPosting,
   getCycleCountDetails,
   togglePendingAndScan,
+  getSLOCDetails,
 } from "../../store/actions/ims/transaction";
 
 interface Transaction {
@@ -18,7 +19,7 @@ interface Transaction {
     status: "idle" | "loading" | "success" | "failed";
   };
   cycleCountDetails: {
-    data: {data: any[]; totalItem: number; totalscanned: number};
+    data: { data: any[]; totalItem: number; totalscanned: number };
     status: "idle" | "loading" | "success" | "failed";
   };
   sloc: {
@@ -41,26 +42,34 @@ interface Transaction {
       status: "idle" | "loading" | "success" | "failed";
     };
   };
+  slocDetails: {
+    data: any[];
+    status: "idle" | "loading" | "success" | "failed";
+  };
 }
 
 const initialState: Transaction = {
-  cycle: {data: [], status: "idle"},
+  cycle: { data: [], status: "idle" },
   sloc: {
-    validation: {data: [], status: "idle"},
+    validation: { data: [], status: "idle" },
     forPosting: {
       data: [],
       status: "idle",
     },
   },
   stockTransfer: {
-    validation: {data: [], status: "idle"},
+    validation: { data: [], status: "idle" },
     forPosting: {
       data: [],
       status: "idle",
     },
   },
   cycleCountDetails: {
-    data: {data: [], totalItem: 0, totalscanned: 0},
+    data: { data: [], totalItem: 0, totalscanned: 0 },
+    status: "idle",
+  },
+  slocDetails: {
+    data: [],
     status: "idle",
   },
 };
@@ -76,7 +85,7 @@ const inventoryTransactionReducer = createSlice({
         state.cycle.status = "loading";
       })
       .addCase(getCycleCount.fulfilled, (state, action) => {
-        const {data, paginating} = action.payload;
+        const { data, paginating } = action.payload;
         if (paginating) {
           console.log("paginating");
           state.cycle.data = [...state.cycle.data, ...data];
@@ -120,7 +129,7 @@ const inventoryTransactionReducer = createSlice({
         state.sloc.validation.status = "loading";
       })
       .addCase(getSLOCValid.fulfilled, (state, action) => {
-        const {data, paginating} = action.payload;
+        const { data, paginating } = action.payload;
 
         if (paginating) {
           console.log("paginating");
@@ -143,7 +152,7 @@ const inventoryTransactionReducer = createSlice({
         state.sloc.forPosting.status = "loading";
       })
       .addCase(getSLOCPosting.fulfilled, (state, action) => {
-        const {data, paginating} = action.payload;
+        const { data, paginating } = action.payload;
         if (paginating) {
           console.log("paginating");
           state.sloc.forPosting.data = [
@@ -160,13 +169,25 @@ const inventoryTransactionReducer = createSlice({
         state.sloc.forPosting.status = "failed";
       });
 
+    builder
+      .addCase(getSLOCDetails.pending, (state, action) => {
+        state.slocDetails.status = "loading";
+      })
+      .addCase(getSLOCDetails.fulfilled, (state, action) => {
+        state.slocDetails.status = "success";
+        state.slocDetails.data = action.payload.data;
+      })
+      .addCase(getSLOCDetails.rejected, (state, action) => {
+        state.slocDetails.status = "failed";
+      });
+
     // Stock transfer
     builder
       .addCase(getStockTransferValid.pending, (state, action) => {
         state.stockTransfer.validation.status = "loading";
       })
       .addCase(getStockTransferValid.fulfilled, (state, action) => {
-        const {data, paginating} = action.payload;
+        const { data, paginating } = action.payload;
         if (paginating) {
           console.log("paginating");
           state.stockTransfer.validation.data = [
@@ -188,7 +209,7 @@ const inventoryTransactionReducer = createSlice({
         state.stockTransfer.forPosting.status = "loading";
       })
       .addCase(getStockTransferPosting.fulfilled, (state, action) => {
-        const {data, paginating} = action.payload;
+        const { data, paginating } = action.payload;
         if (paginating) {
           console.log("paginating");
           state.stockTransfer.forPosting.data = [

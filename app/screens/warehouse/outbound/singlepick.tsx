@@ -9,12 +9,12 @@ import React from "react";
 import CustomButton from "../../../../src/components/forms/buttons/CustomButton";
 import CustomTable from "../../../../src/components/forms/table/CustomTable";
 import ScanModal from "../../../../src/components/modals/ScanModal";
-import {useDocumentHooks} from "../../../../src/hooks/documentHooks";
-import {generalStyles} from "../../../../src/styles/styles";
+import { useDocumentHooks } from "../../../../src/hooks/documentHooks";
+import { generalStyles } from "../../../../src/styles/styles";
 import SelectModal from "../../../../src/components/modals/SelectModal";
 import ItemsList from "../../../../src/components/list-holder/ItemsList";
 import SwitchButton from "../../../../src/components/forms/buttons/SwitchButton";
-import {useOutboundHooks} from "../../../../src/hooks/outboundHooks";
+import { useOutboundHooks } from "../../../../src/hooks/outboundHooks";
 import LoadingSpinner from "../../../../src/components/load-spinner/LoadingSpinner";
 import CustomLoadingText from "../../../../src/components/load-spinner/CustomLoadingText";
 import MessageToast from "../../../../src/components/message-toast/MessageToast";
@@ -41,7 +41,7 @@ const SinglePick = () => {
     page: "singlepick",
   });
 
-  const {handleScanModal, handleSelectModal, closeSelectModal, handlePost} =
+  const { handleScanModal, handleSelectModal, closeSelectModal, handlePost } =
     useDocumentHooks();
 
   const renderTables = () => {
@@ -110,7 +110,7 @@ const SinglePick = () => {
         />
       )}
 
-      {isNotificationModal && <NotificationModal />}
+      {/* {isNotificationModal && <NotificationModal />} */}
 
       <View style={generalStyles.outerContainer}>
         <CustomButton
@@ -135,7 +135,7 @@ const SinglePick = () => {
 
         <ScrollView
           style={generalStyles.innerContainer}
-          contentContainerStyle={{flexGrow: 1}}
+          contentContainerStyle={{ flexGrow: 1 }}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }

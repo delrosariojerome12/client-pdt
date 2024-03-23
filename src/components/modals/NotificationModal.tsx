@@ -7,12 +7,12 @@ import {
   View,
   StyleSheet,
 } from "react-native";
-import {useAppSelector, useAppDispatch} from "../../store/store";
-import {handleToggleNotificationModal} from "../../reducers/modalReducer";
+import { useAppSelector, useAppDispatch } from "../../store/store";
+import { handleToggleNotificationModal } from "../../reducers/modalReducer";
 import HTML from "react-native-render-html";
 
 const NotificationModal = React.memo(() => {
-  const {isNotificationModal, notificationText} = useAppSelector(
+  const { isNotificationModal, notificationText } = useAppSelector(
     (state) => state.modal
   );
   const dispatch = useAppDispatch();
@@ -30,14 +30,14 @@ const NotificationModal = React.memo(() => {
           {/* <Text style={styles.message}>{notificationText}</Text> */}
           <ScrollView
             style={styles.htmlContainer}
-            contentContainerStyle={{flexGrow: 1}}
+            contentContainerStyle={{ flexGrow: 1 }}
           >
             <HTML
               source={{
                 html: notificationText,
               }}
               contentWidth={200}
-              baseStyle={{textAlign: "center"}}
+              baseStyle={{ textAlign: "center" }}
             />
           </ScrollView>
 

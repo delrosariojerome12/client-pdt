@@ -76,8 +76,6 @@ export const useAPIHooks = () => {
       spldocnum = "",
     } = props;
 
-    console.log(userDetails, sesid);
-
     if (!userDetails?.usrcde) {
       throw new Error("Missing Usercode");
     }
@@ -385,12 +383,15 @@ export const useAPIHooks = () => {
       const formattedResult = await response.json();
       console.log("sukli", formattedResult);
 
-      if (formattedResult.sofValMsg.length > 0) {
-        dispatch(handleToggleNotificationModal());
-        dispatch(handleSetNotificationText(formattedResult.sofValMsg));
-        return null;
-      }
       if (formattedResult.bool) {
+        if (
+          event_action == "post_docWPL" &&
+          formattedResult.sofValMsg.length > 0
+        ) {
+          dispatch(handleToggleNotificationModal());
+          dispatch(handleSetNotificationText(formattedResult.sofValMsg));
+          return null;
+        }
         console.log("connect php success");
         return formattedResult;
       } else {

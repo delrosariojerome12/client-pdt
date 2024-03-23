@@ -1,5 +1,5 @@
-import {useAppSelector, useAppDispatch} from "../store/store";
-import {Alert} from "react-native";
+import { useAppSelector, useAppDispatch } from "../store/store";
+import { Alert } from "react-native";
 import {
   getPTODetails,
   getPTO,
@@ -22,8 +22,8 @@ import {
   handleToggleEditBatchModal,
   handleToggleSearchBatchModal,
 } from "../reducers/modalReducer";
-import {handleSetBatchItem} from "../reducers/documentReducer";
-import {getBatch, updateBatch} from "../store/actions/generalActions";
+import { handleSetBatchItem } from "../reducers/documentReducer";
+import { getBatch, updateBatch } from "../store/actions/generalActions";
 import {
   setMfgDate,
   setBatchNo,
@@ -36,24 +36,27 @@ import {
   togglePendingAndScan,
   getCycleCountDetails,
   getCycleCount,
+  getSLOCValid,
+  getSLOCDetails,
 } from "../store/actions/ims/transaction";
-import {useDocumentHooks} from "./documentHooks";
-import {formatDateYYYYMMDD} from "../helper/Date";
-import {setStatus, setStatusText} from "../reducers/statusReducer";
-import {useAPIHooks} from "./apiHooks";
-import {TypeSelect} from "./documentHooks";
+import { useDocumentHooks } from "./documentHooks";
+import { formatDateYYYYMMDD } from "../helper/Date";
+import { setStatus, setStatusText } from "../reducers/statusReducer";
+import { useAPIHooks } from "./apiHooks";
+import { TypeSelect } from "./documentHooks";
 
 type Uses = "update" | "create";
 
 export const useBatchHooks = () => {
-  const {selectedBatchItem, selectedDocument, selectedBinDetails} =
+  const { selectedBatchItem, selectedDocument, selectedBinDetails } =
     useAppSelector((state) => state.document);
   const {
-    batchDetails: {batchNo, expDate, mfgDate, batchedSaved},
+    batchDetails: { batchNo, expDate, mfgDate, batchedSaved },
   } = useAppSelector((state) => state.general);
   const dispatch = useAppDispatch();
-  const {handlePost} = useDocumentHooks();
-  const {connectToPHPNotDispatch, removeScannedQuantityService} = useAPIHooks();
+  const { handlePost } = useDocumentHooks();
+  const { connectToPHPNotDispatch, removeScannedQuantityService } =
+    useAPIHooks();
 
   // on remove then load
   const checkDetailsToReload = (detailsToLoad: TypeSelect) => {
@@ -61,36 +64,41 @@ export const useBatchHooks = () => {
 
     switch (detailsToLoad) {
       case "pto":
-        dispatch(getPTODetails({docnum: selectedDocument.docnum}));
-        dispatch(getPTO({limit: 10, offset: 0}));
+        dispatch(getPTODetails({ docnum: selectedDocument.docnum }));
+        dispatch(getPTO({ limit: 10, offset: 0 }));
         break;
       case "wto-inbound":
-        dispatch(getWTODetails({docnum: selectedDocument.docnum}));
-        dispatch(getWTO({limit: 10, offset: 0}));
+        dispatch(getWTODetails({ docnum: selectedDocument.docnum }));
+        dispatch(getWTO({ limit: 10, offset: 0 }));
         break;
       case "wto-outbound":
-        dispatch(getWTOOutboundDetails({docnum: selectedDocument.docnum}));
-        dispatch(getWTOOutboundValid({limit: 10, offset: 0}));
+        dispatch(getWTOOutboundDetails({ docnum: selectedDocument.docnum }));
+        dispatch(getWTOOutboundValid({ limit: 10, offset: 0 }));
         break;
       case "srto":
-        dispatch(getSRTODetails({docnum: selectedDocument.docnum}));
-        dispatch(getSRTO({limit: 10, offset: 0}));
+        dispatch(getSRTODetails({ docnum: selectedDocument.docnum }));
+        dispatch(getSRTO({ limit: 10, offset: 0 }));
         break;
       case "wavepick":
-        dispatch(getWPTOValid({limit: 10, offset: 0}));
-        dispatch(getWPTODetails({docnum: selectedDocument.docnum}));
+        dispatch(getWPTOValid({ limit: 10, offset: 0 }));
+        dispatch(getWPTODetails({ docnum: selectedDocument.docnum }));
         break;
       case "singlepick":
-        dispatch(getWPTODetails({docnum: selectedDocument.docnum}));
-        dispatch(getPKValidate({limit: 10, offset: 0}));
+        dispatch(getWPTODetails({ docnum: selectedDocument.docnum }));
+        dispatch(getPKValidate({ limit: 10, offset: 0 }));
         break;
       case "stg-validate":
-        dispatch(getSTGValidate({limit: 10, offset: 0}));
-        dispatch(getSTGValidateDetails({docnum: selectedDocument.docnum}));
+        dispatch(getSTGValidate({ limit: 10, offset: 0 }));
+        dispatch(getSTGValidateDetails({ docnum: selectedDocument.docnum }));
         break;
       case "cyclecount":
-        dispatch(getCycleCount({limit: 10, offset: 0}));
-        dispatch(getCycleCountDetails({docnum: selectedDocument.docnum}));
+        dispatch(getCycleCount({ limit: 10, offset: 0 }));
+        dispatch(getCycleCountDetails({ docnum: selectedDocument.docnum }));
+        break;
+      case "sloc":
+        dispatch(getSLOCValid({ limit: 10, offset: 0 }));
+        dispatch(getSLOCDetails({ docnum: selectedDocument.docnum }));
+
         break;
 
       default:
@@ -113,16 +121,16 @@ export const useBatchHooks = () => {
             method: "PATCH",
             url: `lst_tracc/purchasetofile1`,
             payload: {
-              data: {doclock: "Y", pdtopen: "Y"},
-              field: {docnum: selectedDocument.docnum},
+              data: { doclock: "Y", pdtopen: "Y" },
+              field: { docnum: selectedDocument.docnum },
             },
           },
           {
             method: "PATCH",
             url: `lst_tracc/purchasetofile2`,
             payload: {
-              data: {itmqty: 0},
-              field: {recid: item.recid},
+              data: { itmqty: 0 },
+              field: { recid: item.recid },
             },
           },
           {
@@ -338,10 +346,37 @@ export const useBatchHooks = () => {
             dispatch(setStatusText(`Scanned Quantity Removed Successfully.`));
           }
         );
-        console.log(ccResponse);
-
         break;
-
+      case "sloc":
+        if (item.validated === 1) {
+          Alert.alert(
+            "Removing Quantity",
+            "Cannot Remove quantity of already validated item."
+          );
+          return;
+        }
+        const slocEndpoints: Endpoint[] = [
+          {
+            method: "PATCH",
+            url: `lst_tracc/storagelocationtransferfile2b`,
+            payload: {
+              field: {
+                recid: item.recid,
+              },
+              data: {
+                scanqty: 0,
+              },
+            },
+          },
+        ];
+        const slocResponse = await removeScannedQuantityService(
+          slocEndpoints,
+          () => {
+            checkDetailsToReload(uses);
+            dispatch(setStatusText(`Scanned Quantity Removed Successfully.`));
+          }
+        );
+        break;
       default:
         alert("Remove not supported");
         break;
@@ -401,8 +436,8 @@ export const useBatchHooks = () => {
             dispatch(
               updateBatch({
                 document: {
-                  data: {doclock: "Y", pdtopen: "Y"},
-                  field: {docnum: selectedDocument.docnum},
+                  data: { doclock: "Y", pdtopen: "Y" },
+                  field: { docnum: selectedDocument.docnum },
                 },
                 item: {
                   field: {
@@ -421,13 +456,13 @@ export const useBatchHooks = () => {
                     )
                   );
                   handleCloseEditBatchModal();
-                  dispatch(getPTODetails({docnum: selectedDocument.docnum}));
+                  dispatch(getPTODetails({ docnum: selectedDocument.docnum }));
                 },
               })
             );
           },
         },
-        {text: "No", style: "cancel"},
+        { text: "No", style: "cancel" },
       ]
     );
   };
@@ -446,7 +481,7 @@ export const useBatchHooks = () => {
           },
           style: "destructive",
         },
-        {text: "No", style: "cancel"},
+        { text: "No", style: "cancel" },
       ]
     );
   };

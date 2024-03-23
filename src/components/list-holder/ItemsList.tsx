@@ -1,6 +1,6 @@
-import {View, Text, StyleSheet} from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import React from "react";
-import {useAppSelector} from "../../store/store";
+import { useAppSelector } from "../../store/store";
 import PTODetails from "../inbound/PTODetails";
 import WTODetails from "../outbound/wtoDetails";
 import SubConBinDetails from "../inventory-management/subConBinDetails";
@@ -10,8 +10,11 @@ import AddBatchModal from "../modals/AddBatchModal";
 import EditBatchModal from "../modals/EditBatchModal";
 import ItemScanModal from "../modals/ItemScanModal";
 import OutboundItemScanModal from "../modals/outbound/OutboundItemScanModal";
-import {TypeSelect} from "../../hooks/documentHooks";
-import {Feather} from "@expo/vector-icons"; // Import Feather icon from expo/vector-icons
+import { TypeSelect } from "../../hooks/documentHooks";
+import { Feather } from "@expo/vector-icons"; // Import Feather icon from expo/vector-icons
+import SlocDetails from "../inventory-management/SlocDetails";
+import TargetScanning from "../inventory-management/TargetScanning";
+import SourceScanning from "../inventory-management/SourceScanning";
 
 export type Options = {
   removeEdit?: boolean;
@@ -34,7 +37,8 @@ interface Props {
     | "outbound"
     | "subcon"
     | "stockTransfer"
-    | "physicalInventory";
+    | "physicalInventory"
+    | "sloc";
   subcategory:
     | "pto"
     | "wto-inbound"
@@ -43,7 +47,8 @@ interface Props {
     | "wavepick"
     | "singlepick"
     | "stg-validate"
-    | "cyclecount";
+    | "cyclecount"
+    | "sloc";
 }
 
 const ItemsList = React.memo((props: Props) => {
@@ -52,18 +57,19 @@ const ItemsList = React.memo((props: Props) => {
     isAddBatchModal,
     isEditBatchModal,
     isOutboundItemScan,
-    isScanBinModal,
+    isSourceScanning,
+    isTargetScanning,
   } = useAppSelector((state) => state.modal);
 
-  const {uses, subcategory} = props;
-  const {selectedDocument} = useAppSelector((state) => state.document);
-  const {ptoDetails, srtoDetails, wtoDetails} = useAppSelector(
+  const { uses, subcategory } = props;
+  const { selectedDocument } = useAppSelector((state) => state.document);
+  const { ptoDetails, srtoDetails, wtoDetails } = useAppSelector(
     (state) => state.inbound
   );
-  const {cycleCountDetails} = useAppSelector(
+  const { cycleCountDetails, slocDetails } = useAppSelector(
     (state) => state.inventoryTransaction
   );
-  const {wtoOutboundDetails, wavepickDetails, singlepickDetails} =
+  const { wtoOutboundDetails, wavepickDetails, singlepickDetails } =
     useAppSelector((state) => state.outbound);
   const renderItems = (
     item: any,
@@ -73,9 +79,11 @@ const ItemsList = React.memo((props: Props) => {
   ) => {
     if (isEmpty) {
       return (
-        <View style={{flex: 1, alignItems: "center", justifyContent: "center"}}>
+        <View
+          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+        >
           <Feather name="alert-circle" size={30} color="black" />
-          <Text style={{marginTop: 10, fontSize: 18, fontWeight: "bold"}}>
+          <Text style={{ marginTop: 10, fontSize: 18, fontWeight: "bold" }}>
             No data available
           </Text>
         </View>
@@ -94,6 +102,8 @@ const ItemsList = React.memo((props: Props) => {
         return (
           <PhysicalInventoryDetails item={item} key={index} options={options} />
         );
+      case "sloc":
+        return <SlocDetails item={item} key={index} options={options} />;
       default:
         break;
     }
@@ -104,15 +114,15 @@ const ItemsList = React.memo((props: Props) => {
       case "pto":
         return {};
       case "wto-inbound":
-        return {receivedQty: "intqty"};
+        return { receivedQty: "intqty" };
       case "srto":
-        return {receivedQty: "srtqty"};
+        return { receivedQty: "srtqty" };
       case "wto-outbound":
         return {};
       case "stg-validate":
-        return {scanUsage: "barcode", showQuantity: true};
+        return { scanUsage: "barcode", showQuantity: true };
       case "cyclecount":
-        return {scanUsage: "barcode", showQuantity: true};
+        return { scanUsage: "barcode", showQuantity: true };
 
       default:
         return {};
@@ -120,14 +130,12 @@ const ItemsList = React.memo((props: Props) => {
   };
 
   const renderView = () => {
-    console.log("why", uses, subcategory);
-
     switch (uses) {
       case "inbound":
         switch (subcategory) {
           case "pto":
             return ptoDetails.data.map((item: any, index: number) => {
-              return renderItems(item, index, {removeType: "pto"});
+              return renderItems(item, index, { removeType: "pto" });
             });
           case "wto-inbound":
             return wtoDetails.data.map((item: any, index: number) => {
@@ -154,19 +162,19 @@ const ItemsList = React.memo((props: Props) => {
         switch (subcategory) {
           case "wto-outbound":
             return wtoOutboundDetails.data.map((item: any, index: number) => {
-              return renderItems(item, index, {removeType: "wto-outbound"});
+              return renderItems(item, index, { removeType: "wto-outbound" });
             });
           case "wavepick":
             return wavepickDetails.data.map((item: any, index: number) => {
-              return renderItems(item, index, {removeType: "wavepick"});
+              return renderItems(item, index, { removeType: "wavepick" });
             });
           case "singlepick":
             return singlepickDetails.data.map((item: any, index: number) => {
-              return renderItems(item, index, {removeType: "singlepick"});
+              return renderItems(item, index, { removeType: "singlepick" });
             });
           case "stg-validate":
             return singlepickDetails.data.map((item: any, index: number) => {
-              return renderItems(item, index, {removeType: "stg-validate"});
+              return renderItems(item, index, { removeType: "stg-validate" });
             });
         }
         break;
@@ -174,14 +182,18 @@ const ItemsList = React.memo((props: Props) => {
         switch (subcategory) {
           case "cyclecount":
             if (cycleCountDetails.data.data.length === 0) {
-              return renderItems({}, 0, {removeType: "cyclecount"}, true);
+              return renderItems({}, 0, { removeType: "cyclecount" }, true);
             }
             return cycleCountDetails.data.data.map(
               (item: any, index: number) => {
-                return renderItems(item, index, {removeType: "cyclecount"});
+                return renderItems(item, index, { removeType: "cyclecount" });
               }
             );
         }
+      case "sloc":
+        return slocDetails.data.map((item: any, index: number) => {
+          return renderItems(item, index, { removeType: "stg-validate" });
+        });
     }
   };
 
@@ -200,6 +212,20 @@ const ItemsList = React.memo((props: Props) => {
         {isOutboundItemScan && (
           <OutboundItemScanModal
             visible={isOutboundItemScan}
+            scanType={subcategory}
+            options={checkOptions()}
+          />
+        )}
+        {isSourceScanning && (
+          <SourceScanning
+            visible={isSourceScanning}
+            scanType={subcategory}
+            options={checkOptions()}
+          />
+        )}
+        {isTargetScanning && (
+          <TargetScanning
+            visible={isTargetScanning}
             scanType={subcategory}
             options={checkOptions()}
           />

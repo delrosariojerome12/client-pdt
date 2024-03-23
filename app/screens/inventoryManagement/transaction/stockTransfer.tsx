@@ -6,18 +6,18 @@ import {
   ActivityIndicator,
 } from "react-native";
 import React from "react";
-import {useAppSelector} from "../../../../src/store/store";
+import { useAppSelector } from "../../../../src/store/store";
 import CustomButton from "../../../../src/components/forms/buttons/CustomButton";
 import CustomTable from "../../../../src/components/forms/table/CustomTable";
 import ScanModal from "../../../../src/components/modals/ScanModal";
 import SelectModal from "../../../../src/components/modals/SelectModal";
-import {useDocumentHooks} from "../../../../src/hooks/documentHooks";
-import {generalStyles} from "../../../../src/styles/styles";
+import { useDocumentHooks } from "../../../../src/hooks/documentHooks";
+import { generalStyles } from "../../../../src/styles/styles";
 import ItemsList from "../../../../src/components/list-holder/ItemsList";
 import SwitchButton from "../../../../src/components/forms/buttons/SwitchButton";
 import MessageToast from "../../../../src/components/message-toast/MessageToast";
 import CustomLoadingText from "../../../../src/components/load-spinner/CustomLoadingText";
-import {useInventoryTransactionHooks} from "../../../../src/hooks/inventoryTransactionHooks";
+import { useInventoryTransactionHooks } from "../../../../src/hooks/inventoryTransactionHooks";
 
 const tableHeaders = ["TO. No.", "BTB No.", ""];
 
@@ -40,9 +40,9 @@ const StockTransfer = React.memo(() => {
     page: "stockTransfer",
   });
 
-  const {selectedDocument} = useAppSelector((state) => state.document);
+  const { selectedDocument } = useAppSelector((state) => state.document);
 
-  const {handleScanModal, handleSelectModal, closeSelectModal, handlePost} =
+  const { handleScanModal, handleSelectModal, closeSelectModal, handlePost } =
     useDocumentHooks();
 
   const renderTables = () => {
@@ -58,6 +58,9 @@ const StockTransfer = React.memo(() => {
             isPostDisable={true}
             buttonUses=""
             selectType="pto"
+            loadingStatus={
+              stockTransfer.validation.status === "loading" && true
+            }
           />
         );
       case 1:
@@ -70,6 +73,9 @@ const StockTransfer = React.memo(() => {
             isSelectDisable={true}
             buttonUses=""
             postType="pto"
+            loadingStatus={
+              stockTransfer.forPosting.status === "loading" && true
+            }
           />
         );
 
@@ -109,7 +115,7 @@ const StockTransfer = React.memo(() => {
 
         <ScrollView
           style={generalStyles.innerContainer}
-          contentContainerStyle={{flexGrow: 1}}
+          contentContainerStyle={{ flexGrow: 1 }}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
@@ -137,11 +143,11 @@ const StockTransfer = React.memo(() => {
             selectedItem={selectedDocument}
             title="Stock Transfer (BIN to BIN) Details"
             propertiesToShow={[
-              {name: "docnum", label: "Document Number"},
-              {name: "warehouse", label: "Warehouse"},
-              {name: "whsNo", label: "WHS No."},
-              {name: "btbNo", label: "BTB No."},
-              {name: "sLoc", label: "S.Loc"},
+              { name: "docnum", label: "Document Number" },
+              { name: "warehouse", label: "Warehouse" },
+              { name: "whsNo", label: "WHS No." },
+              { name: "btbNo", label: "BTB No." },
+              { name: "sLoc", label: "S.Loc" },
             ]}
             customContent={<ItemsList uses="stockTransfer" subcategory="pto" />}
           />

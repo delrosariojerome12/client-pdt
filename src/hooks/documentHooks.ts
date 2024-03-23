@@ -9,6 +9,8 @@ import {
   handleToggleAddBatchModal,
   handleToggleOutboundItemScan,
   handleToggleScanBinModal,
+  handleSourceScanning,
+  handleTargetScanning,
 } from "../reducers/modalReducer";
 import {
   getPTODetails,
@@ -33,6 +35,9 @@ import {
 import {
   getCycleCountDetails,
   getCycleCount,
+  getSLOCDetails,
+  getSLOCValid,
+  getSLOCPosting,
 } from "../store/actions/ims/transaction";
 import {
   handleBinItemDetails,
@@ -82,7 +87,8 @@ export type TypePost =
   | "wavepick"
   | "inv-singlepick"
   | "spl-singlepick"
-  | "cyclecount";
+  | "cyclecount"
+  | "sloc";
 
 export type ScanValidate =
   | "pto"
@@ -94,7 +100,9 @@ export type ScanValidate =
   | "wavepick"
   | "singlepick"
   | "stg-validate"
-  | "cyclecount";
+  | "cyclecount"
+  | "sloc"
+  | "sloc-bin";
 
 export type TypeSelect =
   | "pto"
@@ -104,7 +112,8 @@ export type TypeSelect =
   | "wavepick"
   | "singlepick"
   | "stg-validate"
-  | "cyclecount";
+  | "cyclecount"
+  | "sloc";
 
 export interface SelectProps {
   type: TypeSelect;
@@ -168,6 +177,9 @@ export const useDocumentHooks = () => {
         break;
       case "cyclecount":
         dispatch(getCycleCountDetails({ docnum: item.docnum }));
+        break;
+      case "sloc":
+        dispatch(getSLOCDetails({ docnum: item.docnum }));
         break;
       default:
         break;
@@ -314,20 +326,20 @@ export const useDocumentHooks = () => {
             type: "WTO_SOFTVAL",
             onSuccess: async () => {
               dispatch(setStatus("loading"));
-              console.log("loading muna");
+
               await connectToPHPNotDispatch({
                 recid: item.recid,
                 docnum: item.docnum,
                 type: "WTO_POST",
               });
-              console.log("dito sunod");
+
               dispatch(
                 getWTOOutboundPost({
                   limit: 10,
                   offset: 0,
                 })
               );
-              console.log("tapos na");
+
               dispatch(setStatus("success"));
             },
             onFailure: (e) => {
@@ -352,15 +364,12 @@ export const useDocumentHooks = () => {
             type: "VALIDATE_WPL",
             onSuccess: async () => {
               dispatch(setStatus("loading"));
-              console.log("loading muna");
               await connectToPHPNotDispatch({
                 recid: item.recid,
                 docnum: item.docnum,
                 type: "WPTO",
               });
-              console.log("dito sunod");
               dispatch(getWPTOValid({ limit: 10, offset: 0 }));
-              console.log("tapos na");
               dispatch(setStatus("success"));
             },
             onFailure: (e) => {
@@ -449,9 +458,7 @@ export const useDocumentHooks = () => {
             type: "CC",
             onSuccess: async () => {
               console.log("dafaq");
-              // dispatch(setStatus("loading"));
               dispatch(getCycleCount({ limit: 10, offset: 0 }));
-              // dispatch(setStatus("success"));
             },
             onFailure: (e) => {
               dispatch(resetStatus());
@@ -463,6 +470,45 @@ export const useDocumentHooks = () => {
                 },
               ]);
             },
+          })
+        );
+        break;
+      case "sloc":
+        dispatch(
+          connectToPHP({
+            recid: item.recid,
+            docnum: item.docnum,
+            type: "VALIDATE_SLOC",
+            onSuccess: async () => {
+              dispatch(setStatus("loading"));
+              const res = await connectToPHPNotDispatch({
+                recid: item.recid,
+                docnum: item.docnum,
+                type: "SLOC",
+              });
+              if (res) {
+                dispatch(
+                  getSLOCPosting({
+                    limit: 10,
+                    offset: 0,
+                  })
+                );
+                dispatch(setStatus("success"));
+              }
+            },
+            onFailure: (e) => {
+              console.log("wat", e);
+
+              dispatch(resetStatus());
+              Alert.alert("Transaction Posting Fail", `${e}`, [
+                {
+                  text: "Ok",
+                  onPress: () => {},
+                  style: "destructive",
+                },
+              ]);
+            },
+            dontShowSuccess: true,
           })
         );
         break;
@@ -611,6 +657,7 @@ export const useDocumentHooks = () => {
         case "wavepick":
         case "singlepick":
           if (barcodelvl2 !== "") {
+            console.log("why", barcodelvl2);
             dispatch(setStatus("loading"));
             const response = await connectToPHPNotDispatch({
               recid: selectedDocument.recid,
@@ -643,6 +690,7 @@ export const useDocumentHooks = () => {
             usrnam: userDetails?.usrcde,
             barcodelvl2: barcodelvl2,
           });
+
           if (wpResponse && wpResponse.data.wpto2_data) {
             dispatch(showQuantityField(true));
             !isQuantityFieldShown &&
@@ -755,6 +803,76 @@ export const useDocumentHooks = () => {
           }
 
           break;
+        case "sloc":
+          const slocResponse = await scanBarcode({
+            barcode,
+            category: "sloc_item",
+            scanlevel: scanlevel,
+            recid: selectedItem?.recid.toString(),
+            barcodelvl2: barcodelvl2,
+            docnum: selectedDocument.docnum,
+            pdtmanualqtyoutbound: receiveQty.toString(),
+            spl_docnum: undefined,
+            fromspl: undefined,
+            usrnam: userDetails?.usrcde,
+          });
+
+          console.log("uy nagana", slocResponse);
+
+          if (slocResponse && slocResponse.data.sloc2_data) {
+            dispatch(showQuantityField(true));
+            !isQuantityFieldShown &&
+              dispatch(setStatusText(`Bin No. Successfully Scanned.`));
+            if (isQuantityFieldShown) {
+              dispatch(
+                getSLOCValid({
+                  limit: 10,
+                  offset: 0,
+                })
+              );
+              dispatch(getSLOCDetails({ docnum: selectedDocument.docnum }));
+              dispatch(setStatusText(`Item Successfully Scanned.`));
+              if (slocResponse.data.sloc2_data[0]) {
+                dispatch(handleSetItem(slocResponse.data.sloc2_data[0]));
+              }
+              if (slocResponse.data.sloc2_data.length === 0) {
+                dispatch(setStatusText(`Item Successfully Scanned.`));
+                dispatch(handleSourceScanning());
+              }
+            }
+          }
+          break;
+        case "sloc-bin":
+          const slocBinResponse = await scanBarcode({
+            barcode,
+            category: "sloc_bin",
+            scanlevel: scanlevel,
+            recid: selectedItem?.recid.toString(),
+            barcodelvl2: barcodelvl2,
+            docnum: selectedDocument.docnum,
+            pdtmanualqtyoutbound: receiveQty.toString(),
+            spl_docnum: undefined,
+            fromspl: undefined,
+            usrnam: userDetails?.usrcde,
+          });
+          console.log("huy", slocBinResponse);
+
+          if (slocBinResponse) {
+            if (slocBinResponse.bool) {
+              dispatch(
+                getSLOCValid({
+                  limit: 10,
+                  offset: 0,
+                })
+              );
+              dispatch(getSLOCDetails({ docnum: selectedDocument.docnum }));
+              dispatch(setStatusText(`Item Successfully Va lidated.`));
+              dispatch(handleTargetScanning());
+            }
+          }
+
+          break;
+
         default:
           alert("no api yet");
           break;
@@ -762,7 +880,7 @@ export const useDocumentHooks = () => {
     }
   };
 
-  // search using barcode
+  // search using barcode for searching
   const checkScanBarcode = async (
     uses: ScanValidate,
     { barcode, category }: ScanDocumentParams
@@ -791,13 +909,9 @@ export const useDocumentHooks = () => {
         const spResponse = await scanBarcode({ barcode, category }, true);
         if (spResponse) {
           dispatch(handleToggleScanModal());
-          console.log("dito daapat");
-          console.log(spResponse.data);
-
           if (spResponse.data.for_posting_stg || spResponse.data.for_posting) {
             switch (spResponse.data.page) {
               case "WPL":
-                alert("eto na");
                 break;
               case "SPL":
                 handlePost({ item: spResponse.data, type: "spl-singlepick" });
@@ -817,11 +931,27 @@ export const useDocumentHooks = () => {
               break;
           }
         }
+        break;
+      case "sloc":
+        const slocResponse = await scanBarcode({ barcode, category }, true);
+        console.log("sloc shit", slocResponse.data);
+        dispatch(handleToggleScanModal());
+        if (slocResponse) {
+          if (slocResponse.data.for_posting) {
+            console.log("posting");
+            handlePost({ item: slocResponse.data, type: "sloc" });
+          } else {
+            dispatch(handleToggleScanModal());
+            handleSelectModal({ item: slocResponse.data, type: uses });
+          }
+        }
+        break;
 
       default:
         break;
     }
   };
+
   // end check categories and uses functions
 
   // start of  modals

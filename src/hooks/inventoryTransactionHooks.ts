@@ -1,6 +1,6 @@
-import {useAppDispatch, useAppSelector} from "../store/store";
-import {useState, useEffect} from "react";
-import {ToastMessage} from "../helper/Toast";
+import { useAppDispatch, useAppSelector } from "../store/store";
+import { useState, useEffect } from "react";
+import { ToastMessage } from "../helper/Toast";
 import {
   getCycleCount,
   getSLOCPosting,
@@ -13,13 +13,15 @@ interface InventoryTransaction {
   page: "cycleCount" | "sloc" | "stockTransfer";
 }
 
-export const useInventoryTransactionHooks = ({page}: InventoryTransaction) => {
-  const {cycle, sloc, stockTransfer, cycleCountDetails} = useAppSelector(
-    (state) => state.inventoryTransaction
-  );
-  const {status, statusText} = useAppSelector((state) => state.status);
-  const {selectedDocument} = useAppSelector((state) => state.document);
-  const {isScanModal, isSelectModal} = useAppSelector((state) => state.modal);
+export const useInventoryTransactionHooks = ({
+  page,
+}: InventoryTransaction) => {
+  const { cycle, sloc, stockTransfer, cycleCountDetails, slocDetails } =
+    useAppSelector((state) => state.inventoryTransaction);
+  const { status, statusText } = useAppSelector((state) => state.status);
+  const { selectedDocument } = useAppSelector((state) => state.document);
+  const { isScanModal, isSelectModal, isTargetScanning, isSourceScanning } =
+    useAppSelector((state) => state.modal);
 
   const dispatch = useAppDispatch();
   const [refreshing, setRefreshing] = useState(false);
@@ -252,7 +254,7 @@ export const useInventoryTransactionHooks = ({page}: InventoryTransaction) => {
   }, [activeIndex]);
 
   const handleScroll = (event: any) => {
-    const {layoutMeasurement, contentOffset, contentSize} = event.nativeEvent;
+    const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
 
     const bottomOffset = contentSize.height - layoutMeasurement.height;
     const currentOffset = contentOffset.y;
@@ -289,5 +291,8 @@ export const useInventoryTransactionHooks = ({page}: InventoryTransaction) => {
     checkPageToPaginate,
     selectedDocument,
     cycleCountDetails,
+    slocDetails,
+    isSourceScanning,
+    isTargetScanning,
   };
 };

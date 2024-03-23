@@ -1,58 +1,58 @@
-import {View, Text, StyleSheet, TouchableOpacity, Modal} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Modal } from "react-native";
 import React from "react";
-import {FontAwesome} from "@expo/vector-icons";
+import { FontAwesome } from "@expo/vector-icons";
 import CustomButton from "../forms/buttons/CustomButton";
-import {bgColors} from "../../styles/styles";
-import {useDocumentHooks} from "../../hooks/documentHooks";
+import { bgColors } from "../../styles/styles";
+import { useDocumentHooks } from "../../hooks/documentHooks";
 import ItemScanModal from "../modals/ItemScanModal";
-import {useAppSelector} from "../../store/store";
-import {format} from "../../styles/styles";
-import {OutboundItem} from "../../models/warehouse/outbound/wto-outbound-item";
-import {useBatchHooks} from "../../hooks/batchHooks";
-import {useModalHooks} from "../../hooks/modalHooks";
-import {formatDateStringMMDDYYYY} from "../../helper/Date";
-import {Options} from "../list-holder/ItemsList";
+import { useAppSelector } from "../../store/store";
+import { format } from "../../styles/styles";
+import { OutboundItem } from "../../models/warehouse/outbound/wto-outbound-item";
+import { useBatchHooks } from "../../hooks/batchHooks";
+import { useModalHooks } from "../../hooks/modalHooks";
+import { formatDateStringMMDDYYYY } from "../../helper/Date";
+import { Options } from "../list-holder/ItemsList";
 
 interface Items {
   item: OutboundItem;
   options: Options;
 }
 const WTODetails = React.memo((props: Items) => {
-  const {toggleOutboundItemScan} = useModalHooks();
-  const {removeScannedQuantity} = useBatchHooks();
-  const {item, options} = props;
+  const { toggleOutboundItemScan } = useModalHooks();
+  const { removeScannedQuantity } = useBatchHooks();
+  const { item, options } = props;
 
   return (
     <>
       <View style={[styles.container, bgColors.mediumGrayishBG]}>
         <View style={styles.leftContainer}>
           <View style={format.twoRowText}>
-            <Text style={{fontWeight: "bold"}}>{`Line No:`}</Text>
+            <Text style={{ fontWeight: "bold" }}>{`Line No:`}</Text>
             <Text>{`${item.linenum}`}</Text>
           </View>
           <View style={format.twoRowText}>
-            <Text style={{fontWeight: "bold"}}>Item Code:</Text>
+            <Text style={{ fontWeight: "bold" }}>Item Code:</Text>
             <Text>{`${item.itmcde}`}</Text>
           </View>
           <View style={format.twoRowText}>
-            <Text style={{fontWeight: "bold"}}>Description:</Text>
+            <Text style={{ fontWeight: "bold" }}>Description:</Text>
             <Text>{`${item.itmdsc}`}</Text>
           </View>
           <View style={format.twoRowText}>
-            <Text style={{fontWeight: "bold"}}>UOM:</Text>
+            <Text style={{ fontWeight: "bold" }}>UOM:</Text>
             <Text>{`${item.untmea}`}</Text>
           </View>
           <View style={format.twoRowText}>
-            <Text style={{fontWeight: "bold"}}>Qty:</Text>
+            <Text style={{ fontWeight: "bold" }}>Qty:</Text>
             <Text>{`${item.itmqty}`}</Text>
           </View>
           <View style={styles.remove}>
             <View style={format.twoRowText}>
-              <Text style={{fontWeight: "bold"}}>Scanned Qty:</Text>
+              <Text style={{ fontWeight: "bold" }}>Scanned Qty:</Text>
               <Text>{`${item.scanqty}`}</Text>
             </View>
             <TouchableOpacity
-              style={item.itmqty === item.scanqty && {opacity: 0.5}}
+              style={item.itmqty === item.scanqty && { opacity: 0.5 }}
               disabled={item.itmqty === item.scanqty ? true : false}
               onPress={() => {
                 removeScannedQuantity(item, options.removeType);
@@ -66,26 +66,26 @@ const WTODetails = React.memo((props: Items) => {
           <View style={styles.datesContainer}>
             <View>
               {item.itmqty === item.scanqty && (
-                <Text style={{color: "green", fontWeight: "bold"}}>
-                  **Validated**
+                <Text style={{ color: "green", fontWeight: "bold" }}>
+                  **VALIDATED**
                 </Text>
               )}
               <View style={format.twoRowText}>
-                <Text style={{fontWeight: "bold"}}>Bin No.:</Text>
+                <Text style={{ fontWeight: "bold" }}>Bin No.:</Text>
                 <Text>{`${item.binnum2 || item.binnum || item.binfrom}`}</Text>
               </View>
               <View style={format.twoRowText}>
-                <Text style={{fontWeight: "bold"}}>Batch No.:</Text>
+                <Text style={{ fontWeight: "bold" }}>Batch No.:</Text>
                 <Text>{`${item.batchnum}`}</Text>
               </View>
               <View style={format.twoRowText}>
-                <Text style={{fontWeight: "bold"}}>Mfg. Date:</Text>
+                <Text style={{ fontWeight: "bold" }}>Mfg. Date:</Text>
                 <Text>{`${
                   formatDateStringMMDDYYYY(item.mfgdte as string) || "No Date"
                 }`}</Text>
               </View>
               <View style={format.twoRowText}>
-                <Text style={{fontWeight: "bold"}}>Exp. Date:</Text>
+                <Text style={{ fontWeight: "bold" }}>Exp. Date:</Text>
                 <Text>{`${
                   formatDateStringMMDDYYYY(item.expdte as string) || "No Date"
                 }`}</Text>

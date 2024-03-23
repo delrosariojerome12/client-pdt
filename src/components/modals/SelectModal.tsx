@@ -70,6 +70,7 @@ const SelectModal = React.memo((props: SelectModalProps) => {
       default:
         break;
     }
+
     return (
       <View key={propertyObj.name} style={styles.properties}>
         <Text style={styles.label}>{propertyObj.label}:</Text>
@@ -83,6 +84,8 @@ const SelectModal = React.memo((props: SelectModalProps) => {
   };
 
   if (selectedItem) {
+    console.log("SELECT MODAL");
+
     return (
       <Modal visible={visible} onRequestClose={onClose} transparent>
         {status === "success" && (
