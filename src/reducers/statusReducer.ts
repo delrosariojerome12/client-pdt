@@ -1,5 +1,5 @@
-import {createSlice} from "@reduxjs/toolkit";
-import {connectToPHP, updateBatch} from "../store/actions/generalActions";
+import { createSlice } from "@reduxjs/toolkit";
+import { connectToPHP, updateBatch } from "../store/actions/generalActions";
 
 interface Status {
   status: "idle" | "loading" | "success" | "failed";
@@ -37,7 +37,6 @@ const statusReducer = createSlice({
         state.status = "loading";
       })
       .addCase(connectToPHP.fulfilled, (state, action) => {
-        console.log("wat happend", action.payload);
         if (!action.payload?.dontShowSuccess) {
           state.status = "success";
         }
@@ -61,7 +60,7 @@ const statusReducer = createSlice({
   },
 });
 
-export const {resetStatus, setStatusText, setStatus, showQuantityField} =
+export const { resetStatus, setStatusText, setStatus, showQuantityField } =
   statusReducer.actions;
 
 export default statusReducer.reducer;

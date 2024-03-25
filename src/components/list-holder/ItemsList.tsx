@@ -29,6 +29,7 @@ export type ScanOptions = {
   receivedQty?: "intqty" | "itmqty" | "srtqty";
   showQuantity?: boolean;
   scanUsage?: "bin" | "barcode";
+  targetScan?: "sloc-bin" | "stock-transfer-bin";
 };
 
 interface Props {
@@ -128,7 +129,10 @@ const ItemsList = React.memo((props: Props) => {
         return { scanUsage: "barcode", showQuantity: true };
       case "cyclecount":
         return { scanUsage: "barcode", showQuantity: true };
-
+      case "sloc":
+        return { targetScan: "sloc-bin" };
+      case "stock-transfer":
+        return { targetScan: "stock-transfer-bin" };
       default:
         return {};
     }
@@ -197,7 +201,7 @@ const ItemsList = React.memo((props: Props) => {
         }
       case "sloc":
         return slocDetails.data.map((item: any, index: number) => {
-          return renderItems(item, index, { removeType: "stg-validate" });
+          return renderItems(item, index, { removeType: "sloc" });
         });
       case "stock-transfer":
         return stockTransferDetails.data.map((item: any, index: number) => {

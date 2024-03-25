@@ -32,8 +32,6 @@ const TargetScanning = React.memo((props: ScanModalProps) => {
     setScanfield(String(value));
   };
 
-  console.log("item scan modal");
-
   if (item) {
     return (
       <Modal
@@ -66,8 +64,8 @@ const TargetScanning = React.memo((props: ScanModalProps) => {
               isFocus={true}
               onSubmit={() => {
                 handleScanItem(
-                  { barcode: scanfield, receiveQty: 1 },
-                  "sloc-bin"
+                  { barcode: scanfield, receiveQty: 1, scanlevel: "1" },
+                  options?.targetScan || "sloc-bin"
                 );
               }}
             />
@@ -77,8 +75,8 @@ const TargetScanning = React.memo((props: ScanModalProps) => {
                 onPress={() => {
                   setScanfield("");
                   handleScanItem(
-                    { barcode: scanfield, receiveQty: 1 },
-                    "sloc-bin"
+                    { barcode: scanfield, receiveQty: 1, scanlevel: "1" },
+                    options?.targetScan || "sloc-bin"
                   );
                 }}
                 title="NEXT"

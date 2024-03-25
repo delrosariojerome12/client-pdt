@@ -8,6 +8,7 @@ import { Options } from "../list-holder/ItemsList";
 import { SLOCDetails } from "../../models/ims/SLOC";
 import { useBatchHooks } from "../../hooks/batchHooks";
 import { useModalHooks } from "../../hooks/modalHooks";
+import { formatDateStringMMDDYYYY } from "../../helper/Date";
 
 interface Items {
   item: SLOCDetails;
@@ -55,7 +56,7 @@ const StockTransferDetails = React.memo((props: Items) => {
                 disabled={item.validate === 1 ? true : false}
                 style={item.validate === 1 ? { opacity: 0.5 } : {}}
                 onPress={() => {
-                  removeScannedQuantity(item, "sloc");
+                  removeScannedQuantity(item, "stock-transfer");
                 }}
               >
                 <FontAwesome name="remove" size={24} color="black" />
@@ -73,13 +74,19 @@ const StockTransferDetails = React.memo((props: Items) => {
               <Text style={{ fontWeight: "bold" }}>Batch No.:</Text>
               <Text>{`${item.batchnum || ""}`}</Text>
             </View>
+
             <View style={format.twoRowText}>
               <Text style={{ fontWeight: "bold" }}>Mfg. Date:</Text>
-              <Text>{`${item.mfgdte || ""}`}</Text>
+              <Text>{` ${
+                item.mfgdte ? formatDateStringMMDDYYYY(item.mfgdte) : "No Date"
+              } `}</Text>
             </View>
+
             <View style={format.twoRowText}>
               <Text style={{ fontWeight: "bold" }}>Exp. Date:</Text>
-              <Text>{`${item.expdte || ""}`}</Text>
+              <Text>{` ${
+                item.expdte ? formatDateStringMMDDYYYY(item.expdte) : "No Date"
+              }`}</Text>
             </View>
             <View style={format.twoRowText}>
               <Text style={{ fontWeight: "bold" }}>Target Bin No.:</Text>

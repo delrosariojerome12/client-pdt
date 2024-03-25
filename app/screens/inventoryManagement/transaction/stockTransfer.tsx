@@ -93,7 +93,6 @@ const StockTransfer = React.memo(() => {
     }
   };
 
-  console.log("Stock transfer", stockTransferDetails);
   const checkStatus = () => {
     if (
       !isTargetScanning &&
@@ -104,6 +103,9 @@ const StockTransfer = React.memo(() => {
     }
     return undefined;
   };
+
+  console.log("Stock transfer");
+
   return (
     <>
       {status === "success" && !isSelectModal && !isScanModal && (
@@ -164,7 +166,6 @@ const StockTransfer = React.memo(() => {
             propertiesToShow={[
               { name: "docnum", label: "TO No." },
               { name: "warcde", label: "Warehouse" },
-              { name: "refnum", label: "SLOC Trans. No." },
               { name: "warcdenum", label: "Whs No." },
               { name: "btbnum", label: "BTB No." },
               {

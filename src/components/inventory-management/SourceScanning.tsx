@@ -72,8 +72,6 @@ const OutboundItemScanModal = React.memo((props: ScanModalProps) => {
   };
 
   if (item) {
-    console.log("bkait", isQuantityFieldShown);
-
     return (
       <Modal
         visible={visible}
@@ -157,7 +155,7 @@ const OutboundItemScanModal = React.memo((props: ScanModalProps) => {
                 <View style={format.twoRowText}>
                   <Text style={{ fontWeight: "bold" }}>Exp. Date:</Text>
                   <Text>{` ${
-                    item.expdet
+                    item.expdte
                       ? formatDateStringMMDDYYYY(item.expdte)
                       : "No Date"
                   }`}</Text>

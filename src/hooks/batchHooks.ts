@@ -38,6 +38,8 @@ import {
   getCycleCount,
   getSLOCValid,
   getSLOCDetails,
+  getStockTransferValid,
+  getStockTransferDetails,
 } from "../store/actions/ims/transaction";
 import { useDocumentHooks } from "./documentHooks";
 import { formatDateYYYYMMDD } from "../helper/Date";
@@ -98,7 +100,10 @@ export const useBatchHooks = () => {
       case "sloc":
         dispatch(getSLOCValid({ limit: 10, offset: 0 }));
         dispatch(getSLOCDetails({ docnum: selectedDocument.docnum }));
-
+        break;
+      case "stock-transfer":
+        dispatch(getStockTransferValid({ limit: 10, offset: 0 }));
+        dispatch(getStockTransferDetails({ docnum: selectedDocument.docnum }));
         break;
 
       default:
@@ -376,6 +381,37 @@ export const useBatchHooks = () => {
             dispatch(setStatusText(`Scanned Quantity Removed Successfully.`));
           }
         );
+        break;
+      case "stock-transfer":
+        if (item.validated === 1) {
+          Alert.alert(
+            "Removing Quantity",
+            "Cannot Remove quantity of already validated item."
+          );
+          return;
+        }
+        const stEndpoints: Endpoint[] = [
+          {
+            method: "PATCH",
+            url: `lst_tracc/inventorytranfile2b`,
+            payload: {
+              field: {
+                recid: item.recid,
+              },
+              data: {
+                scanqty: 0,
+              },
+            },
+          },
+        ];
+        const stResponse = await removeScannedQuantityService(
+          stEndpoints,
+          () => {
+            checkDetailsToReload(uses);
+            dispatch(setStatusText(`Scanned Quantity Removed Successfully.`));
+          }
+        );
+
         break;
       default:
         alert("Remove not supported");

@@ -107,7 +107,8 @@ export type ScanValidate =
   | "cyclecount"
   | "sloc"
   | "sloc-bin"
-  | "stock-transfer";
+  | "stock-transfer"
+  | "stock-transfer-bin";
 
 export type TypeSelect =
   | "pto"
@@ -197,8 +198,6 @@ export const useDocumentHooks = () => {
   };
 
   const checkPostType = async (item: any, type: TypePost) => {
-    console.log("wat", item);
-
     switch (type) {
       case "pto":
         dispatch(
@@ -523,6 +522,42 @@ export const useDocumentHooks = () => {
         );
         break;
       case "stock-transfer":
+        dispatch(
+          connectToPHP({
+            recid: item.recid,
+            docnum: item.docnum,
+            type: "BNT_SOFTVAL",
+            onSuccess: async () => {
+              dispatch(setStatus("loading"));
+              const res = await connectToPHPNotDispatch({
+                recid: item.recid,
+                docnum: item.docnum,
+                type: "BNT_POST",
+              });
+              if (res) {
+                dispatch(
+                  getStockTransferPosting({
+                    limit: 10,
+                    offset: 0,
+                  })
+                );
+                dispatch(setStatus("success"));
+              }
+            },
+            onFailure: (e) => {
+              console.log("wat", e);
+              dispatch(resetStatus());
+              Alert.alert("Transaction Posting Fail", `${e}`, [
+                {
+                  text: "Ok",
+                  onPress: () => {},
+                  style: "destructive",
+                },
+              ]);
+            },
+            dontShowSuccess: true,
+          })
+        );
         break;
 
       default:
@@ -757,7 +792,6 @@ export const useDocumentHooks = () => {
             category: "cc_item",
             recid: selectedBinDetails?.recid.toString(),
             docnum: selectedDocument.docnum,
-            // scanlevel: selectedBinDetails ? "2" : "1",
             scanlevel: scanlevel,
             pdtmanualqtyoutbound: receiveQty.toString(),
             usrnam: userDetails?.usrcde,
@@ -896,11 +930,10 @@ export const useDocumentHooks = () => {
             usrnam: userDetails?.usrcde,
           });
           console.log("eyuy", stResponse);
-          console.log(stResponse.data.btn2_data);
 
           if (stResponse && stResponse.data.bnt2_data) {
+            console.log("wat is this", stResponse.data.bnt2_data);
             dispatch(showQuantityField(true));
-            console.log("pumasok?");
 
             !isQuantityFieldShown &&
               dispatch(setStatusText(`Bin No. Successfully Scanned.`));
@@ -915,7 +948,7 @@ export const useDocumentHooks = () => {
                 getStockTransferDetails({ docnum: selectedDocument.docnum })
               );
               dispatch(setStatusText(`Item Successfully Scanned.`));
-              if (stResponse.data.sloc2_data[0]) {
+              if (stResponse.data.bnt2_data[0]) {
                 dispatch(handleSetItem(stResponse.data.bnt2_data[0]));
               }
               if (stResponse.data.bnt2_data.length === 0) {
@@ -926,6 +959,37 @@ export const useDocumentHooks = () => {
           }
           break;
 
+        case "stock-transfer-bin":
+          const stBinResponse = await scanBarcode({
+            barcode,
+            category: "bnt_bin",
+            scanlevel: scanlevel,
+            recid: selectedItem?.recid.toString(),
+            barcodelvl2: barcodelvl2,
+            docnum: selectedDocument.docnum,
+            pdtmanualqtyoutbound: receiveQty.toString(),
+            spl_docnum: undefined,
+            fromspl: undefined,
+            usrnam: userDetails?.usrcde,
+          });
+
+          if (stBinResponse) {
+            if (stBinResponse.bool) {
+              dispatch(
+                getStockTransferValid({
+                  limit: 10,
+                  offset: 0,
+                })
+              );
+              dispatch(
+                getStockTransferDetails({ docnum: selectedDocument.docnum })
+              );
+              dispatch(setStatusText(`Item Successfully Va lidated.`));
+              dispatch(handleTargetScanning());
+            }
+          }
+
+          break;
         default:
           alert("no api yet");
           break;
@@ -987,19 +1051,32 @@ export const useDocumentHooks = () => {
         break;
       case "sloc":
         const slocResponse = await scanBarcode({ barcode, category }, true);
-        console.log("sloc shit", slocResponse.data);
-        dispatch(handleToggleScanModal());
         if (slocResponse) {
+          console.log("sloc shit", slocResponse);
+          dispatch(handleToggleScanModal());
           if (slocResponse.data.for_posting) {
             console.log("posting");
             handlePost({ item: slocResponse.data, type: "sloc" });
           } else {
-            dispatch(handleToggleScanModal());
+            console.log("not here");
             handleSelectModal({ item: slocResponse.data, type: uses });
           }
         }
         break;
       case "stock-transfer":
+        const stResponse = await scanBarcode({ barcode, category }, true);
+        console.log("stock transfer shit", stResponse);
+
+        if (stResponse) {
+          dispatch(handleToggleScanModal());
+
+          if (stResponse.data.for_posting) {
+            console.log("posting");
+            handlePost({ item: stResponse.data, type: "stock-transfer" });
+          } else {
+            handleSelectModal({ item: stResponse.data, type: uses });
+          }
+        }
         break;
 
       default:
