@@ -19,7 +19,13 @@ import {
   getSLOCValid,
   getStockTransferValid,
 } from "../store/actions/ims/transaction";
-import {useAppDispatch} from "../store/store";
+import {
+  getStockTOPosting,
+  getStockTOValid,
+} from "../store/actions/ims/replenishment";
+import { getphysicalRecord } from "../store/actions/ims/physicalCount";
+import { getDTSValid, getDTSPosting } from "../store/actions/ims/subcon";
+import { useAppDispatch } from "../store/store";
 
 export interface RouteItem {
   title: string;
@@ -54,35 +60,35 @@ export const useHomeRoutes = () => {
               title: "PURCHASE TRANSFER ORDER",
               path: "pto",
               onLoad: () => {
-                dispatch(getPTO({limit: 10, offset: 0}));
+                dispatch(getPTO({ limit: 10, offset: 0 }));
               },
             },
             {
               title: "PUTAWAY TO - PUR TRANSFER",
               path: "pur",
               onLoad: () => {
-                dispatch(getPUR({limit: 10, offset: 0}));
+                dispatch(getPUR({ limit: 10, offset: 0 }));
               },
             },
             {
               title: "WAREHOUSE TRANSFER ORDER",
               path: "wto",
               onLoad: () => {
-                dispatch(getWTO({limit: 10, offset: 0}));
+                dispatch(getWTO({ limit: 10, offset: 0 }));
               },
             },
             {
               title: "PUTAWAY TO - WHS TRANSFER",
               path: "whs",
               onLoad: () => {
-                dispatch(getWHS({limit: 10, offset: 0}));
+                dispatch(getWHS({ limit: 10, offset: 0 }));
               },
             },
             {
               title: "SALES RETURN TRANSFER ORDER",
               path: "srto",
               onLoad: () => {
-                dispatch(getSRTO({limit: 10, offset: 0}));
+                dispatch(getSRTO({ limit: 10, offset: 0 }));
               },
             },
           ],
@@ -102,21 +108,21 @@ export const useHomeRoutes = () => {
               title: "WAREHOUSE TRANSFER ORDER",
               path: "wto",
               onLoad: () => {
-                dispatch(getWTOOutboundValid({limit: 10, offset: 0}));
+                dispatch(getWTOOutboundValid({ limit: 10, offset: 0 }));
               },
             },
             {
               title: "WAVE PICK LIST",
               path: "wavepick",
               onLoad: () => {
-                dispatch(getWPTOValid({limit: 10, offset: 0}));
+                dispatch(getWPTOValid({ limit: 10, offset: 0 }));
               },
             },
             {
               title: "SINGLE PICK LIST",
               path: "singlepick",
               onLoad: () => {
-                dispatch(getPKValidate({limit: 10, offset: 0}));
+                dispatch(getPKValidate({ limit: 10, offset: 0 }));
               },
             },
           ],
@@ -163,21 +169,21 @@ export const useHomeRoutes = () => {
               title: "CYCLE COUNT",
               path: "cycleCount",
               onLoad: () => {
-                dispatch(getCycleCount({limit: 10, offset: 0}));
+                dispatch(getCycleCount({ limit: 10, offset: 0 }));
               },
             },
             {
               title: "S.LOC TO S.LOC",
               path: "slocToSloc",
               onLoad: () => {
-                dispatch(getSLOCValid({limit: 10, offset: 0}));
+                dispatch(getSLOCValid({ limit: 10, offset: 0 }));
               },
             },
             {
               title: "STOCK TRANSFER (BIN TO BIN)",
               path: "stockTransfer",
               onLoad: () => {
-                dispatch(getStockTransferValid({limit: 10, offset: 0}));
+                dispatch(getStockTransferValid({ limit: 10, offset: 0 }));
               },
             },
           ],
@@ -191,7 +197,7 @@ export const useHomeRoutes = () => {
               title: "DELIVERY TO SUPPLIER",
               path: "deliveryToSupplier",
               onLoad: () => {
-                alert("test");
+                dispatch(getDTSValid({ limit: 10, offset: 0 }));
               },
             },
           ],
@@ -205,7 +211,7 @@ export const useHomeRoutes = () => {
               title: "PHYSICAL INVENTORY RECORD",
               path: "physicalInventory",
               onLoad: () => {
-                alert("test");
+                dispatch(getphysicalRecord({ limit: 10, offset: 0 }));
               },
             },
           ],
@@ -221,7 +227,7 @@ export const useHomeRoutes = () => {
               title: "STOCK REPLENISHMENT TO",
               path: "stockReplenish",
               onLoad: () => {
-                alert("test");
+                dispatch(getStockTOValid({ limit: 10, offset: 0 }));
               },
             },
           ],
@@ -257,7 +263,7 @@ export const useHomeRoutes = () => {
       icon: "luggage-cart",
     },
   ];
-  return {homeRoutes};
+  return { homeRoutes };
 };
 
 export const homeRoutes = [
