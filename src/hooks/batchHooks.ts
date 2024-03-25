@@ -41,6 +41,10 @@ import {
   getStockTransferValid,
   getStockTransferDetails,
 } from "../store/actions/ims/transaction";
+import {
+  getStockTODetails,
+  getStockTOValid,
+} from "../store/actions/ims/replenishment";
 import { useDocumentHooks } from "./documentHooks";
 import { formatDateYYYYMMDD } from "../helper/Date";
 import { setStatus, setStatusText } from "../reducers/statusReducer";
@@ -104,6 +108,10 @@ export const useBatchHooks = () => {
       case "stock-transfer":
         dispatch(getStockTransferValid({ limit: 10, offset: 0 }));
         dispatch(getStockTransferDetails({ docnum: selectedDocument.docnum }));
+        break;
+      case "stock-replenish":
+        dispatch(getStockTOValid({ limit: 10, offset: 0 }));
+        dispatch(getStockTODetails({ docnum: selectedDocument.docnum }));
         break;
 
       default:
@@ -406,6 +414,38 @@ export const useBatchHooks = () => {
         ];
         const stResponse = await removeScannedQuantityService(
           stEndpoints,
+          () => {
+            checkDetailsToReload(uses);
+            dispatch(setStatusText(`Scanned Quantity Removed Successfully.`));
+          }
+        );
+
+        break;
+      case "stock-replenish":
+        if (item.validated === 1) {
+          Alert.alert(
+            "Removing Quantity",
+            "Cannot Remove quantity of already validated item."
+          );
+          return;
+        }
+
+        const srEndpoints: Endpoint[] = [
+          {
+            method: "PATCH",
+            url: `lst_tracc/stockreplenishmenttofile2b`,
+            payload: {
+              field: {
+                recid: item.recid,
+              },
+              data: {
+                scanqty: 0,
+              },
+            },
+          },
+        ];
+        const srResponse = await removeScannedQuantityService(
+          srEndpoints,
           () => {
             checkDetailsToReload(uses);
             dispatch(setStatusText(`Scanned Quantity Removed Successfully.`));

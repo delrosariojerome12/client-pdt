@@ -585,7 +585,7 @@ export const drawerScreens = [
   },
   {
     name: "inventoryManagement/replenishment/stockReplenish",
-    title: "Stock Replenishment To",
+    title: "Stock Replenishment TO",
     isVisible: false,
   },
   // end ims

@@ -29,7 +29,7 @@ export type ScanOptions = {
   receivedQty?: "intqty" | "itmqty" | "srtqty";
   showQuantity?: boolean;
   scanUsage?: "bin" | "barcode";
-  targetScan?: "sloc-bin" | "stock-transfer-bin";
+  targetScan?: "sloc-bin" | "stock-transfer-bin" | "stock-replenish-bin";
 };
 
 interface Props {
@@ -51,7 +51,8 @@ interface Props {
     | "stg-validate"
     | "cyclecount"
     | "sloc"
-    | "stock-transfer";
+    | "stock-transfer"
+    | "stock-replenish";
 }
 
 const ItemsList = React.memo((props: Props) => {
@@ -73,6 +74,7 @@ const ItemsList = React.memo((props: Props) => {
     useAppSelector((state) => state.inventoryTransaction);
   const { wtoOutboundDetails, wavepickDetails, singlepickDetails } =
     useAppSelector((state) => state.outbound);
+  const { tableDetails } = useAppSelector((state) => state.table);
 
   const renderItems = (
     item: any,
@@ -133,6 +135,9 @@ const ItemsList = React.memo((props: Props) => {
         return { targetScan: "sloc-bin" };
       case "stock-transfer":
         return { targetScan: "stock-transfer-bin" };
+      case "stock-replenish":
+        return { targetScan: "stock-replenish-bin" };
+
       default:
         return {};
     }
@@ -204,6 +209,14 @@ const ItemsList = React.memo((props: Props) => {
           return renderItems(item, index, { removeType: "sloc" });
         });
       case "stock-transfer":
+        switch (subcategory) {
+          case "stock-replenish":
+            return tableDetails.data.map((item: any, index: number) => {
+              return renderItems(item, index, {
+                removeType: "stock-replenish",
+              });
+            });
+        }
         return stockTransferDetails.data.map((item: any, index: number) => {
           return renderItems(item, index, { removeType: "stock-transfer" });
         });

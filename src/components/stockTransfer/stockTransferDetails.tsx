@@ -56,7 +56,7 @@ const StockTransferDetails = React.memo((props: Items) => {
                 disabled={item.validate === 1 ? true : false}
                 style={item.validate === 1 ? { opacity: 0.5 } : {}}
                 onPress={() => {
-                  removeScannedQuantity(item, "stock-transfer");
+                  removeScannedQuantity(item, options.removeType);
                 }}
               >
                 <FontAwesome name="remove" size={24} color="black" />

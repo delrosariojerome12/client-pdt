@@ -6,7 +6,6 @@ import {
   ActivityIndicator,
 } from "react-native";
 import React from "react";
-import { useAppSelector } from "../../../../src/store/store";
 import CustomButton from "../../../../src/components/forms/buttons/CustomButton";
 import CustomTable from "../../../../src/components/forms/table/CustomTable";
 import ScanModal from "../../../../src/components/modals/ScanModal";
@@ -39,11 +38,10 @@ const StockTransfer = React.memo(() => {
     stockTransferDetails,
     isSourceScanning,
     isTargetScanning,
+    selectedDocument,
   } = useInventoryTransactionHooks({
     page: "stockTransfer",
   });
-
-  const { selectedDocument } = useAppSelector((state) => state.document);
 
   const { handleScanModal, handleSelectModal, closeSelectModal, handlePost } =
     useDocumentHooks();
@@ -104,7 +102,7 @@ const StockTransfer = React.memo(() => {
     return undefined;
   };
 
-  console.log("Stock transfer");
+  console.log("Stock transfer", stockTransfer, "table:");
 
   return (
     <>

@@ -63,6 +63,12 @@ import {
   setExpDate,
   setMfgDate,
 } from "../reducers/generalReducer";
+import {
+  getStockTODetails,
+  getStockTOPosting,
+  getStockTOValid,
+} from "../store/actions/ims/replenishment";
+
 import { useAPIHooks } from "./apiHooks";
 import { setStatusText, showQuantityField } from "../reducers/statusReducer";
 import { useModalHooks } from "./modalHooks";
@@ -92,7 +98,8 @@ export type TypePost =
   | "spl-singlepick"
   | "cyclecount"
   | "sloc"
-  | "stock-transfer";
+  | "stock-transfer"
+  | "stock-replenish";
 
 export type ScanValidate =
   | "pto"
@@ -108,7 +115,8 @@ export type ScanValidate =
   | "sloc"
   | "sloc-bin"
   | "stock-transfer"
-  | "stock-transfer-bin";
+  | "stock-transfer-bin"
+  | "stock-replenish";
 
 export type TypeSelect =
   | "pto"
@@ -120,7 +128,8 @@ export type TypeSelect =
   | "stg-validate"
   | "cyclecount"
   | "sloc"
-  | "stock-transfer";
+  | "stock-transfer"
+  | "stock-replenish";
 
 export interface SelectProps {
   type: TypeSelect;
@@ -191,7 +200,8 @@ export const useDocumentHooks = () => {
       case "stock-transfer":
         dispatch(getStockTransferDetails({ docnum: item.docnum }));
         break;
-
+      case "stock-replenish":
+        dispatch(getStockTODetails({ docnum: item.docnum }));
       default:
         break;
     }
@@ -558,6 +568,9 @@ export const useDocumentHooks = () => {
             dontShowSuccess: true,
           })
         );
+        break;
+      case "stock-replenish":
+        alert("No api yet.");
         break;
 
       default:
@@ -1072,14 +1085,30 @@ export const useDocumentHooks = () => {
 
           if (stResponse.data.for_posting) {
             console.log("posting");
-            handlePost({ item: stResponse.data, type: "stock-transfer" });
+            handlePost({ item: stResponse.data, type: "stock-replenish" });
           } else {
             handleSelectModal({ item: stResponse.data, type: uses });
           }
         }
         break;
+      case "stock-replenish":
+        const srResponse = await scanBarcode({ barcode, category }, true);
+        console.log("stock transfer shit", stResponse);
+
+        if (srResponse) {
+          dispatch(handleToggleScanModal());
+
+          if (srResponse.data.for_posting) {
+            console.log("posting");
+            handlePost({ item: srResponse.data, type: "stock-transfer" });
+          } else {
+            handleSelectModal({ item: srResponse.data, type: uses });
+          }
+        }
+        break;
 
       default:
+        alert("no scan barcode api");
         break;
     }
   };

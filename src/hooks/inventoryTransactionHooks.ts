@@ -214,7 +214,6 @@ export const useInventoryTransactionHooks = ({
 
   // on tab change
   const checkOnTabChange = () => {
-    console.log("tab change");
     switch (page) {
       case "sloc":
         switch (activeIndex) {
@@ -255,6 +254,7 @@ export const useInventoryTransactionHooks = ({
             );
             break;
         }
+        break;
     }
   };
 
