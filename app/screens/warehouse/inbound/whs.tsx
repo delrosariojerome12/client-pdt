@@ -20,10 +20,17 @@ const tableHeaders = ["Date", "Document No.", "Intransit No.", ""];
 const tableVisibleProps = ["trndte", "docnum", "intnum"];
 
 const WHS = () => {
-  const { handleScroll, isPaginating, onRefresh, status, whs, isScanModal } =
-    useInboundHooks({
-      page: "whs",
-    });
+  const {
+    handleScroll,
+    isPaginating,
+    onRefresh,
+    status,
+    whs,
+    isScanModal,
+    refreshing,
+  } = useInboundHooks({
+    page: "whs",
+  });
 
   const { handleScanModal, handlePost } = useDocumentHooks();
 
@@ -52,7 +59,7 @@ const WHS = () => {
             <RefreshControl refreshing={false} onRefresh={onRefresh} />
           }
           onScroll={handleScroll}
-          scrollEventThrottle={150}
+          scrollEventThrottle={0}
         >
           <CustomTable
             tableHeaders={tableHeaders}
@@ -62,7 +69,9 @@ const WHS = () => {
             isSelectDisable={true}
             buttonUses="whs"
             postType="whs"
-            loadingStatus={whs.status === "loading" && true}
+            loadingStatus={
+              whs.status === "loading" && !refreshing && !isPaginating && true
+            }
           />
 
           {isScanModal && (

@@ -1,5 +1,5 @@
 import { useAppDispatch, useAppSelector } from "../store/store";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { ToastMessage } from "../helper/Toast";
 import {
   getWTOOutboundPost,
@@ -11,6 +11,7 @@ import {
   getSTGValidate,
   getSPLPosting,
 } from "../store/actions/warehouse/warehouseActions";
+import { debounce } from "lodash";
 
 interface OutboundUse {
   page: "singlepick" | "wavepick" | "wto";
@@ -63,7 +64,7 @@ export const useOutboundHooks = ({ page }: OutboundUse) => {
           case 0:
           case null:
             const wtoValidOffset =
-              wto.validation.data.length - 10 === 0
+              wto.validation.data.length - 10 <= 0
                 ? 10
                 : wto.validation.data.length - 10;
             dispatch(
@@ -80,10 +81,9 @@ export const useOutboundHooks = ({ page }: OutboundUse) => {
           case 1:
             // posting
             const wtoPostOffset =
-              wto.forPosting.data.length - 10 === 0
+              wto.forPosting.data.length - 10 <= 0
                 ? 10
                 : wto.forPosting.data.length - 10;
-            // wto.forPosting.data.length + 10;
             dispatch(
               getWTOOutboundPost({
                 limit: 10,
@@ -103,10 +103,9 @@ export const useOutboundHooks = ({ page }: OutboundUse) => {
           case 0:
           case null:
             const wptoValidOffset =
-              wavepick.validation.data.length - 10 === 0
+              wavepick.validation.data.length - 10 <= 0
                 ? 10
                 : wavepick.validation.data.length - 10;
-            // wavepick.validation.data.length + 10;
             dispatch(
               getWPTOValid({
                 limit: 10,
@@ -122,7 +121,7 @@ export const useOutboundHooks = ({ page }: OutboundUse) => {
           // posting
           case 1:
             const wptoPostOffset =
-              wavepick.forPosting.data.length - 10 === 0
+              wavepick.forPosting.data.length - 10 <= 0
                 ? 10
                 : wavepick.forPosting.data.length - 10;
             dispatch(
@@ -145,7 +144,7 @@ export const useOutboundHooks = ({ page }: OutboundUse) => {
           case 0:
           case null:
             const pkOffset =
-              singlepick.pkValidate.data.length - 10 === 0
+              singlepick.pkValidate.data.length - 10 <= 0
                 ? 10
                 : singlepick.pkValidate.data.length - 10;
             dispatch(
@@ -161,7 +160,7 @@ export const useOutboundHooks = ({ page }: OutboundUse) => {
             break;
           case 1:
             const invOffset =
-              singlepick.invPosting.data.length - 10 === 0
+              singlepick.invPosting.data.length - 10 <= 0
                 ? 10
                 : singlepick.invPosting.data.length - 10;
             dispatch(
@@ -177,10 +176,9 @@ export const useOutboundHooks = ({ page }: OutboundUse) => {
             break;
           case 2:
             const stgOffset =
-              singlepick.stgValidate.data.length - 10 === 0
+              singlepick.stgValidate.data.length - 10 <= 0
                 ? 10
                 : singlepick.stgValidate.data.length - 10;
-            // singlepick.stgValidate.data.length + 10;
             dispatch(
               getSTGValidate({
                 limit: 10,
@@ -194,13 +192,12 @@ export const useOutboundHooks = ({ page }: OutboundUse) => {
             break;
           case 3:
             const splOffset =
-              singlepick.splPosting.data.length - 10 === 0
+              singlepick.splPosting.data.length - 10 <= 0
                 ? 10
                 : singlepick.splPosting.data.length - 10;
 
-            // singlepick.splPosting.data.length + 10;
             dispatch(
-              getSTGValidate({
+              getSPLPosting({
                 limit: 10,
                 offset: splOffset,
                 paginating: true,
@@ -343,6 +340,11 @@ export const useOutboundHooks = ({ page }: OutboundUse) => {
     }
   }, [activeIndex]);
 
+  const debouncedPaginateData = useCallback(
+    debounce(checkPageToPaginate, 500),
+    []
+  );
+
   const handleScroll = (event: any) => {
     const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
 
@@ -352,7 +354,7 @@ export const useOutboundHooks = ({ page }: OutboundUse) => {
     const threshold = 50;
 
     if (currentOffset >= bottomOffset - threshold && !isPaginating) {
-      checkPageToPaginate();
+      debouncedPaginateData();
     }
   };
 

@@ -65,7 +65,7 @@ const PUR = () => {
             <RefreshControl refreshing={false} onRefresh={onRefresh} />
           }
           onScroll={handleScroll}
-          scrollEventThrottle={150}
+          scrollEventThrottle={0}
         >
           <CustomTable
             tableHeaders={tableHeaders}
@@ -75,7 +75,9 @@ const PUR = () => {
             isSelectDisable={true}
             postType="pur"
             buttonUses="pur"
-            loadingStatus={pur.status === "loading" && true}
+            loadingStatus={
+              pur.status === "loading" && !refreshing && !isPaginating && true
+            }
           />
 
           {isScanModal && (

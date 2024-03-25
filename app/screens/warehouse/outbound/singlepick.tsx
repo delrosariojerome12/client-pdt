@@ -60,6 +60,8 @@ const SinglePick = () => {
             loadingStatus={
               singlepick.pkValidate.status === "loading" &&
               !isScanItemModal &&
+              !refreshing &&
+              !isPaginating &&
               true
             }
           />
@@ -74,7 +76,12 @@ const SinglePick = () => {
             onPost={handlePost}
             buttonUses=""
             postType="inv-singlepick"
-            loadingStatus={singlepick.invPosting.status === "loading" && true}
+            loadingStatus={
+              singlepick.invPosting.status === "loading" &&
+              !refreshing &&
+              !isPaginating &&
+              true
+            }
           />
         );
       case 2:
@@ -90,6 +97,8 @@ const SinglePick = () => {
             loadingStatus={
               singlepick.stgValidate.status === "loading" &&
               !isScanItemModal &&
+              !refreshing &&
+              !isPaginating &&
               true
             }
           />
@@ -104,7 +113,12 @@ const SinglePick = () => {
             onPost={handlePost}
             buttonUses=""
             postType="spl-singlepick"
-            loadingStatus={singlepick.splPosting.status === "loading" && true}
+            loadingStatus={
+              singlepick.splPosting.status === "loading" &&
+              !refreshing &&
+              !isPaginating &&
+              true
+            }
           />
         );
     }
@@ -150,7 +164,7 @@ const SinglePick = () => {
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
           onScroll={handleScroll}
-          scrollEventThrottle={150}
+          scrollEventThrottle={0}
         >
           {renderTables()}
 

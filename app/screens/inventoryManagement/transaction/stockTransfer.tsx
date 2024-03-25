@@ -140,7 +140,7 @@ const StockTransfer = React.memo(() => {
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
           onScroll={handleScroll}
-          scrollEventThrottle={150}
+          scrollEventThrottle={0}
         >
           {renderTables()}
         </ScrollView>

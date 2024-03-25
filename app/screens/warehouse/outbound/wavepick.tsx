@@ -78,7 +78,7 @@ const WavePick = () => {
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
           onScroll={handleScroll}
-          scrollEventThrottle={150}
+          scrollEventThrottle={0}
         >
           {activeIndex === 0 || activeIndex === null ? (
             <CustomTable
@@ -92,6 +92,8 @@ const WavePick = () => {
               loadingStatus={
                 wavepick.validation.status === "loading" &&
                 !isScanItemModal &&
+                !refreshing &&
+                !isPaginating &&
                 true
               }
             />
@@ -104,7 +106,12 @@ const WavePick = () => {
               onPost={handlePost}
               buttonUses="wavepick"
               postType="wavepick"
-              loadingStatus={wavepick.forPosting.status === "loading" && true}
+              loadingStatus={
+                wavepick.forPosting.status === "loading" &&
+                !refreshing &&
+                !isPaginating &&
+                true
+              }
             />
           )}
 

@@ -24,6 +24,7 @@
     "expo-linking": "~6.2.2",
     "expo-router": "~3.4.8",
     "expo-status-bar": "~1.11.1",
+    "lodash": "^4.17.21",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-freeze": "^1.0.3",
@@ -41,6 +42,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
+    "@types/lodash": "^4.17.0",
     "@types/react": "~18.2.45",
     "@types/react-native-datawedge-intents": "^0.1.5",
     "typescript": "^5.1.3"

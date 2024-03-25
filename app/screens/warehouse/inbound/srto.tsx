@@ -69,7 +69,7 @@ const SRTO = () => {
             <RefreshControl refreshing={false} onRefresh={onRefresh} />
           }
           onScroll={handleScroll}
-          scrollEventThrottle={150}
+          scrollEventThrottle={0}
         >
           <CustomTable
             tableHeaders={tableHeaders}
@@ -80,7 +80,11 @@ const SRTO = () => {
             selectType="srto"
             buttonUses="srto"
             loadingStatus={
-              srto.status === "loading" && !isScanItemModal && true
+              srto.status === "loading" &&
+              !isScanItemModal &&
+              !refreshing &&
+              !isPaginating &&
+              true
             }
           />
 

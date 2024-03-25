@@ -75,7 +75,7 @@ const PTO = () => {
             <RefreshControl refreshing={false} onRefresh={onRefresh} />
           }
           onScroll={handleScroll}
-          scrollEventThrottle={150}
+          scrollEventThrottle={0}
         >
           <CustomTable
             tableHeaders={tableHeaders}
@@ -86,7 +86,13 @@ const PTO = () => {
             selectType="pto"
             postType="pto"
             buttonUses="pto"
-            loadingStatus={pto.status === "loading" && !isScanItemModal && true}
+            loadingStatus={
+              pto.status === "loading" &&
+              !isScanItemModal &&
+              !refreshing &&
+              !isPaginating &&
+              true
+            }
           />
 
           {isScanModal && (

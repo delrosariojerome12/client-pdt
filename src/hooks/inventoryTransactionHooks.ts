@@ -1,5 +1,5 @@
 import { useAppDispatch, useAppSelector } from "../store/store";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { ToastMessage } from "../helper/Toast";
 import {
   getCycleCount,
@@ -8,6 +8,7 @@ import {
   getStockTransferPosting,
   getStockTransferValid,
 } from "../store/actions/ims/transaction";
+import { debounce } from "lodash";
 
 interface InventoryTransaction {
   page: "cycleCount" | "sloc" | "stockTransfer";
@@ -264,6 +265,11 @@ export const useInventoryTransactionHooks = ({
     }
   }, [activeIndex]);
 
+  const debouncedPaginateData = useCallback(
+    debounce(checkPageToPaginate, 500),
+    []
+  );
+
   const handleScroll = (event: any) => {
     const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
 
@@ -273,7 +279,7 @@ export const useInventoryTransactionHooks = ({
     const threshold = 50;
 
     if (currentOffset >= bottomOffset - threshold && !isPaginating) {
-      checkPageToPaginate();
+      debouncedPaginateData();
     }
   };
 

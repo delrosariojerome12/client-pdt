@@ -81,7 +81,7 @@ const WTO = () => {
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
           onScroll={handleScroll}
-          scrollEventThrottle={150}
+          scrollEventThrottle={0}
         >
           {activeIndex === 0 || activeIndex === null ? (
             <CustomTable
@@ -93,7 +93,11 @@ const WTO = () => {
               selectType="wto-outbound"
               buttonUses="wto-outbound"
               loadingStatus={
-                wto.validation.status === "loading" && !isScanItemModal && true
+                wto.validation.status === "loading" &&
+                !isScanItemModal &&
+                !refreshing &&
+                !isPaginating &&
+                true
               }
             />
           ) : (
@@ -105,7 +109,12 @@ const WTO = () => {
               onPost={handlePost}
               postType="wto-outbound"
               buttonUses="wto-outbound"
-              loadingStatus={wto.forPosting.status === "loading" && true}
+              loadingStatus={
+                wto.forPosting.status === "loading" &&
+                !refreshing &&
+                !isPaginating &&
+                true
+              }
             />
           )}
 

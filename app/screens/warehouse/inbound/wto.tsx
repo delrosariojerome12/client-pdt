@@ -74,7 +74,7 @@ const WTO = () => {
             <RefreshControl refreshing={false} onRefresh={onRefresh} />
           }
           onScroll={handleScroll}
-          scrollEventThrottle={150}
+          scrollEventThrottle={0}
         >
           <CustomTable
             tableHeaders={tableHeaders}
@@ -85,7 +85,13 @@ const WTO = () => {
             selectType="wto-inbound"
             postType="wto-inbound"
             buttonUses="wto-inbound"
-            loadingStatus={wto.status === "loading" && !isScanItemModal && true}
+            loadingStatus={
+              wto.status === "loading" &&
+              !isScanItemModal &&
+              !refreshing &&
+              !isPaginating &&
+              true
+            }
           />
 
           {isScanModal && (
