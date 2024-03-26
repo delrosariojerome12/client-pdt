@@ -53,7 +53,7 @@ export const getCycleCountDetails = createAsyncThunk(
   }
 );
 
-export const togglePendingAndScan = createAsyncThunk(
+export const togglePendingAndScanCycle = createAsyncThunk(
   "ims/togglePendingScan",
   async (
     {

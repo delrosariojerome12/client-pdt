@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import {
   Modal,
   View,
@@ -10,20 +10,20 @@ import {
 } from "react-native";
 import CustomInputs from "../forms/inputs/CustomInputs";
 import CustomButton from "../forms/buttons/CustomButton";
-import {useDocumentHooks} from "../../hooks/documentHooks";
-import {FontAwesome5} from "@expo/vector-icons";
-import {format} from "../../styles/styles";
+import { useDocumentHooks } from "../../hooks/documentHooks";
+import { FontAwesome5 } from "@expo/vector-icons";
+import { format } from "../../styles/styles";
 import BatchDetails from "./BatchDetails";
-import {ScanCategory} from "../../models/generic/ScanCategory";
-import {ScanValidate} from "../../hooks/documentHooks";
-import {useAppSelector, useAppDispatch} from "../../store/store";
+import { ScanCategory } from "../../models/generic/ScanCategory";
+import { ScanValidate } from "../../hooks/documentHooks";
+import { useAppSelector, useAppDispatch } from "../../store/store";
 import {
   formatDateDDMMYYYY,
   formatDateMMDDYYYY,
   formatDateStringMMDDYYYY,
 } from "../../helper/Date";
-import {clearBatchDetails} from "../../reducers/generalReducer";
-import {handleBinItemDetails} from "../../reducers/documentReducer";
+import { clearBatchDetails } from "../../reducers/generalReducer";
+import { handleBinItemDetails } from "../../reducers/documentReducer";
 import MessageToast from "../message-toast/MessageToast";
 
 interface ScanModalProps {
@@ -35,11 +35,11 @@ interface ScanModalProps {
 }
 
 const ScanBinAndItemModal = React.memo((props: ScanModalProps) => {
-  const {visible, onClose, placeholder, scanParams, typeForFetching} = props;
-  const {handleScanItem} = useDocumentHooks();
-  const {selectedBinDetails} = useAppSelector((state) => state.document);
-  const {batchDetails} = useAppSelector((state) => state.general);
-  const {status, statusText} = useAppSelector((state) => state.status);
+  const { visible, onClose, placeholder, scanParams, typeForFetching } = props;
+  const { handleScanItem } = useDocumentHooks();
+  const { selectedBinDetails } = useAppSelector((state) => state.document);
+  const { batchDetails } = useAppSelector((state) => state.general);
+  const { status, statusText } = useAppSelector((state) => state.status);
 
   const dispatch = useAppDispatch();
 
@@ -183,49 +183,49 @@ const ScanBinAndItemModal = React.memo((props: ScanModalProps) => {
                   <View style={styles.itemContainer}>
                     <Text style={styles.floatingText}>Bin Item Details</Text>
                     <View style={format.twoRowText}>
-                      <Text style={{fontWeight: "bold"}}>Line No. :</Text>
+                      <Text style={{ fontWeight: "bold" }}>Line No. :</Text>
                       <Text>{selectedBinDetails.linenum}</Text>
                     </View>
                     <View style={format.twoRowText}>
-                      <Text style={{fontWeight: "bold"}}>Item Code:</Text>
+                      <Text style={{ fontWeight: "bold" }}>Item Code:</Text>
                       <Text>{selectedBinDetails.itmcde}</Text>
                     </View>
                     <View style={format.twoRowText}>
-                      <Text style={{fontWeight: "bold"}}>Description:</Text>
+                      <Text style={{ fontWeight: "bold" }}>Description:</Text>
                       <Text>{selectedBinDetails.itmdsc}</Text>
                     </View>
 
                     <View style={format.twoRowText}>
-                      <Text style={{fontWeight: "bold"}}>Batch No.:</Text>
+                      <Text style={{ fontWeight: "bold" }}>Batch No.:</Text>
                       <Text>{selectedBinDetails.batchnum}</Text>
                     </View>
                     <View style={format.twoRowText}>
-                      <Text style={{fontWeight: "bold"}}>Mfg. Date:</Text>
+                      <Text style={{ fontWeight: "bold" }}>Mfg. Date:</Text>
                       <Text>
                         {formatDateStringMMDDYYYY(selectedBinDetails.mfgdte)}
                       </Text>
                     </View>
                     <View style={format.twoRowText}>
-                      <Text style={{fontWeight: "bold"}}>Exp. Date:</Text>
+                      <Text style={{ fontWeight: "bold" }}>Exp. Date:</Text>
                       <Text>
                         {formatDateStringMMDDYYYY(selectedBinDetails.expdte)}
                       </Text>
                     </View>
                     <View style={format.twoRowText}>
-                      <Text style={{fontWeight: "bold"}}>Bin No.:</Text>
+                      <Text style={{ fontWeight: "bold" }}>Bin No.:</Text>
                       <Text>{selectedBinDetails.binnum}</Text>
                     </View>
 
                     <View style={format.twoRowText}>
-                      <Text style={{fontWeight: "bold"}}>Qty:</Text>
+                      <Text style={{ fontWeight: "bold" }}>Qty:</Text>
                       <Text>{selectedBinDetails.itmqty}</Text>
                     </View>
                     <View style={format.twoRowText}>
-                      <Text style={{fontWeight: "bold"}}>UOM:</Text>
+                      <Text style={{ fontWeight: "bold" }}>UOM:</Text>
                       <Text>{selectedBinDetails.untmea}</Text>
                     </View>
                     <View style={format.twoRowText}>
-                      <Text style={{fontWeight: "bold"}}>Scanned Qty:</Text>
+                      <Text style={{ fontWeight: "bold" }}>Scanned Qty:</Text>
                     </View>
                   </View>
 
@@ -281,28 +281,28 @@ const ScanBinAndItemModal = React.memo((props: ScanModalProps) => {
                       Scanned Item Details
                     </Text>
                     <View style={format.twoRowText}>
-                      <Text style={{fontWeight: "bold"}}>Item Code:</Text>
+                      <Text style={{ fontWeight: "bold" }}>Item Code:</Text>
                       <Text>{selectedBinDetails.itmcde}</Text>
                     </View>
                     <View style={format.twoRowText}>
-                      <Text style={{fontWeight: "bold"}}>Description:</Text>
+                      <Text style={{ fontWeight: "bold" }}>Description:</Text>
                       <Text>{selectedBinDetails.itmdsc}</Text>
                     </View>
 
                     <View style={format.twoRowText}>
-                      <Text style={{fontWeight: "bold"}}>Batch No.:</Text>
+                      <Text style={{ fontWeight: "bold" }}>Batch No.:</Text>
                       <Text>{batchDetails.batchNo}</Text>
                     </View>
                     <View style={format.twoRowText}>
-                      <Text style={{fontWeight: "bold"}}>Mfg. Date:</Text>
+                      <Text style={{ fontWeight: "bold" }}>Mfg. Date:</Text>
                       <Text>{formatDateMMDDYYYY(batchDetails.mfgDate)}</Text>
                     </View>
                     <View style={format.twoRowText}>
-                      <Text style={{fontWeight: "bold"}}>Exp. Date:</Text>
+                      <Text style={{ fontWeight: "bold" }}>Exp. Date:</Text>
                       <Text>{formatDateMMDDYYYY(batchDetails.mfgDate)}</Text>
                     </View>
                     <View style={format.twoRowText}>
-                      <Text style={{fontWeight: "bold"}}>Bin No.:</Text>
+                      <Text style={{ fontWeight: "bold" }}>Bin No.:</Text>
                       <Text>{selectedBinDetails.binnum}</Text>
                     </View>
                   </View>

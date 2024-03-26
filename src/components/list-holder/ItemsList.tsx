@@ -38,7 +38,7 @@ interface Props {
     | "outbound"
     | "subcon"
     | "stock-transfer"
-    | "physicalInventory"
+    | "physical-inventory"
     | "sloc";
 
   subcategory:
@@ -50,6 +50,7 @@ interface Props {
     | "singlepick"
     | "stg-validate"
     | "cyclecount"
+    | "physical-inventory"
     | "sloc"
     | "stock-transfer"
     | "stock-replenish";
@@ -74,7 +75,9 @@ const ItemsList = React.memo((props: Props) => {
     useAppSelector((state) => state.inventoryTransaction);
   const { wtoOutboundDetails, wavepickDetails, singlepickDetails } =
     useAppSelector((state) => state.outbound);
-  const { tableDetails } = useAppSelector((state) => state.table);
+  const { tableDetails, tableDetailsTotal } = useAppSelector(
+    (state) => state.table
+  );
 
   const renderItems = (
     item: any,
@@ -102,7 +105,7 @@ const ItemsList = React.memo((props: Props) => {
         return <WTODetails item={item} key={index} options={options} />;
       case "subcon":
         return <SubConBinDetails item={item} key={index} />;
-      case "physicalInventory":
+      case "physical-inventory":
         return (
           <PhysicalInventoryDetails item={item} key={index} options={options} />
         );
@@ -192,7 +195,7 @@ const ItemsList = React.memo((props: Props) => {
             });
         }
         break;
-      case "physicalInventory":
+      case "physical-inventory":
         switch (subcategory) {
           case "cyclecount":
             if (cycleCountDetails.data.data.length === 0) {
@@ -201,6 +204,22 @@ const ItemsList = React.memo((props: Props) => {
             return cycleCountDetails.data.data.map(
               (item: any, index: number) => {
                 return renderItems(item, index, { removeType: "cyclecount" });
+              }
+            );
+          case "physical-inventory":
+            if (tableDetailsTotal.data.data.length === 0) {
+              return renderItems(
+                {},
+                0,
+                { removeType: "physical-inventory" },
+                true
+              );
+            }
+            return tableDetailsTotal.data.data.map(
+              (item: any, index: number) => {
+                return renderItems(item, index, {
+                  removeType: "physical-inventory",
+                });
               }
             );
         }

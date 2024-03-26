@@ -9,7 +9,7 @@ import {
   getStockTransferValid,
   getStockTransferPosting,
   getCycleCountDetails,
-  togglePendingAndScan,
+  togglePendingAndScanCycle,
   getSLOCDetails,
   getStockTransferDetails,
 } from "../../store/actions/ims/transaction";
@@ -121,14 +121,14 @@ const inventoryTransactionReducer = createSlice({
       });
 
     builder
-      .addCase(togglePendingAndScan.pending, (state, action) => {
+      .addCase(togglePendingAndScanCycle.pending, (state, action) => {
         state.cycleCountDetails.status = "loading";
       })
-      .addCase(togglePendingAndScan.fulfilled, (state, action) => {
+      .addCase(togglePendingAndScanCycle.fulfilled, (state, action) => {
         state.cycleCountDetails.data = action.payload;
         state.cycleCountDetails.status = "success";
       })
-      .addCase(togglePendingAndScan.rejected, (state, action) => {
+      .addCase(togglePendingAndScanCycle.rejected, (state, action) => {
         state.cycleCountDetails.status = "failed";
       });
 

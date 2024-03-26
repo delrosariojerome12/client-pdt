@@ -1,12 +1,12 @@
-import {View, Text, StyleSheet, TouchableOpacity, Modal} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Modal } from "react-native";
 import React from "react";
-import {FontAwesome} from "@expo/vector-icons";
-import {bgColors} from "../../styles/styles";
-import {useDocumentHooks} from "../../hooks/documentHooks";
-import {format} from "../../styles/styles";
-import {useBatchHooks} from "../../hooks/batchHooks";
-import {formatDateStringMMDDYYYY} from "../../helper/Date";
-import {Options} from "../list-holder/ItemsList";
+import { FontAwesome } from "@expo/vector-icons";
+import { bgColors } from "../../styles/styles";
+import { useDocumentHooks } from "../../hooks/documentHooks";
+import { format } from "../../styles/styles";
+import { useBatchHooks } from "../../hooks/batchHooks";
+import { formatDateStringMMDDYYYY } from "../../helper/Date";
+import { Options } from "../list-holder/ItemsList";
 
 interface PhysicalInventoryProps {
   item: any;
@@ -14,8 +14,8 @@ interface PhysicalInventoryProps {
 }
 
 const PhysicalInventoryDetails = React.memo((props: PhysicalInventoryProps) => {
-  const {removeScannedQuantity} = useBatchHooks();
-  const {item, options} = props;
+  const { removeScannedQuantity } = useBatchHooks();
+  const { item, options } = props;
 
   return (
     <>
@@ -23,44 +23,44 @@ const PhysicalInventoryDetails = React.memo((props: PhysicalInventoryProps) => {
         <View style={styles.topContainer}>
           <View style={styles.leftContainer}>
             <View style={format.twoRowText}>
-              <Text style={{fontWeight: "bold"}}>{`Line No:`}</Text>
+              <Text style={{ fontWeight: "bold" }}>{`Line No:`}</Text>
               <Text>{item.linenum}</Text>
             </View>
             <View style={format.twoRowText}>
-              <Text style={{fontWeight: "bold"}}>Bin No.:</Text>
+              <Text style={{ fontWeight: "bold" }}>Bin No.:</Text>
               <Text>{item.binnum}</Text>
             </View>
             <View style={format.twoRowText}>
-              <Text style={{fontWeight: "bold"}}>Item Code:</Text>
+              <Text style={{ fontWeight: "bold" }}>Item Code:</Text>
               <Text>{item.itmcde}</Text>
             </View>
             <View style={format.twoRowText}>
-              <Text style={{fontWeight: "bold"}}>Description:</Text>
+              <Text style={{ fontWeight: "bold" }}>Description:</Text>
               <Text>{item.itmdsc}</Text>
             </View>
 
             <View style={format.twoRowText}>
-              <Text style={{fontWeight: "bold"}}>UOM:</Text>
+              <Text style={{ fontWeight: "bold" }}>UOM:</Text>
               <Text>{item.untmea}</Text>
             </View>
           </View>
           <View style={styles.rightContainer}>
             <View style={format.twoRowText}>
-              <Text style={{fontWeight: "bold"}}>Batch No.:</Text>
+              <Text style={{ fontWeight: "bold" }}>Batch No.:</Text>
               <Text>{item.batchnum || "No Batch No."}</Text>
             </View>
             <View style={format.twoRowText}>
-              <Text style={{fontWeight: "bold"}}>Mfg. Date:</Text>
+              <Text style={{ fontWeight: "bold" }}>Mfg. Date:</Text>
               <Text>{formatDateStringMMDDYYYY(item.mfgdte)}</Text>
             </View>
             <View style={format.twoRowText}>
-              <Text style={{fontWeight: "bold"}}>Exp. Date:</Text>
+              <Text style={{ fontWeight: "bold" }}>Exp. Date:</Text>
               <Text>{formatDateStringMMDDYYYY(item.expdte)}</Text>
             </View>
 
             <View style={styles.remove}>
               <View style={format.twoRowText}>
-                <Text style={{fontWeight: "bold"}}>Qty:</Text>
+                <Text style={{ fontWeight: "bold" }}>Qty:</Text>
                 <Text>{item.itmqty}</Text>
               </View>
               <TouchableOpacity

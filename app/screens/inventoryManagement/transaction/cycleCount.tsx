@@ -106,7 +106,7 @@ const CycleCount = React.memo(() => {
               { name: "warloccde", label: "Storage Location" },
             ]}
             customContent={
-              <ItemsList uses="physicalInventory" subcategory="cyclecount" />
+              <ItemsList uses="physical-inventory" subcategory="cyclecount" />
             }
             scanOptions={{
               scanModal: true,

@@ -68,6 +68,10 @@ import {
   getStockTOPosting,
   getStockTOValid,
 } from "../store/actions/ims/replenishment";
+import {
+  getphysicalRecordDetails,
+  getphysicalRecord,
+} from "../store/actions/ims/physicalCount";
 
 import { useAPIHooks } from "./apiHooks";
 import { setStatusText, showQuantityField } from "../reducers/statusReducer";
@@ -98,6 +102,7 @@ export type TypePost =
   | "inv-singlepick"
   | "spl-singlepick"
   | "cyclecount"
+  | "physical-inventory"
   | "sloc"
   | "stock-transfer"
   | "stock-replenish";
@@ -113,6 +118,7 @@ export type ScanValidate =
   | "singlepick"
   | "stg-validate"
   | "cyclecount"
+  | "physical-inventory"
   | "sloc"
   | "sloc-bin"
   | "stock-transfer"
@@ -129,6 +135,7 @@ export type TypeSelect =
   | "singlepick"
   | "stg-validate"
   | "cyclecount"
+  | "physical-inventory"
   | "sloc"
   | "stock-transfer"
   | "stock-replenish"
@@ -168,9 +175,10 @@ export const useDocumentHooks = () => {
     getBinAndValidate,
     connectToPHPNotDispatch,
     getCycleCount2,
+    getPIRSingle,
   } = useAPIHooks();
   const { toggleEditBatchModal } = useModalHooks();
-  const { handleGet } = useServiceHooks();
+  const { handleGet, handlePatch } = useServiceHooks();
 
   // start check categories and uses functions
 
@@ -207,6 +215,13 @@ export const useDocumentHooks = () => {
         break;
       case "stock-replenish":
         dispatch(getStockTODetails({ docnum: item.docnum }));
+        break;
+      case "physical-inventory":
+        dispatch(
+          getphysicalRecordDetails({ docnum: item.docnum, refnum: item.refnum })
+        );
+        break;
+
       default:
         break;
     }
@@ -611,9 +626,63 @@ export const useDocumentHooks = () => {
           })
         );
         break;
+      case "physical-inventory":
+        dispatch(
+          connectToPHP({
+            recid: item.recid,
+            docnum: item.docnum,
+            refnum: item.refnum,
+            type: "VALIDATE_PIR",
+            onSuccess: async () => {
+              dispatch(setStatus("loading"));
+              const res = await connectToPHPNotDispatch({
+                recid: item.recid,
+                docnum: item.docnum,
+                refnum: item.refnum,
+                type: "PIR",
+              });
+
+              await handlePatch({
+                url: "/lst_tracc/physicalcountfile31",
+                requestData: {
+                  field: {
+                    docnum: item.docnum,
+                    refnum: item.refnum,
+                  },
+                  data: {
+                    validate: 1,
+                  },
+                },
+                disableToast: true,
+              });
+
+              if (res) {
+                dispatch(
+                  getphysicalRecord({
+                    limit: 10,
+                    offset: 0,
+                  })
+                );
+                dispatch(setStatus("success"));
+              }
+            },
+            onFailure: (e) => {
+              dispatch(resetStatus());
+              Alert.alert("Transaction Posting Fail", `${e}`, [
+                {
+                  text: "Ok",
+                  onPress: () => {},
+                  style: "destructive",
+                },
+              ]);
+            },
+            dontShowSuccess: true,
+          })
+        );
+        break;
 
       default:
-        alert("No api yet.");
+        alert("No supported yet.");
         break;
     }
   };
@@ -1110,6 +1179,74 @@ export const useDocumentHooks = () => {
             }
           }
           break;
+
+        case "physical-inventory":
+          const pirResponse = await scanBarcode({
+            barcode,
+            category: "pir_item",
+            recid: selectedBinDetails?.recid.toString(),
+            docnum: selectedDocument.docnum,
+            refnum: selectedDocument.refnum,
+            scanlevel: scanlevel,
+            pdtmanualqtyoutbound: receiveQty.toString(),
+            usrnam: userDetails?.usrcde,
+            barcodelvl2: barcodelvl2,
+            scanneditem:
+              scanlevel === "2.1"
+                ? JSON.stringify({
+                    itmcde: selectedBinDetails.itmcde,
+                    itmdsc: selectedBinDetails.itmdsc,
+                    untmea: selectedBinDetails.untmea,
+                    itmtyp: selectedBinDetails.itmtyp,
+                    binnum: selectedBinDetails.binnum,
+                    batchnum: selectedBinDetails.batchnum,
+                    mfgdte: selectedBinDetails.mfgdte,
+                    expdte: selectedBinDetails.expdte,
+                  })
+                : "",
+          });
+          console.log("pir res", pirResponse);
+          console.log("sana", selectedBinDetails);
+
+          if (pirResponse) {
+            if (pirResponse.data.item_match === false) {
+              Alert.alert("Notification", `Item Barcode not Matched`, [
+                {
+                  text: "OK",
+                },
+              ]);
+            }
+            if (pirResponse.data.item_match) {
+              toggleEditBatchModal();
+            }
+            if (pirResponse.data.scanned_item) {
+              dispatch(setBatchedSaved(true));
+              dispatch(setBatchNo(pirResponse.data.scanned_item.batchnum));
+              dispatch(
+                setExpDate(new Date(pirResponse.data.scanned_item.expdte))
+              );
+              dispatch(
+                setMfgDate(new Date(pirResponse.data.scanned_item.mfgdte))
+              );
+            }
+
+            if (pirResponse.data.pir2_data) {
+              if (pirResponse.data.pir2_data[0]) {
+                dispatch(handleBinItemDetails(pirResponse.data.pir2_data[0]));
+              }
+              if (pirResponse.data.pir2_data.length === 0) {
+                dispatch(
+                  getphysicalRecordDetails({
+                    docnum: selectedDocument.docnum,
+                    refnum: selectedDocument.refnum,
+                  })
+                );
+                dispatch(setStatusText(`Item Successfully Scanned.`));
+              }
+            }
+          }
+          break;
+
         default:
           alert("no api yet");
           break;
@@ -1136,6 +1273,7 @@ export const useDocumentHooks = () => {
       case "wto-outbound":
       case "wavepick":
       case "cyclecount":
+      case "physical-inventory":
         const response = await scanBarcode({ barcode, category });
         if (response) {
           handleSelectModal({ item: response.data, type: uses });
@@ -1254,8 +1392,6 @@ export const useDocumentHooks = () => {
 
   // start of  modals
   const handleSelectModal = ({ item, type }: SelectProps) => {
-    console.log("mga pinasa");
-    console.log(type, item);
     // FETCH-DOCNUM-DETAILS-ONSELECT
     checkSelectType({ item, type });
     dispatch(handleSetDocument(item));
@@ -1462,12 +1598,14 @@ export const useDocumentHooks = () => {
     ]);
   };
 
-  const validatePhysicalRecord = (item: any) => {
-    Alert.alert("Validation", `Do you want to validate '${item.pirNo}'`, [
+  const validatePhysicalRecord = async (item: any) => {
+    console.log("item", item);
+
+    // const pir = await getPIRSingle(item.docnum, item.recid, item.refnum);
+    Alert.alert("Validation", `Do you want to validate '${item.refnum}'`, [
       {
         text: "Yes",
-        onPress: () => alert("No api yet."),
-        style: "destructive",
+        onPress: () => checkPostType(item, "physical-inventory"),
       },
       { text: "No", style: "cancel" }, // Just close the alert without any action
     ]);

@@ -1,14 +1,16 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { ProductData } from "../models/generic/ProductData";
 import {
   getStockTODetails,
   getStockTOPosting,
   getStockTOValid,
 } from "../store/actions/ims/replenishment";
-import { getDTSValid, getDTSPosting } from "../store/actions/ims/subcon";
-import { getphysicalRecord } from "../store/actions/ims/physicalCount";
+import { togglePendingAndScanPIR } from "../store/actions/ims/physicalCount";
+import {
+  getphysicalRecord,
+  getphysicalRecordDetails,
+} from "../store/actions/ims/physicalCount";
 
-import { ActionReducerMapBuilder, AsyncThunk } from "@reduxjs/toolkit";
+import { ActionReducerMapBuilder } from "@reduxjs/toolkit";
 
 interface AsyncAction<T> {
   pending: string;
@@ -25,6 +27,10 @@ interface Table {
     data: any[] | [];
     status: "idle" | "loading" | "success" | "failed";
   };
+  tableDetailsTotal: {
+    data: { data: []; totalItem: 0; totalscanned: 0 };
+    status: "idle" | "loading" | "success" | "failed";
+  };
 }
 
 const initialState: Table = {
@@ -34,6 +40,14 @@ const initialState: Table = {
   },
   tableDetails: {
     data: [],
+    status: "idle",
+  },
+  tableDetailsTotal: {
+    data: {
+      totalItem: 0,
+      totalscanned: 0,
+      data: [],
+    },
     status: "idle",
   },
 };
@@ -115,12 +129,36 @@ const tableReducer = createSlice({
     createAsyncReducerCases(
       builder,
       {
-        pending: getDTSValid.pending.type,
-        fulfilled: getDTSValid.fulfilled.type,
-        rejected: getDTSValid.rejected.type,
+        pending: getphysicalRecord.pending.type,
+        fulfilled: getphysicalRecord.fulfilled.type,
+        rejected: getphysicalRecord.rejected.type,
       },
       "tableData"
     );
+
+    builder
+      .addCase(getphysicalRecordDetails.pending, (state, action) => {
+        state.tableDetailsTotal.status = "loading";
+      })
+      .addCase(getphysicalRecordDetails.fulfilled, (state, action) => {
+        state.tableDetailsTotal.status = "success";
+        state.tableDetailsTotal.data = action.payload;
+      })
+      .addCase(getphysicalRecordDetails.rejected, (state, action) => {
+        state.tableDetailsTotal.status = "failed";
+      });
+
+    builder
+      .addCase(togglePendingAndScanPIR.pending, (state, action) => {
+        state.tableDetailsTotal.status = "loading";
+      })
+      .addCase(togglePendingAndScanPIR.fulfilled, (state, action) => {
+        state.tableDetailsTotal.status = "success";
+        state.tableDetailsTotal.data = action.payload;
+      })
+      .addCase(togglePendingAndScanPIR.rejected, (state, action) => {
+        state.tableDetailsTotal.status = "failed";
+      });
   },
 });
 

@@ -633,6 +633,20 @@ export const useAPIHooks = () => {
 
     return response;
   };
+  //
+
+  const getPIRSingle = async (
+    docnum: string,
+    recid: number,
+    refnum: string
+  ) => {
+    const response = await handleGet({
+      url: `lst_tracc/physicalcountfile31?recid=${recid}&docnum=${docnum}&refnum=${refnum}&_limit=1`,
+      disableToast: true,
+    });
+
+    return response;
+  };
   const getBatchAndBinInquiry = async (filter: string) => {
     try {
       let response: any = await handleGet({
@@ -709,5 +723,6 @@ export const useAPIHooks = () => {
     getCycleCount2,
     getBatchAndBinInquiry,
     getStockOnHand,
+    getPIRSingle,
   };
 };

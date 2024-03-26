@@ -1,192 +1,184 @@
-import {View, Text} from "react-native";
-import React, {useEffect, useState} from "react";
+import {
+  View,
+  Text,
+  ScrollView,
+  ActivityIndicator,
+  RefreshControl,
+} from "react-native";
+import React, { useEffect, useState } from "react";
 import CustomButton from "../../../../src/components/forms/buttons/CustomButton";
+import CustomTable from "../../../../src/components/forms/table/CustomTable";
 import ScanModal from "../../../../src/components/modals/ScanModal";
-import {useDocumentHooks} from "../../../../src/hooks/documentHooks";
-import {useAppSelector} from "../../../../src/store/store";
-import {generalStyles} from "../../../../src/styles/styles";
+import { useDocumentHooks } from "../../../../src/hooks/documentHooks";
+import { generalStyles } from "../../../../src/styles/styles";
 import VerticalList from "../../../../src/components/list/verticalList";
 import ItemsList from "../../../../src/components/list-holder/ItemsList";
+import SelectModal from "../../../../src/components/modals/SelectModal";
 import SelectandScanModal from "../../../../src/components/modals/SelectandScanModal";
+import MessageToast from "../../../../src/components/message-toast/MessageToast";
+import CustomLoadingText from "../../../../src/components/load-spinner/CustomLoadingText";
+import { usePhysicalCountHooks } from "../../../../src/hooks/physicalCountHooks";
+import InputWithSearch from "../../../../src/components/forms/inputs/InputWithSearch";
 
-const PhysicalInventory = () => {
-  const {isScanModal, isSelectModal} = useAppSelector((state) => state.modal);
-  const {selectedDocument} = useAppSelector((state) => state.document);
-
-  const [isShowPending, setIsShowPending] = useState<boolean>(false);
-  const [isShowCounted, setIsShowCounted] = useState<boolean>(false);
+const PhysicalInventory = React.memo(() => {
+  const {
+    isPaginating,
+    refreshing,
+    onRefresh,
+    isScanModal,
+    isSelectModal,
+    status,
+    statusText,
+    activeIndex,
+    handleIndexChange,
+    handleScroll,
+    isSourceScanning,
+    isTargetScanning,
+    tableData,
+    tableDetailsTotal,
+    selectedDocument,
+    isScanBinModal,
+    filteredData,
+    searchText,
+    handleSearch,
+    handleChangeSearchText,
+  } = usePhysicalCountHooks({
+    page: "physical-inventory-record",
+  });
 
   const {
     handleScanModal,
     handleSelectModal,
     closeSelectModal,
+    handlePost,
+    // validateCycleCount,
     validatePhysicalRecord,
   } = useDocumentHooks();
 
-  const data = [
-    {
-      warehouse: "Warehouse A",
-      whsNo: "WH001",
-      date: "2024-02-17",
-      ccrNo: "CCR001",
-      sLoc: "good",
-      pirNo: "123ANC",
-      items: [
-        {
-          itemCode: "ABC123",
-          itemName: "Item 1",
-          pieces: 5,
-          receiveQty: 5,
-          LPNNumber: "LPN123",
-          batchNumber: "BATCH001",
-          mfgDate: "2023-01-01",
-          expDate: "2024-12-31",
-        },
-        {
-          itemCode: "DEF456",
-          itemName: "Item 2",
-          pieces: 10,
-          receiveQty: 10,
-          LPNNumber: "LPN456",
-          batchNumber: "BATCH002",
-          mfgDate: "2023-02-01",
-          expDate: "2024-12-31",
-        },
-        {
-          itemCode: "GHI789",
-          itemName: "Item 3",
-          pieces: 15,
-          receiveQty: 15,
-          LPNNumber: "LPN789",
-          batchNumber: "BATCH003",
-          mfgDate: "2023-03-01",
-          expDate: "2024-12-31",
-        },
-      ],
-    },
-    {
-      warehouse: "Warehouse B",
-      whsNo: "WH002",
-      date: "2024-02-17",
-      ccrNo: "CCR002",
-      sLoc: "bad",
-      pirNo: "123ANC",
-
-      items: [
-        {
-          itemCode: "ABC123",
-          itemName: "Item 1",
-          pieces: 5,
-          receiveQty: 5,
-          LPNNumber: "LPN123",
-          batchNumber: "BATCH001",
-          mfgDate: "2023-01-01",
-          expDate: "2024-12-31",
-        },
-      ],
-    },
-    {
-      warehouse: "Warehouse C",
-      whsNo: "WH003",
-      date: "2024-02-17",
-      ccrNo: "CCR003",
-      sLoc: "good",
-    },
-    {
-      warehouse: "Warehouse D",
-      whsNo: "WH003",
-      date: "2024-02-17",
-      ccrNo: "CCR003",
-      sLoc: "good",
-      pirNo: "123ANC",
-      items: [
-        {
-          itemCode: "ABC123",
-          itemName: "Item 1",
-          pieces: 5,
-          receiveQty: 5,
-          LPNNumber: "LPN123",
-          batchNumber: "BATCH001",
-          mfgDate: "2023-01-01",
-          expDate: "2024-12-31",
-        },
-        {
-          itemCode: "DEF456",
-          itemName: "Item 2",
-          pieces: 10,
-          receiveQty: 10,
-          LPNNumber: "LPN456",
-          batchNumber: "BATCH002",
-          mfgDate: "2023-02-01",
-          expDate: "2024-12-31",
-        },
-      ],
-    },
-  ];
-
+  const checkStatus = () => {
+    if (
+      !isScanBinModal &&
+      !refreshing &&
+      !isPaginating &&
+      tableDetailsTotal.status === "loading"
+    ) {
+      return true;
+    }
+    return undefined;
+  };
   console.log("physical inventory");
 
   return (
-    <View style={generalStyles.innerContainer}>
-      <CustomButton
-        title="SCAN PIR NO."
-        onPress={handleScanModal}
-        type="regular"
-      />
+    <>
+      {status === "success" && !isSelectModal && !isScanModal && (
+        <MessageToast
+          status="success"
+          text="Document Successfully Posted"
+          speed={2500}
+        />
+      )}
 
-      <ScanModal
-        visible={isScanModal}
-        onClose={handleScanModal}
-        placeholder="Waiting to Scan PIR NO. Barcode..."
-      />
+      <View style={generalStyles.outerContainer}>
+        <CustomButton
+          title="SCAN PIR NO."
+          onPress={handleScanModal}
+          type="regular"
+        />
 
-      <VerticalList
-        data={data}
-        onValidate={validatePhysicalRecord}
-        onSelect={handleSelectModal}
-        propertiesToShow={[
-          {name: "warehouse", label: "Warehouse"},
-          {name: "whsNo", label: "Warehouse Number"},
-          {name: "date", label: "Date"},
-          {name: "ccrNo", label: "CCR Number"},
-          {name: "sLoc", label: "Storage Location"},
-        ]}
-      />
+        {status === "loading" && !isSelectModal && !isScanModal && (
+          <CustomLoadingText text="Posting..." visible={true} />
+        )}
 
-      <SelectandScanModal
-        visible={isSelectModal}
-        onClose={closeSelectModal}
-        selectedItem={selectedDocument}
-        title="Physical Inventory Record Details"
-        propertiesToShow={[
-          {name: "pirNo", label: "PIR No. "},
-          {name: "warehouse", label: "Warehouse"},
-          {name: "whsNo", label: "WHS No. "},
-          {name: "sLoc", label: "Storage Location"},
-        ]}
-        customContent={<ItemsList uses="physicalInventory" />}
-        scanOptions={{
-          scanModal: true,
-          scanCounted: true,
-          showPending: true,
-          scanModalDetails: {
-            placeholder: "Waiting to Scan Bin No. Barcode...",
-            title: "SCAN BIN NO. / ITEM",
-          },
-        }}
-        checkBoxOptions={{
-          counted: {
-            showCounted: isShowCounted,
-            toggleCounted: () => setIsShowCounted(!isShowCounted),
-          },
-          pending: {
-            showPending: isShowPending,
-            togglePending: () => setIsShowPending(!isShowPending),
-          },
-        }}
-      />
-    </View>
+        {isScanModal && (
+          <ScanModal
+            visible={isScanModal}
+            onClose={() => {
+              handleScanModal();
+            }}
+            placeholder="Waiting to Scan PIR NO. Barcode..."
+            typeForFetching="physical-inventory"
+            scanParams="pir"
+            usage="searching"
+          />
+        )}
+
+        {isSelectModal && (
+          <SelectandScanModal
+            usage="physical-count"
+            loadingStatus={checkStatus()}
+            visible={isSelectModal}
+            onClose={() => {
+              closeSelectModal();
+            }}
+            selectedItem={selectedDocument}
+            title="Physical Inventory Record Details"
+            propertiesToShow={[
+              { name: "refnum", label: "PIR No." },
+              { name: "warcde", label: "Warehouse" },
+              { name: "warcdenum", label: "Warehouse No." },
+              { name: "warloccde", label: "Storage Location" },
+            ]}
+            customContent={
+              <ItemsList
+                uses="physical-inventory"
+                subcategory="physical-inventory"
+              />
+            }
+          />
+        )}
+
+        <InputWithSearch
+          label="Batch No."
+          onShow={handleSearch}
+          text={searchText}
+          onTextChange={handleChangeSearchText}
+        />
+        <ScrollView
+          style={generalStyles.innerContainer}
+          contentContainerStyle={{ flexGrow: 1 }}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          onScroll={handleScroll}
+          scrollEventThrottle={0}
+        >
+          <VerticalList
+            onValidate={validatePhysicalRecord}
+            onSelect={handleSelectModal}
+            data={searchText ? filteredData : tableData.data}
+            selectType="physical-inventory"
+            propertiesToShow={[
+              { name: "trndte", label: "Date" },
+              { name: "refnum", label: "PIR Number" },
+              { name: "warcde", label: "Warehouse" },
+              { name: "warcdenum", label: "Warehouse Number" },
+              { name: "warloccde", label: "Storage Location" },
+            ]}
+            loadingStatus={
+              tableData.status === "loading" &&
+              !refreshing &&
+              !isPaginating &&
+              true
+            }
+          />
+        </ScrollView>
+
+        {isPaginating && (
+          <View
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              paddingVertical: 10,
+              height: 100,
+            }}
+          >
+            <ActivityIndicator size="large" color="#0000ff" />
+            <Text>Loading more data...</Text>
+          </View>
+        )}
+      </View>
+    </>
   );
-};
+});
 
 export default PhysicalInventory;

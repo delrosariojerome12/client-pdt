@@ -12,8 +12,6 @@ import {
   getWPTODetails,
   getWPTOValid,
   getPKValidate,
-  getINVPosting,
-  getSPLPosting,
   getSTGValidate,
   getSTGValidateDetails,
 } from "../store/actions/warehouse/warehouseActions";
@@ -33,7 +31,7 @@ import {
   setBatchPostMode,
 } from "../reducers/generalReducer";
 import {
-  togglePendingAndScan,
+  togglePendingAndScanCycle,
   getCycleCountDetails,
   getCycleCount,
   getSLOCValid,
@@ -41,10 +39,15 @@ import {
   getStockTransferValid,
   getStockTransferDetails,
 } from "../store/actions/ims/transaction";
+import { togglePendingAndScanPIR } from "../store/actions/ims/physicalCount";
 import {
   getStockTODetails,
   getStockTOValid,
 } from "../store/actions/ims/replenishment";
+import {
+  getphysicalRecord,
+  getphysicalRecordDetails,
+} from "../store/actions/ims/physicalCount";
 import { useDocumentHooks } from "./documentHooks";
 import { formatDateYYYYMMDD } from "../helper/Date";
 import { setStatus, setStatusText } from "../reducers/statusReducer";
@@ -112,6 +115,15 @@ export const useBatchHooks = () => {
       case "stock-replenish":
         dispatch(getStockTOValid({ limit: 10, offset: 0 }));
         dispatch(getStockTODetails({ docnum: selectedDocument.docnum }));
+        break;
+      case "physical-inventory":
+        dispatch(getphysicalRecord({ limit: 10, offset: 0 }));
+        dispatch(
+          getphysicalRecordDetails({
+            docnum: selectedDocument.docnum,
+            refnum: selectedDocument.refnum,
+          })
+        );
         break;
 
       default:
@@ -453,6 +465,42 @@ export const useBatchHooks = () => {
         );
 
         break;
+      case "physical-inventory":
+        if (item.validated === 1) {
+          Alert.alert(
+            "Removing Quantity",
+            "Cannot Remove quantity of already validated item."
+          );
+          return;
+        }
+
+        const pirEndpoints: Endpoint[] = [
+          {
+            method: "PATCH",
+            url: `lst_tracc/physicalcountfile3`,
+            payload: {
+              field: {
+                recid: item.recid,
+              },
+              data: {
+                stritmqty: "",
+                itmqty: 0,
+                pstritmqty: "0",
+              },
+            },
+          },
+        ];
+        const pirResponse = await removeScannedQuantityService(
+          pirEndpoints,
+          () => {
+            checkDetailsToReload(uses);
+            dispatch(setStatusText(`Scanned Quantity Removed Successfully.`));
+          }
+        );
+
+        console.log(pirResponse);
+
+        break;
       default:
         alert("Remove not supported");
         break;
@@ -499,6 +547,7 @@ export const useBatchHooks = () => {
       });
     }
   };
+
   const handlePostUpdateBatch = () => {
     Alert.alert(
       `Batch Details Update Posting`,
@@ -544,8 +593,6 @@ export const useBatchHooks = () => {
   };
 
   const removeScannedQuantity = (item: any, detailsToLoad: TypeSelect) => {
-    console.log(detailsToLoad);
-
     Alert.alert(
       "Remove Scanned Quantity",
       `Are you sure you want to remove the scanned quantity of item: '${item.itmdsc}' ?`,
@@ -563,15 +610,33 @@ export const useBatchHooks = () => {
   };
   const handleCheckPendingScan = (
     showPending: boolean,
-    showScanned: boolean
+    showScanned: boolean,
+    usage: "cycle-count" | "physical-count"
   ) => {
-    dispatch(
-      togglePendingAndScan({
-        docnum: selectedDocument.docnum,
-        showPending,
-        showScanned,
-      })
-    );
+    switch (usage) {
+      case "cycle-count":
+        dispatch(
+          togglePendingAndScanCycle({
+            docnum: selectedDocument.docnum,
+            showPending,
+            showScanned,
+          })
+        );
+        break;
+      case "physical-count":
+        dispatch(
+          togglePendingAndScanPIR({
+            docnum: selectedDocument.docnum,
+            refnum: selectedDocument.refnum,
+            showPending,
+            showScanned,
+          })
+        );
+        break;
+
+      default:
+        break;
+    }
   };
 
   // modals

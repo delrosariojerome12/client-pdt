@@ -5,8 +5,8 @@ import {
   TextInput,
   StyleSheet,
 } from "react-native";
-import React, {useState} from "react";
-import {FontAwesome} from "@expo/vector-icons";
+import React, { useState } from "react";
+import { FontAwesome } from "@expo/vector-icons";
 
 interface InputProps {
   label: string;
@@ -17,7 +17,7 @@ interface InputProps {
 }
 
 const InputWithSearch = (props: InputProps) => {
-  const {label, onShow, text, onTextChange, disable} = props;
+  const { label, onShow, text, onTextChange, disable } = props;
 
   return (
     <View style={style.inputWithSearchContainer}>
@@ -33,8 +33,19 @@ const InputWithSearch = (props: InputProps) => {
           placeholder="" // No need for placeholder when using conditional rendering
           value={text}
           onChangeText={(newText) => onTextChange && onTextChange(newText)}
+          onSubmitEditing={() => {
+            if (text.trim() !== "") {
+              onShow && onShow();
+            }
+          }}
         />
-        <TouchableOpacity onPress={onShow}>
+        <TouchableOpacity
+          onPress={() => {
+            if (text.trim() !== "") {
+              onShow && onShow();
+            }
+          }}
+        >
           <FontAwesome name="search" size={20} color="#808080" />
         </TouchableOpacity>
       </View>
@@ -57,6 +68,7 @@ const style = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     paddingLeft: 5, // Adjust as needed
+    paddingVertical: 5,
   },
   placeholder: {
     position: "absolute",

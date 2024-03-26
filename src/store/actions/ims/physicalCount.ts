@@ -9,10 +9,11 @@ interface FetchPayload {
 }
 interface FetchDocnumDetails {
   docnum: string;
+  refnum: string;
 }
 
 export const getphysicalRecord = createAsyncThunk(
-  "ims/getphysicalRecord",
+  "ims/getPIR",
   async (
     { limit, offset, paginating }: FetchPayload,
     { rejectWithValue, getState }
@@ -29,6 +30,58 @@ export const getphysicalRecord = createAsyncThunk(
         data: response.data,
         paginating: paginating,
       };
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const getphysicalRecordDetails = createAsyncThunk(
+  "ims/getPIRDetails",
+  async (
+    { docnum, refnum }: FetchDocnumDetails,
+    { rejectWithValue, getState }
+  ) => {
+    try {
+      const state = getState() as RootState;
+      const { ipAddress, port, protocol } = state.auth.server;
+
+      const url = `${protocol}://${ipAddress}:${port}/api/getPIROutboundDetails?docnum=${docnum}&refnum=${refnum}&showpending=true&showscanned=true`;
+
+      const response = await axios.get(url);
+
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const togglePendingAndScanPIR = createAsyncThunk(
+  "ims/togglePendingScanPIR",
+  async (
+    {
+      showPending,
+      showScanned,
+      docnum,
+      refnum,
+    }: {
+      showPending: boolean;
+      docnum: string;
+      refnum: string;
+      showScanned: boolean;
+    },
+    { rejectWithValue, getState }
+  ) => {
+    try {
+      const state = getState() as RootState;
+      const { ipAddress, port, protocol } = state.auth.server;
+
+      const url = `${protocol}://${ipAddress}:${port}/api/getPIROutboundDetails?docnum=${docnum}&refnum=${refnum}&showpending=${showPending}&showscanned=${showScanned}`;
+
+      const response = await axios.get(url);
+
+      return response.data;
     } catch (error: any) {
       return rejectWithValue(error.message);
     }

@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import {
   Modal,
   View,
@@ -8,16 +8,16 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
-import {FontAwesome5} from "@expo/vector-icons";
-import {shadows} from "../../styles/styles";
+import { FontAwesome5 } from "@expo/vector-icons";
+import { shadows } from "../../styles/styles";
 import CustomButton from "../forms/buttons/CustomButton";
-import {useAppSelector} from "../../store/store";
+import { useAppSelector } from "../../store/store";
 import CustomCheckBox from "../forms/inputs/CustomCheckBox";
 import ScanModal from "./ScanModal";
 import MessageToast from "../message-toast/MessageToast";
 import CustomLoadingText from "../load-spinner/CustomLoadingText";
-import {useBatchHooks} from "../../hooks/batchHooks";
-import {useModalHooks} from "../../hooks/modalHooks";
+import { useBatchHooks } from "../../hooks/batchHooks";
+import { useModalHooks } from "../../hooks/modalHooks";
 import ScanBinAndItemModal from "./ScanBinAndItemModal";
 
 interface SelectScanModalProps {
@@ -25,13 +25,10 @@ interface SelectScanModalProps {
   onClose: () => void;
   selectedItem: any;
   title: string;
-  propertiesToShow: {name: string; label: string}[];
+  propertiesToShow: { name: string; label: string }[];
   customContent: JSX.Element;
-  scanOptions?: {
-    scanModal: boolean;
-    scanModalDetails?: {title: string; placeholder: string};
-  };
   loadingStatus?: boolean;
+  usage: "cycle-count" | "physical-count";
 }
 
 const SelectandScanModal = React.memo((props: SelectScanModalProps) => {
@@ -42,22 +39,25 @@ const SelectandScanModal = React.memo((props: SelectScanModalProps) => {
     title,
     propertiesToShow,
     customContent,
-    scanOptions,
     loadingStatus,
+    usage,
   } = props;
-  const {status, statusText} = useAppSelector((state) => state.status);
+  const { status, statusText } = useAppSelector((state) => state.status);
 
-  const {cycleCountDetails} = useAppSelector(
+  const { tableDetailsTotal } = useAppSelector((state) => state.table);
+  const { cycleCountDetails } = useAppSelector(
     (state) => state.inventoryTransaction
   );
 
-  const {handleCheckPendingScan} = useBatchHooks();
-  const {toggleScanBinModal, isScanBinModal} = useModalHooks();
+  const { handleCheckPendingScan } = useBatchHooks();
+  const { toggleScanBinModal, isScanBinModal } = useModalHooks();
 
   const [isShowPending, setIsShowPending] = useState<boolean>(true);
   const [isShowScanned, setIsShowScanned] = useState<boolean>(true);
 
   if (selectedItem) {
+    console.log("wat", usage);
+
     return (
       <Modal visible={visible} onRequestClose={onClose} transparent>
         {status === "success" && (
@@ -94,8 +94,10 @@ const SelectandScanModal = React.memo((props: SelectScanModalProps) => {
                 }}
                 placeholder="Waiting to Scan Bin No. Barcode..."
                 visible={isScanBinModal}
-                scanParams="cc_item"
-                typeForFetching="cyclecount"
+                scanParams={usage === "cycle-count" ? "cc_item" : "pir_item"}
+                typeForFetching={
+                  usage === "cycle-count" ? "cyclecount" : "physical-inventory"
+                }
               />
             )}
 
@@ -112,15 +114,23 @@ const SelectandScanModal = React.memo((props: SelectScanModalProps) => {
                   ))}
                   <View style={styles.properties}>
                     <Text style={styles.label}>Scanned/Counted: </Text>
-                    <Text>{`${cycleCountDetails.data.totalscanned}/${cycleCountDetails.data.totalItem}`}</Text>
+                    {usage === "cycle-count" ? (
+                      <Text>{`${cycleCountDetails.data.totalscanned}/${cycleCountDetails.data.totalItem}`}</Text>
+                    ) : (
+                      <Text>{`${tableDetailsTotal.data.totalscanned}/${tableDetailsTotal.data.totalItem}`}</Text>
+                    )}
                   </View>
 
-                  <View style={{flexDirection: "row"}}>
+                  <View style={{ flexDirection: "row" }}>
                     <CustomCheckBox
                       label="Show Pending"
                       isChecked={isShowPending}
                       onToggle={() => {
-                        handleCheckPendingScan(!isShowPending, isShowScanned);
+                        handleCheckPendingScan(
+                          !isShowPending,
+                          isShowScanned,
+                          usage
+                        );
                         setIsShowPending(!isShowPending);
                       }}
                     />
@@ -128,7 +138,11 @@ const SelectandScanModal = React.memo((props: SelectScanModalProps) => {
                       label="Show Scanned"
                       isChecked={isShowScanned}
                       onToggle={() => {
-                        handleCheckPendingScan(isShowPending, !isShowScanned);
+                        handleCheckPendingScan(
+                          isShowPending,
+                          !isShowScanned,
+                          usage
+                        );
                         setIsShowScanned(!isShowScanned);
                       }}
                     />
