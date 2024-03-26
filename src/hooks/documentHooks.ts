@@ -72,6 +72,7 @@ import {
 import { useAPIHooks } from "./apiHooks";
 import { setStatusText, showQuantityField } from "../reducers/statusReducer";
 import { useModalHooks } from "./modalHooks";
+import { useServiceHooks } from "./serviceHooks";
 
 export type ButtonUses =
   | "pto"
@@ -116,7 +117,8 @@ export type ScanValidate =
   | "sloc-bin"
   | "stock-transfer"
   | "stock-transfer-bin"
-  | "stock-replenish";
+  | "stock-replenish"
+  | "stock-replenish-bin";
 
 export type TypeSelect =
   | "pto"
@@ -129,7 +131,8 @@ export type TypeSelect =
   | "cyclecount"
   | "sloc"
   | "stock-transfer"
-  | "stock-replenish";
+  | "stock-replenish"
+  | "stock-replenish-bin";
 
 export interface SelectProps {
   type: TypeSelect;
@@ -143,6 +146,7 @@ export interface PostProps {
     header: string;
     body: string;
   };
+  validatePost?: boolean;
 }
 
 export const useDocumentHooks = () => {
@@ -166,6 +170,7 @@ export const useDocumentHooks = () => {
     getCycleCount2,
   } = useAPIHooks();
   const { toggleEditBatchModal } = useModalHooks();
+  const { handleGet } = useServiceHooks();
 
   // start check categories and uses functions
 
@@ -570,7 +575,41 @@ export const useDocumentHooks = () => {
         );
         break;
       case "stock-replenish":
-        alert("No api yet.");
+        dispatch(
+          connectToPHP({
+            recid: item.recid,
+            docnum: item.docnum,
+            type: "VALIDATE_WHREPTO",
+            onSuccess: async () => {
+              dispatch(setStatus("loading"));
+              const res = await connectToPHPNotDispatch({
+                recid: item.recid,
+                docnum: item.docnum,
+                type: "WHREPTO",
+              });
+              if (res) {
+                dispatch(
+                  getStockTOPosting({
+                    limit: 10,
+                    offset: 0,
+                  })
+                );
+                dispatch(setStatus("success"));
+              }
+            },
+            onFailure: (e) => {
+              dispatch(resetStatus());
+              Alert.alert("Transaction Posting Fail", `${e}`, [
+                {
+                  text: "Ok",
+                  onPress: () => {},
+                  style: "destructive",
+                },
+              ]);
+            },
+            dontShowSuccess: true,
+          })
+        );
         break;
 
       default:
@@ -971,7 +1010,6 @@ export const useDocumentHooks = () => {
             }
           }
           break;
-
         case "stock-transfer-bin":
           const stBinResponse = await scanBarcode({
             barcode,
@@ -1001,7 +1039,76 @@ export const useDocumentHooks = () => {
               dispatch(handleTargetScanning());
             }
           }
+          break;
+        case "stock-replenish":
+          const srResponse = await scanBarcode({
+            barcode,
+            category: "whrepto_item",
+            scanlevel: scanlevel,
+            recid: selectedItem?.recid.toString(),
+            barcodelvl2: barcodelvl2,
+            docnum: selectedDocument.docnum,
+            pdtmanualqtyoutbound: receiveQty.toString(),
+            spl_docnum: undefined,
+            fromspl: undefined,
+            usrnam: userDetails?.usrcde,
+          });
+          console.log("eyuy", srResponse);
 
+          if (srResponse && srResponse.data.whrepto2_data) {
+            console.log("wat is this", srResponse.data.whrepto2_data);
+            dispatch(showQuantityField(true));
+
+            !isQuantityFieldShown &&
+              dispatch(setStatusText(`Bin No. Successfully Scanned.`));
+            if (isQuantityFieldShown) {
+              dispatch(
+                getStockTransferValid({
+                  limit: 10,
+                  offset: 0,
+                })
+              );
+              dispatch(getStockTODetails({ docnum: selectedDocument.docnum }));
+              dispatch(setStatusText(`Item Successfully Scanned.`));
+              if (srResponse.data.whrepto2_data[0]) {
+                dispatch(handleSetItem(srResponse.data.whrepto2_data[0]));
+              }
+              if (srResponse.data.whrepto2_data.length === 0) {
+                dispatch(setStatusText(`Item Successfully Scanned.`));
+                dispatch(handleSourceScanning());
+              }
+            }
+          }
+          break;
+        case "stock-replenish-bin":
+          const srBinResponse = await scanBarcode({
+            barcode,
+            category: "whrepto_bin",
+            scanlevel: scanlevel,
+            recid: selectedItem?.recid.toString(),
+            barcodelvl2: barcodelvl2,
+            docnum: selectedDocument.docnum,
+            pdtmanualqtyoutbound: receiveQty.toString(),
+            spl_docnum: undefined,
+            fromspl: undefined,
+            usrnam: userDetails?.usrcde,
+          });
+
+          console.log(srBinResponse);
+
+          if (srBinResponse) {
+            if (srBinResponse.bool) {
+              dispatch(
+                getStockTOValid({
+                  limit: 10,
+                  offset: 0,
+                })
+              );
+              dispatch(getStockTODetails({ docnum: selectedDocument.docnum }));
+              dispatch(setStatusText(`Item Successfully Va lidated.`));
+              dispatch(handleTargetScanning());
+            }
+          }
           break;
         default:
           alert("no api yet");
@@ -1100,7 +1207,11 @@ export const useDocumentHooks = () => {
 
           if (srResponse.data.for_posting) {
             console.log("posting");
-            handlePost({ item: srResponse.data, type: "stock-transfer" });
+            handlePost({
+              item: srResponse.data,
+              type: "stock-replenish",
+              validatePost: true,
+            });
           } else {
             handleSelectModal({ item: srResponse.data, type: uses });
           }
@@ -1109,6 +1220,32 @@ export const useDocumentHooks = () => {
 
       default:
         alert("no scan barcode api");
+        break;
+    }
+  };
+
+  const checkValidate = async ({ item, type }: PostProps) => {
+    switch (type) {
+      case "stock-replenish":
+        await handleGet({
+          url: `/lst_tracc/stockreplenishmenttofile1?recid=${item.recid}&docnum=${item.docnum}&_limit=1`,
+          disableToast: true,
+          onSuccess(data) {
+            if (data[0].posted === 1) {
+              dispatch(setStatus("idle"));
+              Alert.alert("Duplication Posting", "Document Already Posted", [
+                {
+                  text: "OK",
+                },
+              ]);
+              return;
+            }
+            handlePost({ item: item, type: type });
+          },
+        });
+        break;
+
+      default:
         break;
     }
   };
@@ -1168,8 +1305,15 @@ export const useDocumentHooks = () => {
   };
   // end of  modals
 
-  const handlePost = ({ item, type, customMessage }: PostProps) => {
-    if (customMessage) {
+  const handlePost = ({
+    item,
+    type,
+    customMessage,
+    validatePost,
+  }: PostProps) => {
+    if (validatePost) {
+      checkValidate({ item, type });
+    } else if (customMessage) {
       Alert.alert(`${customMessage.header}`, `${customMessage.body}`, [
         {
           text: "Yes",

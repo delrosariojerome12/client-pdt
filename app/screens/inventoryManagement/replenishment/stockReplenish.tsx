@@ -4,6 +4,7 @@ import {
   ScrollView,
   RefreshControl,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import React from "react";
 import CustomButton from "../../../../src/components/forms/buttons/CustomButton";
@@ -82,6 +83,7 @@ const StockReplenish = React.memo(() => {
               !isPaginating &&
               true
             }
+            validatePost={true}
           />
         );
 
@@ -101,7 +103,7 @@ const StockReplenish = React.memo(() => {
     return undefined;
   };
 
-  console.log("Stock Replenish", tableDetails);
+  console.log("Stock Replenish");
 
   return (
     <>

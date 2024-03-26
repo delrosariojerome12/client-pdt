@@ -27,6 +27,7 @@ interface TableProps {
   postType?: TypePost;
   buttonUses: ButtonUses;
   loadingStatus?: boolean;
+  validatePost?: boolean;
 }
 
 const CustomTable = (props: TableProps) => {
@@ -44,6 +45,7 @@ const CustomTable = (props: TableProps) => {
     postType,
     buttonUses,
     loadingStatus,
+    validatePost,
   } = props;
 
   const correctButtonStatus = (rowData: any, buttonType: "post" | "select") => {
@@ -128,9 +130,15 @@ const CustomTable = (props: TableProps) => {
                 : {},
             ]}
             disabled={correctButtonStatus(rowData, "post")}
-            onPress={() =>
-              onPost && postType && onPost({ item: rowData, type: postType })
-            }
+            onPress={() => {
+              onPost &&
+                postType &&
+                onPost({
+                  item: rowData,
+                  type: postType,
+                  validatePost: validatePost,
+                });
+            }}
           >
             <Text style={styles.buttonText}>POST</Text>
           </TouchableOpacity>
