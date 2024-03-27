@@ -11,12 +11,15 @@ import {
   getAsyncData,
   removeAsyncData,
 } from "../../src/helper/AsyncStorage";
+import { useUserActivityLog } from "./userActivityLogHooks";
+import { METHODS } from "../enums/activitylog";
 
 export const useAuthHooks = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
 
   const { handlePost, handleGet, handlePatch, status } = useServiceHooks();
+  const { updateAction } = useUserActivityLog();
 
   const [userID, setUserID] = useState<any>("");
   const [password, setPassword] = useState<any>("");
@@ -28,7 +31,7 @@ export const useAuthHooks = () => {
     // }
     const randomString = await generateRandomString(32);
 
-    await handlePost({
+    const response = await handlePost({
       url: "auth/login",
       requestData: {
         usrpwd: "5436",
@@ -42,7 +45,6 @@ export const useAuthHooks = () => {
       onSuccess: (data) => {
         setTimeout(async () => {
           dispatch(onLogin({ sesidData: randomString, userData: data }));
-          router.replace("screens/home/");
 
           storeAsyncData(
             { sesidData: randomString, userData: data },
@@ -68,9 +70,19 @@ export const useAuthHooks = () => {
             },
             disableToast: true,
           });
+
+          router.replace("screens/home/");
         }, 1500);
       },
     });
+
+    if (response) {
+      updateAction({
+        method: METHODS.LOGIN,
+        remarks: "User Logged In.",
+        activity: "User Logged In.",
+      });
+    }
   };
 
   const handleLogout = () => {
@@ -78,6 +90,11 @@ export const useAuthHooks = () => {
     try {
       dispatch(onLogout());
       removeAsyncData("user-cred");
+      updateAction({
+        method: METHODS.LOGOUT,
+        remarks: "User Logged Out.",
+        activity: "User Logged Out.",
+      });
       setTimeout(() => {
         router.replace("/");
       }, 1500);

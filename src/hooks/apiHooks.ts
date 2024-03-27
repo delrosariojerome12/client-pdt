@@ -101,7 +101,6 @@ export const useAPIHooks = () => {
         formData.append("recid", recid);
         formData.append("docnum", docnum);
         break;
-
       case "PTO_ADDBATCH":
         targerPPHP = "trn_purchaseto_ajax.php";
         event_action = "save_addbatch";
@@ -117,7 +116,6 @@ export const useAPIHooks = () => {
         formData.append("addexpdte", expdte);
         formData.append("hid_addcopyline", copyline);
         break;
-
       case "rearrangelinennum":
         targerPPHP = "trn_purchaseto_ajax.php";
         event_action = "rearrangelinennum";
@@ -126,7 +124,6 @@ export const useAPIHooks = () => {
         formData.append("recid", recid);
         formData.append("docnum", docnum);
         break;
-
       case "chk_binbatch_onhand":
         targerPPHP = "trn_wavepicksocoadd.php";
         event_action = "chk_binbatch_onhand";
@@ -135,7 +132,6 @@ export const useAPIHooks = () => {
         formData.append("recid", recid);
         formData.append("docnum", docnum);
         break;
-
       case "VALIDATE_WPL":
         targerPPHP = "trn_wavepicksocoadd.php";
         event_action = "chk_validated_posted";
@@ -145,7 +141,6 @@ export const useAPIHooks = () => {
         formData.append("docnum", docnum);
         formData.append("for_posting", "1");
         break;
-
       case "STOCKREP_delete_item":
         targerPPHP = "trn_stockreplenishmenttransferorder_ajax.php";
         event_action = "delete_item";
@@ -154,7 +149,6 @@ export const useAPIHooks = () => {
         formData.append("xparams[docnum]", docnum);
         formData.append("xparams[recid]", recid);
         break;
-
       case "INVPOST":
         targerPPHP = "trn_wavepicksocoadd.php";
         event_action = "post_docWPL";
@@ -166,7 +160,6 @@ export const useAPIHooks = () => {
         formData.append("sonum", soconum);
         formData.append("fromspl", "1");
         break;
-
       case "WTO":
         targerPPHP = "trn_whstointransit_ajax.php";
         event_action = "post_to";
@@ -175,7 +168,6 @@ export const useAPIHooks = () => {
         formData.append("recid", recid);
         formData.append("docnum", docnum);
         break;
-
       case "SRTO":
         targerPPHP = "trn_salesreturnadd.php";
         event_action = "post_to";
@@ -184,7 +176,6 @@ export const useAPIHooks = () => {
         formData.append("recid", recid);
         formData.append("docnum", docnum);
         break;
-
       case "WPTO":
         targerPPHP = "trn_wavepicksocoadd.php";
         event_action = "post_docWPL";
@@ -193,7 +184,6 @@ export const useAPIHooks = () => {
         formData.append("recid", recid);
         formData.append("docnum", docnum);
         break;
-
       case "PTAPUR":
         targerPPHP = "trn_putawayto_ajax.php";
         event_action = "postputawayto";
@@ -202,7 +192,6 @@ export const useAPIHooks = () => {
         formData.append("recid", recid);
         formData.append("intnum", docnum);
         break;
-
       case "PTAWHS":
         targerPPHP = "trn_putawayto_whsto_ajax.php";
         event_action = "postputawayto";
@@ -211,7 +200,6 @@ export const useAPIHooks = () => {
         formData.append("recid", recid);
         formData.append("intnum", docnum);
         break;
-
       case "CC":
         targerPPHP = "trn_cyclecount_ajax.php";
         event_action = "validate_item";
@@ -237,7 +225,6 @@ export const useAPIHooks = () => {
         formData.append("xparams[source]", "PDT");
         // formData.append("xarr_data", JSON.stringify(arr_data));
         break;
-
       case "VALIDATE_SLOC":
         targerPPHP = "trn_sloctosloc_ajax.php";
         event_action = "check_bin";
@@ -247,7 +234,6 @@ export const useAPIHooks = () => {
         formData.append("recid", recid);
         formData.append("xpar", "POST");
         break;
-
       case "SLOC":
         targerPPHP = "trn_sloctosloc_ajax.php";
         event_action = "post_item";
@@ -257,7 +243,6 @@ export const useAPIHooks = () => {
         formData.append("xparams[recid]", recid);
         formData.append("xparams[xpar]", "POST");
         break;
-
       case "VALIDATE_PIR":
         // targerPPHP = "trn_phc_multiperday_ajax.php";
         // event_action = "check_1isto1"; // laging icheck pagmay changes dito. damay ung counter part
@@ -269,7 +254,6 @@ export const useAPIHooks = () => {
         formData.append("docnum", docnum);
         formData.append("refnum", refnum);
         break;
-
       case "PIR":
         targerPPHP = "trn_phc_multiperday_info_addbin.php";
         event_action = "uncounted";
@@ -286,7 +270,6 @@ export const useAPIHooks = () => {
         formData.append("docnum", docnum);
         formData.append("recid", recid);
         break;
-
       case "WHREPTO":
         targerPPHP = "trn_stockreplenishmenttransferorder_ajax.php";
         event_action = "post_item";
@@ -295,7 +278,6 @@ export const useAPIHooks = () => {
         formData.append("xparams[docnum]", docnum);
         formData.append("xparams[recid]", recid);
         break;
-
       case "BNT_SOFTVAL":
         targerPPHP = "trn_add_stt_bintobin.php";
         event_action = "validate_post";
@@ -305,7 +287,6 @@ export const useAPIHooks = () => {
         formData.append("xparams[recid]", recid);
         formData.append("xparams[par]", "POST");
         break;
-
       case "BNT_POST":
         targerPPHP = "trn_add_stt_bintobin.php";
         event_action = "post_item";
@@ -315,7 +296,6 @@ export const useAPIHooks = () => {
         formData.append("xparams[recid]", recid);
         formData.append("xparams[par]", "POST");
         break;
-
       case "WTO_SOFTVAL":
         targerPPHP = "trn_whs_transfer_outbound_to_ajax.php";
         event_action = "validatedocument";
@@ -324,7 +304,6 @@ export const useAPIHooks = () => {
         formData.append("id", recid);
         formData.append("posting", "yes");
         break;
-
       case "WTO_POST":
         targerPPHP = "trn_whs_transfer_outbound_to_ajax.php";
         event_action = "post-unpost";
@@ -333,7 +312,6 @@ export const useAPIHooks = () => {
         formData.append("id", recid);
         formData.append("type", "Post");
         break;
-
       case "SPL":
         targerPPHP = "trn_singlepicksocoadd.php";
         event_action = "post_doc";
@@ -341,7 +319,6 @@ export const useAPIHooks = () => {
         formData.append("event_action", event_action);
         formData.append("docnum", docnum);
         break;
-
       case "DTS_SOFTVAL":
         targerPPHP = "trn_dts_to_ajax.php";
         event_action = "validate_post";
@@ -352,7 +329,6 @@ export const useAPIHooks = () => {
         formData.append("xparams[recid]", recid);
         formData.append("xparams[docnum]", docnum);
         break;
-
       case "DTS_POST":
         targerPPHP = "trn_dts_to_ajax.php";
         event_action = "post_item";
@@ -363,16 +339,12 @@ export const useAPIHooks = () => {
         formData.append("xparams[recid]", recid);
         formData.append("xparams[docnum]", docnum);
         break;
-
       default:
         console.log("default");
         break;
     }
 
     const url = `${traccDomain}${traccDirectory}/${targerPPHP}`;
-    console.log("post url:", url);
-
-    console.log("pinasa", formData);
 
     try {
       const response = await fetch(url, {
@@ -381,7 +353,7 @@ export const useAPIHooks = () => {
         headers: {},
       });
       const formattedResult = await response.json();
-      console.log("sukli", formattedResult);
+      console.log("formattedResult", formattedResult);
 
       if (formattedResult.bool) {
         if (

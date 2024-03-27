@@ -76,43 +76,46 @@ export const useDrawerHooks = () => {
           options={{
             headerTitle: drawer.title,
             drawerItemStyle: { display: drawer.isVisible ? "flex" : "none" },
-            headerRight: () => (
-              <View style={{ flexDirection: "row", gap: 10, marginRight: 10 }}>
-                <TouchableOpacity
-                  style={{
-                    backgroundColor: "#eee",
-                    padding: 10,
-                    borderRadius: 50 / 3,
-                  }}
-                  onPress={() => {
-                    dispatch(resetStatus());
-                    dispatch(resetSearch());
+            headerRight: () =>
+              drawer.title.toUpperCase() !== "HOME" && (
+                <View
+                  style={{ flexDirection: "row", gap: 10, marginRight: 10 }}
+                >
+                  <TouchableOpacity
+                    style={{
+                      backgroundColor: "#eee",
+                      padding: 10,
+                      borderRadius: 50 / 3,
+                    }}
+                    onPress={() => {
+                      dispatch(resetStatus());
+                      dispatch(resetSearch());
 
-                    if (previousRoutes.length === 1) {
-                      dispatch(
-                        handleRemovePreviousRoute(
-                          previousRoutes[previousRoutes.length - 1]
-                        )
-                      );
-                      router.back();
-                    } else {
-                      if (previousRoutes.length !== 0) {
+                      if (previousRoutes.length === 1) {
                         dispatch(
                           handleRemovePreviousRoute(
                             previousRoutes[previousRoutes.length - 1]
                           )
                         );
-                        router.navigate(
-                          previousRoutes[previousRoutes.length - 1]
-                        );
+                        router.back();
+                      } else {
+                        if (previousRoutes.length !== 0) {
+                          dispatch(
+                            handleRemovePreviousRoute(
+                              previousRoutes[previousRoutes.length - 1]
+                            )
+                          );
+                          router.navigate(
+                            previousRoutes[previousRoutes.length - 1]
+                          );
+                        }
                       }
-                    }
-                  }}
-                >
-                  <FontAwesome5 name="arrow-left" size={24} color="black" />
-                </TouchableOpacity>
-              </View>
-            ),
+                    }}
+                  >
+                    <FontAwesome5 name="arrow-left" size={24} color="black" />
+                  </TouchableOpacity>
+                </View>
+              ),
           }}
         />
       );

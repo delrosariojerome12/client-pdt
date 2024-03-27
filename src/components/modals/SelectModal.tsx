@@ -75,7 +75,7 @@ const SelectModal = React.memo((props: SelectModalProps) => {
       <View key={propertyObj.name} style={styles.properties}>
         <Text style={styles.label}>{propertyObj.label}:</Text>
         <Text>
-          {propertyObj.name.includes("dte")
+          {propertyObj.name.includes("dte") && selectedItem[propertyObj.name]
             ? formatDateStringMMDDYYYY(selectedItem[propertyObj.name])
             : selectedItem[propertyObj.name]}
         </Text>

@@ -58,7 +58,6 @@ export const getDTSPosting = createAsyncThunk(
   }
 );
 
-// need to change api
 export const getDTSDetails = createAsyncThunk(
   "ims/getDTSDetails",
   async ({ docnum }: FetchDocnumDetails, { rejectWithValue, getState }) => {
@@ -66,7 +65,7 @@ export const getDTSDetails = createAsyncThunk(
       const state = getState() as RootState;
       const { ipAddress, port, protocol } = state.auth.server;
 
-      const url = `${protocol}://${ipAddress}:${port}/api/getWHREPTOOutboundDetails?docnum=${docnum}`;
+      const url = `${protocol}://${ipAddress}:${port}/api/getDTSOutboundDetails?docnum=${docnum}`;
 
       const response = await axios.get(url);
 
