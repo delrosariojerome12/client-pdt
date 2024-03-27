@@ -38,6 +38,7 @@ const WTO = () => {
     statusText,
     wtoOutboundDetails,
     isScanItemModal,
+    isOutboundItemScan,
   } = useOutboundHooks({
     page: "wto",
   });
@@ -93,6 +94,7 @@ const WTO = () => {
               selectType="wto-outbound"
               buttonUses="wto-outbound"
               loadingStatus={
+                !isOutboundItemScan &&
                 wto.validation.status === "loading" &&
                 !isScanItemModal &&
                 !refreshing &&
@@ -110,6 +112,7 @@ const WTO = () => {
               postType="wto-outbound"
               buttonUses="wto-outbound"
               loadingStatus={
+                !isOutboundItemScan &&
                 wto.forPosting.status === "loading" &&
                 !refreshing &&
                 !isPaginating &&
@@ -132,6 +135,7 @@ const WTO = () => {
           {isSelectModal && (
             <SelectModal
               loadingStatus={
+                !isOutboundItemScan &&
                 wtoOutboundDetails.status === "loading" &&
                 !isScanItemModal &&
                 true

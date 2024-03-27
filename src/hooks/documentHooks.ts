@@ -633,37 +633,49 @@ export const useDocumentHooks = () => {
             docnum: item.docnum,
             refnum: item.refnum,
             type: "VALIDATE_PIR",
-            onSuccess: async () => {
-              dispatch(setStatus("loading"));
-              const res = await connectToPHPNotDispatch({
-                recid: item.recid,
-                docnum: item.docnum,
-                refnum: item.refnum,
-                type: "PIR",
-              });
-
-              await handlePatch({
-                url: "/lst_tracc/physicalcountfile31",
-                requestData: {
-                  field: {
-                    docnum: item.docnum,
-                    refnum: item.refnum,
+            onSuccess: async (data) => {
+              dispatch(setStatus("idle"));
+              console.log("data", data);
+              if (data && data.length > 0) {
+                Alert.alert("Notification", data, [
+                  {
+                    text: "OK",
+                    onPress: async () => {
+                      dispatch(setStatus("loading"));
+                      const res = await connectToPHPNotDispatch({
+                        recid: item.recid,
+                        docnum: item.docnum,
+                        refnum: item.refnum,
+                        type: "PIR",
+                      });
+                      await handlePatch({
+                        url: "/lst_tracc/physicalcountfile31",
+                        requestData: {
+                          field: {
+                            docnum: item.docnum,
+                            refnum: item.refnum,
+                          },
+                          data: {
+                            validate: 1,
+                          },
+                        },
+                        disableToast: true,
+                      });
+                      if (res) {
+                        dispatch(
+                          getphysicalRecord({
+                            limit: 10,
+                            offset: 0,
+                          })
+                        );
+                        dispatch(setStatus("success"));
+                      }
+                    },
                   },
-                  data: {
-                    validate: 1,
+                  {
+                    text: "CANCEL",
                   },
-                },
-                disableToast: true,
-              });
-
-              if (res) {
-                dispatch(
-                  getphysicalRecord({
-                    limit: 10,
-                    offset: 0,
-                  })
-                );
-                dispatch(setStatus("success"));
+                ]);
               }
             },
             onFailure: (e) => {
@@ -963,7 +975,14 @@ export const useDocumentHooks = () => {
               if (ccResponse.data.cc2_data.length === 0) {
                 dispatch(
                   getCycleCountDetails({ docnum: selectedDocument.docnum })
-                );
+                ).then((data) => {
+                  if (
+                    data.payload &&
+                    data.payload.totalscanned === data.payload.totalItem
+                  ) {
+                    dispatch(handleToggleScanBinModal());
+                  }
+                });
                 dispatch(setStatusText(`Item Successfully Scanned.`));
                 // dispatch(handleToggleScanBinModal());
               }
@@ -1240,7 +1259,14 @@ export const useDocumentHooks = () => {
                     docnum: selectedDocument.docnum,
                     refnum: selectedDocument.refnum,
                   })
-                );
+                ).then((data) => {
+                  if (
+                    data.payload &&
+                    data.payload.totalscanned === data.payload.totalItem
+                  ) {
+                    dispatch(handleToggleScanBinModal());
+                  }
+                });
                 dispatch(setStatusText(`Item Successfully Scanned.`));
               }
             }
@@ -1392,6 +1418,8 @@ export const useDocumentHooks = () => {
 
   // start of  modals
   const handleSelectModal = ({ item, type }: SelectProps) => {
+    console.log("wat type", item, type);
+
     // FETCH-DOCNUM-DETAILS-ONSELECT
     checkSelectType({ item, type });
     dispatch(handleSetDocument(item));

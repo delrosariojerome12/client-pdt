@@ -657,6 +657,8 @@ export const useBatchHooks = () => {
         dispatch(clearBatchDetails());
         break;
       case "update":
+        console.log("item shi", item);
+
         dispatch(setBatchPostMode("postUpdateBatch"));
         dispatch(setBatchNo(item.batchnum));
         dispatch(setMfgDate(new Date(item.mfgdte)));
@@ -674,14 +676,14 @@ export const useBatchHooks = () => {
     dispatch(clearBatchDetails());
   };
   const handleSearchBatchModal = () => {
-    console.log("nyare", selectedBinDetails.itmcde);
+    console.log(selectedBinDetails);
     console.log(selectedBatchItem);
 
     dispatch(
       getBatch({
         limit: 10,
         offset: 0,
-        itmcde: selectedBinDetails.itmcde || selectedBatchItem.itmcde,
+        itmcde: selectedBinDetails?.itmcde || selectedBatchItem?.itmcde,
       })
     );
     dispatch(handleToggleSearchBatchModal());

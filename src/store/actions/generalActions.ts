@@ -50,7 +50,7 @@ interface ConnectToPHPParams {
   recid: any;
   docnum: string;
   type: string;
-  onSuccess: () => void;
+  onSuccess: (res?: any) => void;
   onFailure: (e: any) => void;
   dontShowSuccess?: boolean;
   refnum?: string;
@@ -483,6 +483,13 @@ export const connectToPHP = createAsyncThunk(
     console.log("post url:", url);
 
     console.log("form data", formData);
+    function stripHtmlTags(html: any) {
+      return html.replace(/<\/?[^>]+(>|$)/g, "");
+    }
+    function cleanHTML(text: string): string {
+      var regex = /<br\s*[\/]?>/gi;
+      return text.replace(regex, ". ");
+    }
 
     try {
       const response = await fetch(url, {
@@ -494,13 +501,14 @@ export const connectToPHP = createAsyncThunk(
       console.log("AXIOS RESPONSE:", formattedResult);
 
       if (formattedResult.bool) {
-        onSuccess();
+        if (formattedResult.softvalmsg && !formattedResult.softval) {
+          onSuccess(cleanHTML(formattedResult.softvalmsg));
+          return { formattedResult, dontShowSuccess };
+        }
+        onSuccess(formattedResult);
         return { formattedResult, dontShowSuccess };
       } else {
         if (formattedResult.msg) {
-          function stripHtmlTags(html: any) {
-            return html.replace(/<\/?[^>]+(>|$)/g, "");
-          }
           const listItemRegex = /<li>(.*?)<\/li>/g;
           const listItems = [];
           let match;

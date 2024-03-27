@@ -49,6 +49,8 @@ export const getphysicalRecordDetails = createAsyncThunk(
       const url = `${protocol}://${ipAddress}:${port}/api/getPIROutboundDetails?docnum=${docnum}&refnum=${refnum}&showpending=true&showscanned=true`;
 
       const response = await axios.get(url);
+      console.log("daan", url);
+      console.log("sukli", response.data);
 
       return response.data;
     } catch (error: any) {

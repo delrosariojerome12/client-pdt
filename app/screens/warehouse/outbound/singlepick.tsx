@@ -37,6 +37,7 @@ const SinglePick = () => {
     status,
     singlepickDetails,
     isScanItemModal,
+    isOutboundItemScan,
   } = useOutboundHooks({
     page: "singlepick",
   });
@@ -59,7 +60,7 @@ const SinglePick = () => {
             buttonUses=""
             loadingStatus={
               singlepick.pkValidate.status === "loading" &&
-              !isScanItemModal &&
+              !isOutboundItemScan &&
               !refreshing &&
               !isPaginating &&
               true
@@ -78,6 +79,7 @@ const SinglePick = () => {
             postType="inv-singlepick"
             loadingStatus={
               singlepick.invPosting.status === "loading" &&
+              !isOutboundItemScan &&
               !refreshing &&
               !isPaginating &&
               true
@@ -96,7 +98,7 @@ const SinglePick = () => {
             buttonUses=""
             loadingStatus={
               singlepick.stgValidate.status === "loading" &&
-              !isScanItemModal &&
+              !isOutboundItemScan &&
               !refreshing &&
               !isPaginating &&
               true
@@ -115,6 +117,7 @@ const SinglePick = () => {
             postType="spl-singlepick"
             loadingStatus={
               singlepick.splPosting.status === "loading" &&
+              !isOutboundItemScan &&
               !refreshing &&
               !isPaginating &&
               true
@@ -183,7 +186,7 @@ const SinglePick = () => {
             <SelectModal
               loadingStatus={
                 singlepickDetails.status === "loading" &&
-                !isScanItemModal &&
+                !isOutboundItemScan &&
                 true
               }
               visible={isSelectModal}

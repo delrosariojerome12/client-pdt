@@ -92,6 +92,7 @@ const CycleCount = React.memo(() => {
 
         {isSelectModal && (
           <SelectandScanModal
+            usage="cycle-count"
             loadingStatus={checkStatus()}
             visible={isSelectModal}
             onClose={() => {
@@ -108,13 +109,6 @@ const CycleCount = React.memo(() => {
             customContent={
               <ItemsList uses="physical-inventory" subcategory="cyclecount" />
             }
-            scanOptions={{
-              scanModal: true,
-              scanModalDetails: {
-                placeholder: "Waiting to Scan Bin No. Barcode...",
-                title: "SCAN BIN NO. / ITEM",
-              },
-            }}
           />
         )}
         <ScrollView

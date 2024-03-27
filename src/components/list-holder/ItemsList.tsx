@@ -11,7 +11,7 @@ import EditBatchModal from "../modals/EditBatchModal";
 import ItemScanModal from "../modals/ItemScanModal";
 import OutboundItemScanModal from "../modals/outbound/OutboundItemScanModal";
 import { TypeSelect } from "../../hooks/documentHooks";
-import { Feather } from "@expo/vector-icons"; // Import Feather icon from expo/vector-icons
+import { Feather } from "@expo/vector-icons";
 import SlocDetails from "../inventory-management/SlocDetails";
 import TargetScanning from "../inventory-management/TargetScanning";
 import SourceScanning from "../inventory-management/SourceScanning";

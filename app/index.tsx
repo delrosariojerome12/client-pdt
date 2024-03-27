@@ -6,20 +6,33 @@ import {
   Linking,
   ToastAndroid,
 } from "react-native";
-import React, {useState} from "react";
+import React, { useState, useEffect } from "react";
 import CustomButton from "../src/components/forms/buttons/CustomButton";
-import {Link} from "expo-router";
-import {useAuthHooks} from "../src/hooks/authHooks";
+import { Link } from "expo-router";
+import { useAuthHooks } from "../src/hooks/authHooks";
 
 const Index = () => {
-  const {handleLogin, userID, setUserID, password, setPassword, status} =
-    useAuthHooks();
+  const {
+    checkIsLoggedIn,
+    handleLogin,
+    userID,
+    setUserID,
+    password,
+    setPassword,
+    status,
+  } = useAuthHooks();
 
   const handleLinkPress = () => {
     const url = "https://your-license-agreement-url.com"; // Replace with your actual URL
     Linking.openURL(url);
   };
-  console.log("login");
+
+  useEffect(() => {
+    const checkUserData = async () => {
+      checkIsLoggedIn();
+    };
+    checkUserData();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -60,11 +73,10 @@ const Index = () => {
 
       <View style={styles.licenseTextContainer}>
         <Text style={styles.licenseText}>
-          By using this program you agree to the terms and conditions of the
-          <Text style={styles.licenseTextLink} onPress={handleLinkPress}>
-            {" "}
-            license agreement.
-          </Text>
+          By using this program you agree to the terms and conditions of the{" "}
+          <Link href={"license"} asChild>
+            <Text style={styles.licenseTextLink}>license agreement.</Text>
+          </Link>
         </Text>
       </View>
     </View>

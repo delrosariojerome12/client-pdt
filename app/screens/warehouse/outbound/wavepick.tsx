@@ -36,7 +36,7 @@ const WavePick = () => {
     handleIndexChange,
     wavepickDetails,
     status,
-    isScanItemModal,
+    isOutboundItemScan,
   } = useOutboundHooks({
     page: "wavepick",
   });
@@ -90,8 +90,8 @@ const WavePick = () => {
               selectType="wavepick"
               buttonUses="wavepick"
               loadingStatus={
+                !isOutboundItemScan &&
                 wavepick.validation.status === "loading" &&
-                !isScanItemModal &&
                 !refreshing &&
                 !isPaginating &&
                 true
@@ -107,6 +107,7 @@ const WavePick = () => {
               buttonUses="wavepick"
               postType="wavepick"
               loadingStatus={
+                !isOutboundItemScan &&
                 wavepick.forPosting.status === "loading" &&
                 !refreshing &&
                 !isPaginating &&
@@ -129,7 +130,9 @@ const WavePick = () => {
           {isSelectModal && (
             <SelectModal
               loadingStatus={
-                wavepickDetails.status === "loading" && !isScanItemModal && true
+                wavepickDetails.status === "loading" &&
+                !isOutboundItemScan &&
+                true
               }
               visible={isSelectModal}
               onClose={closeSelectModal}

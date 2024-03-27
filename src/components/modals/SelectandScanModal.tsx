@@ -13,7 +13,6 @@ import { shadows } from "../../styles/styles";
 import CustomButton from "../forms/buttons/CustomButton";
 import { useAppSelector } from "../../store/store";
 import CustomCheckBox from "../forms/inputs/CustomCheckBox";
-import ScanModal from "./ScanModal";
 import MessageToast from "../message-toast/MessageToast";
 import CustomLoadingText from "../load-spinner/CustomLoadingText";
 import { useBatchHooks } from "../../hooks/batchHooks";

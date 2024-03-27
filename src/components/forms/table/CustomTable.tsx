@@ -12,6 +12,7 @@ import { generalStyles } from "../../../styles/styles";
 import { SelectProps, PostProps } from "../../../hooks/documentHooks";
 import { TypeSelect, TypePost, ButtonUses } from "../../../hooks/documentHooks";
 import { formatDateStringMMDDYYYY } from "../../../helper/Date";
+import { Feather } from "@expo/vector-icons";
 
 interface TableProps {
   tableHeaders: string[];
@@ -188,8 +189,11 @@ const CustomTable = (props: TableProps) => {
     }
 
     return (
-      <View style={styles.placeholderContainer}>
-        <Text style={styles.placeholderText}>No data available</Text>
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+        <Feather name="alert-circle" size={30} color="black" />
+        <Text style={{ marginTop: 10, fontSize: 18, fontWeight: "bold" }}>
+          No data available
+        </Text>
       </View>
     );
   };

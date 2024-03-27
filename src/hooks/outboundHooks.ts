@@ -27,8 +27,13 @@ export const useOutboundHooks = ({ page }: OutboundUse) => {
     stgDetails,
     singlepickDetails,
   } = useAppSelector((state) => state.outbound);
-  const { isScanModal, isSelectModal, isNotificationModal, isScanItemModal } =
-    useAppSelector((state) => state.modal);
+  const {
+    isScanModal,
+    isSelectModal,
+    isNotificationModal,
+    isScanItemModal,
+    isOutboundItemScan,
+  } = useAppSelector((state) => state.modal);
   const { selectedDocument } = useAppSelector((state) => state.document);
   const { status, statusText } = useAppSelector((state) => state.status);
 
@@ -386,5 +391,6 @@ export const useOutboundHooks = ({ page }: OutboundUse) => {
     wavepickDetails,
     singlepickDetails,
     isScanItemModal,
+    isOutboundItemScan,
   };
 };
