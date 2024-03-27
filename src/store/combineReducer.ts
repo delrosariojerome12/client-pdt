@@ -11,6 +11,7 @@ import table from "../reducers/tableReducer";
 import inbound from "../reducers/warehouse/inboundReducer";
 import outbound from "../reducers/warehouse/outboundReducer";
 import inventoryTransaction from "../reducers/inventoryManagement/inventoryTransactionReducer";
+import subcon from "../reducers/inventoryManagement/subconReducer";
 
 export const rootReducer = combineReducers({
   auth: authUser,
@@ -23,5 +24,6 @@ export const rootReducer = combineReducers({
   inbound: inbound,
   outbound: outbound,
   inventoryTransaction: inventoryTransaction,
+  subcon: subcon,
   table: table,
 });

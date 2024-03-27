@@ -3,7 +3,6 @@ import React from "react";
 import { useAppSelector } from "../../store/store";
 import PTODetails from "../inbound/PTODetails";
 import WTODetails from "../outbound/wtoDetails";
-import SubConBinDetails from "../inventory-management/subConBinDetails";
 import StockTransferDetails from "../stockTransfer/stockTransferDetails";
 import PhysicalInventoryDetails from "../physical-inventory/physicalInventoryDetails";
 import AddBatchModal from "../modals/AddBatchModal";
@@ -15,6 +14,7 @@ import { Feather } from "@expo/vector-icons"; // Import Feather icon from expo/v
 import SlocDetails from "../inventory-management/SlocDetails";
 import TargetScanning from "../inventory-management/TargetScanning";
 import SourceScanning from "../inventory-management/SourceScanning";
+import SubConDetails from "../inventory-management/subConDetails";
 
 export type Options = {
   removeEdit?: boolean;
@@ -53,7 +53,8 @@ interface Props {
     | "physical-inventory"
     | "sloc"
     | "stock-transfer"
-    | "stock-replenish";
+    | "stock-replenish"
+    | "dts";
 }
 
 const ItemsList = React.memo((props: Props) => {
@@ -73,6 +74,7 @@ const ItemsList = React.memo((props: Props) => {
   );
   const { cycleCountDetails, slocDetails, stockTransferDetails } =
     useAppSelector((state) => state.inventoryTransaction);
+  const { deliveryToSupplierDetails } = useAppSelector((state) => state.subcon);
   const { wtoOutboundDetails, wavepickDetails, singlepickDetails } =
     useAppSelector((state) => state.outbound);
   const { tableDetails, tableDetailsTotal } = useAppSelector(
@@ -104,7 +106,7 @@ const ItemsList = React.memo((props: Props) => {
       case "outbound":
         return <WTODetails item={item} key={index} options={options} />;
       case "subcon":
-        return <SubConBinDetails item={item} key={index} />;
+        return <SubConDetails item={item} key={index} options={options} />;
       case "physical-inventory":
         return (
           <PhysicalInventoryDetails item={item} key={index} options={options} />
@@ -115,6 +117,8 @@ const ItemsList = React.memo((props: Props) => {
         return (
           <StockTransferDetails item={item} key={index} options={options} />
         );
+      case "subcon":
+        return <SubConDetails item={item} key={index} options={options} />;
       default:
         break;
     }
@@ -129,6 +133,7 @@ const ItemsList = React.memo((props: Props) => {
       case "srto":
         return { receivedQty: "srtqty" };
       case "wto-outbound":
+      case "dts":
         return {};
       case "stg-validate":
         return { scanUsage: "barcode", showQuantity: true };
@@ -239,6 +244,12 @@ const ItemsList = React.memo((props: Props) => {
         return stockTransferDetails.data.map((item: any, index: number) => {
           return renderItems(item, index, { removeType: "stock-transfer" });
         });
+      case "subcon":
+        return deliveryToSupplierDetails.data.map(
+          (item: any, index: number) => {
+            return renderItems(item, index, { removeType: "dts" });
+          }
+        );
     }
   };
 

@@ -1,15 +1,15 @@
-import React, {useState} from "react";
-import {Modal, View, Text, StyleSheet, TouchableOpacity} from "react-native";
+import React, { useState } from "react";
+import { Modal, View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import CustomInputs from "../forms/inputs/CustomInputs";
-import {FontAwesome5, Ionicons} from "@expo/vector-icons";
-import {useAppSelector} from "../../store/store";
+import { FontAwesome5, Ionicons } from "@expo/vector-icons";
+import { useAppSelector } from "../../store/store";
 import CustomButton from "../forms/buttons/CustomButton";
-import {useDocumentHooks} from "../../hooks/documentHooks";
-import {format} from "../../styles/styles";
+import { useDocumentHooks } from "../../hooks/documentHooks";
+import { format } from "../../styles/styles";
 import MessageToast from "../message-toast/MessageToast";
-import {ScanValidate} from "../../hooks/documentHooks";
+import { ScanValidate } from "../../hooks/documentHooks";
 import CustomLoadingText from "../load-spinner/CustomLoadingText";
-import {ScanOptions} from "../list-holder/ItemsList";
+import { ScanOptions } from "../list-holder/ItemsList";
 
 interface ScanModalProps {
   visible: boolean;
@@ -18,15 +18,15 @@ interface ScanModalProps {
 }
 
 const ItemScanModal = React.memo((props: ScanModalProps) => {
-  const {selectedItem} = useAppSelector((state) => state.document);
-  const {closeItemScanModal, handleScanItem} = useDocumentHooks();
+  const { selectedItem } = useAppSelector((state) => state.document);
+  const { closeItemScanModal, handleScanItem } = useDocumentHooks();
   const item: any = selectedItem;
-  const {status} = useAppSelector((state) => state.status);
+  const { status } = useAppSelector((state) => state.status);
 
   const [scanfield, setScanfield] = useState<string>("");
   const [quantityField, setQuantityField] = useState<number>(1);
 
-  const {visible, scanType, options} = props;
+  const { visible, scanType, options } = props;
   const handleOnChange = (key: string, value: string | number) => {
     setScanfield(String(value));
   };
@@ -58,7 +58,7 @@ const ItemScanModal = React.memo((props: ScanModalProps) => {
               <TouchableOpacity onPress={closeItemScanModal}>
                 <FontAwesome5 name="arrow-left" size={24} color="black" />
               </TouchableOpacity>
-              <View style={{flexDirection: "row", gap: 10}}>
+              <View style={{ flexDirection: "row", gap: 10 }}>
                 <Ionicons name="scan" size={24} color="black" />
                 <Text style={styles.headerText}>Scan Barcode</Text>
               </View>
@@ -75,7 +75,11 @@ const ItemScanModal = React.memo((props: ScanModalProps) => {
                 setQuantityField(1);
                 setScanfield("");
                 handleScanItem(
-                  {barcode: scanfield, receiveQty: quantityField},
+                  {
+                    barcode: scanfield,
+                    receiveQty: quantityField,
+                    scanlevel: "1",
+                  },
                   scanType
                 );
               }}
@@ -105,25 +109,25 @@ const ItemScanModal = React.memo((props: ScanModalProps) => {
                 Item Details
               </Text>
               <View style={format.twoRowText}>
-                <Text style={{fontWeight: "bold"}}>Line No: </Text>
+                <Text style={{ fontWeight: "bold" }}>Line No: </Text>
                 <Text>{item.linenum}</Text>
               </View>
               <View style={format.twoRowText}>
-                <Text style={{fontWeight: "bold"}}>Item Code: </Text>
+                <Text style={{ fontWeight: "bold" }}>Item Code: </Text>
                 <Text>{item.itmcde}</Text>
               </View>
               <View style={format.twoRowText}>
-                <Text style={{fontWeight: "bold"}}>Item Description: </Text>
+                <Text style={{ fontWeight: "bold" }}>Item Description: </Text>
                 <Text> {item.itmdsc}</Text>
               </View>
 
               <View style={format.twoRowText}>
-                <Text style={{fontWeight: "bold"}}>UOM: </Text>
+                <Text style={{ fontWeight: "bold" }}>UOM: </Text>
                 <Text> {item.untmea}</Text>
               </View>
 
               <View style={format.twoRowText}>
-                <Text style={{fontWeight: "bold"}}>Quantity: </Text>
+                <Text style={{ fontWeight: "bold" }}>Quantity: </Text>
                 {options?.receivedQty ? (
                   <Text> {`${item.itmqty || ""}`}</Text>
                 ) : (
@@ -132,7 +136,7 @@ const ItemScanModal = React.memo((props: ScanModalProps) => {
               </View>
 
               <View style={format.twoRowText}>
-                <Text style={{fontWeight: "bold"}}>Received Quantity: </Text>
+                <Text style={{ fontWeight: "bold" }}>Received Quantity: </Text>
                 {options?.receivedQty ? (
                   <Text> {`${item[options.receivedQty]}`}</Text>
                 ) : (
@@ -147,7 +151,11 @@ const ItemScanModal = React.memo((props: ScanModalProps) => {
                   setQuantityField(1);
                   setScanfield("");
                   handleScanItem(
-                    {barcode: scanfield, receiveQty: quantityField},
+                    {
+                      barcode: scanfield,
+                      receiveQty: quantityField,
+                      scanlevel: "2",
+                    },
                     scanType
                   );
                 }}

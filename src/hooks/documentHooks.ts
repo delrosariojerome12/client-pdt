@@ -77,6 +77,13 @@ import { useAPIHooks } from "./apiHooks";
 import { setStatusText, showQuantityField } from "../reducers/statusReducer";
 import { useModalHooks } from "./modalHooks";
 import { useServiceHooks } from "./serviceHooks";
+import { useUserActivityLog } from "./userActivityLogHooks";
+import { METHODS } from "../enums/activitylog";
+import {
+  getDTSDetails,
+  getDTSPosting,
+  getDTSValid,
+} from "../store/actions/ims/subcon";
 
 export type ButtonUses =
   | "pto"
@@ -105,7 +112,8 @@ export type TypePost =
   | "physical-inventory"
   | "sloc"
   | "stock-transfer"
-  | "stock-replenish";
+  | "stock-replenish"
+  | "dts";
 
 export type ScanValidate =
   | "pto"
@@ -124,7 +132,8 @@ export type ScanValidate =
   | "stock-transfer"
   | "stock-transfer-bin"
   | "stock-replenish"
-  | "stock-replenish-bin";
+  | "stock-replenish-bin"
+  | "dts";
 
 export type TypeSelect =
   | "pto"
@@ -139,7 +148,8 @@ export type TypeSelect =
   | "sloc"
   | "stock-transfer"
   | "stock-replenish"
-  | "stock-replenish-bin";
+  | "stock-replenish-bin"
+  | "dts";
 
 export interface SelectProps {
   type: TypeSelect;
@@ -167,6 +177,7 @@ export const useDocumentHooks = () => {
   const {
     batchDetails: { batchNo, expDate, mfgDate },
   } = useAppSelector((state) => state.general);
+  const { updateAction } = useUserActivityLog();
 
   const dispatch = useAppDispatch();
   const {
@@ -221,7 +232,9 @@ export const useDocumentHooks = () => {
           getphysicalRecordDetails({ docnum: item.docnum, refnum: item.refnum })
         );
         break;
-
+      case "dts":
+        dispatch(getDTSDetails({ docnum: item.docnum }));
+        break;
       default:
         break;
     }
@@ -680,7 +693,44 @@ export const useDocumentHooks = () => {
           })
         );
         break;
+      case "dts":
+        dispatch(
+          connectToPHP({
+            recid: item.recid,
+            docnum: item.docnum,
+            type: "DTS_SOFTVAL",
+            onSuccess: async () => {
+              dispatch(setStatus("loading"));
 
+              await connectToPHPNotDispatch({
+                recid: item.recid,
+                docnum: item.docnum,
+                type: "DTS_POST",
+              });
+
+              dispatch(
+                getDTSPosting({
+                  limit: 10,
+                  offset: 0,
+                })
+              );
+
+              dispatch(setStatus("success"));
+            },
+            onFailure: (e) => {
+              dispatch(resetStatus());
+              Alert.alert("Transaction Posting Fail", `${e}`, [
+                {
+                  text: "Ok",
+                  onPress: () => {},
+                  style: "destructive",
+                },
+              ]);
+            },
+            dontShowSuccess: true,
+          })
+        );
+        break;
       default:
         alert("No supported yet.");
         break;
@@ -727,6 +777,12 @@ export const useDocumentHooks = () => {
             dispatch(getPTO({ limit: 10, offset: 0 }));
             if (ptoResponse.data.pto2_data[0]) {
               dispatch(handleSetItem(ptoResponse.data.pto2_data[0]));
+
+              updateAction({
+                method: METHODS.UPDATE,
+                remarks: `Update Received Qty of LPN No. : ${selectedItem.lpnnum}`,
+                activity: `Update Received Qty of LPN No. : ${selectedItem.lpnnum}`,
+              });
             }
             if (ptoResponse.data.pto2_data.length === 0) {
               dispatch(setStatusText(`Item Successfully Scanned.`));
@@ -756,6 +812,11 @@ export const useDocumentHooks = () => {
             dispatch(getWTO({ limit: 10, offset: 0 }));
             if (wtoiResponse.data.wto2_data[0]) {
               dispatch(handleSetItem(wtoiResponse.data.wto2_data[0]));
+              updateAction({
+                method: METHODS.UPDATE,
+                remarks: `Update Received Qty of LPN No. : ${selectedItem.lpnnum}`,
+                activity: `Update Received Qty of LPN No. : ${selectedItem.lpnnum}`,
+              });
             }
             if (wtoiResponse.data.wto2_data.length === 0) {
               console.log("daan rito");
@@ -783,6 +844,14 @@ export const useDocumentHooks = () => {
             dispatch(getSRTO({ limit: 10, offset: 0 }));
             if (srtoResponse.data.srto2_data[0]) {
               dispatch(handleSetItem(srtoResponse.data.srto2_data[0]));
+              updateAction({
+                method: METHODS.UPDATE,
+                remarks: `Update Received Qty of SRTO No. : ${
+                  selectedDocument.docnum
+                }, Item Line No. ${selectedItem.linenum.toString()}
+                      with Current Act Rec. Qty : ${selectedItem.srtqty}`,
+                activity: `Update Received Qty of SRTO No. : ${selectedDocument.docnum}`,
+              });
             }
             if (srtoResponse.data.srto2_data.length === 0) {
               dispatch(setStatusText(`Item Successfully Scanned.`));
@@ -796,7 +865,7 @@ export const useDocumentHooks = () => {
             category: "lpnnum_wto_outbound",
             recid: selectedItem?.recid.toString(),
             docnum: selectedDocument.docnum,
-            scanlevel: barcodelvl2 ? "2" : "1",
+            scanlevel: scanlevel,
             pdtmanualqtyoutbound: receiveQty.toString(),
             fromspl: undefined,
             spl_docnum: undefined,
@@ -808,7 +877,6 @@ export const useDocumentHooks = () => {
             !isQuantityFieldShown &&
               dispatch(setStatusText(`Bin No. Successfully Scanned.`));
             if (isQuantityFieldShown) {
-              console.log("wat", selectedDocument.docnum);
               dispatch(
                 getWTOOutboundDetails({ docnum: selectedDocument.docnum })
               );
@@ -816,6 +884,14 @@ export const useDocumentHooks = () => {
               dispatch(setStatusText(`Item Successfully Scanned.`));
               if (response.data.wto2_data[0]) {
                 dispatch(handleSetItem(response.data.wto2_data[0]));
+
+                if (scanlevel != "1") {
+                  updateAction({
+                    method: METHODS.UPDATE,
+                    remarks: `Update ${response.data.wto2_data[0].itmcde} Received Qty WTOO No. : ${response.data.wto2_data[0].docnum}`,
+                    activity: `Update ${response.data.wto2_data[0].itmcde} Received Qty of WTOO No. : ${response.data.wto2_data[0].docnum}`,
+                  });
+                }
               }
               if (response.data.wto2_data.length === 0) {
                 dispatch(handleToggleOutboundItemScan());
@@ -825,8 +901,7 @@ export const useDocumentHooks = () => {
           break;
         case "wavepick":
         case "singlepick":
-          if (barcodelvl2 !== "") {
-            console.log("why", barcodelvl2);
+          if (scanlevel !== "1") {
             dispatch(setStatus("loading"));
             const response = await connectToPHPNotDispatch({
               recid: selectedDocument.recid,
@@ -852,7 +927,7 @@ export const useDocumentHooks = () => {
             category: "wpto_item",
             recid: selectedItem?.recid.toString(),
             docnum: selectedDocument.docnum,
-            scanlevel: barcodelvl2 ? "2" : "1",
+            scanlevel: scanlevel,
             pdtmanualqtyoutbound: receiveQty.toString(),
             fromspl: scanUsage === "singlepick" ? "1" : undefined,
             spl_docnum: selectedDocument.docnum,
@@ -865,7 +940,6 @@ export const useDocumentHooks = () => {
             !isQuantityFieldShown &&
               dispatch(setStatusText(`Bin No. Successfully Scanned.`));
             if (isQuantityFieldShown) {
-              console.log("wat", selectedDocument.docnum);
               if (scanUsage === "singlepick") {
                 dispatch(getPKValidate({ limit: 10, offset: 0 }));
               } else {
@@ -875,6 +949,19 @@ export const useDocumentHooks = () => {
               dispatch(setStatusText(`Item Successfully Scanned.`));
               if (wpResponse.data.wpto2_data[0]) {
                 dispatch(handleSetItem(wpResponse.data.wpto2_data[0]));
+                if (scanlevel != "1") {
+                  let remarks = "Wavepick List";
+                  let spl_wpl_docnum = wpResponse.data.wpto2_data[0].docnum;
+                  if (scanUsage === "singlepick") {
+                    remarks = "(PK VAL) Singlepick List";
+                    spl_wpl_docnum = selectedDocument.docnum;
+                  }
+                  updateAction({
+                    method: METHODS.UPDATE,
+                    remarks: `Update ${wpResponse.data.wpto2_data[0].itmcde} Received Qty ${remarks} No. : ${spl_wpl_docnum}`,
+                    activity: `Update ${wpResponse.data.wpto2_data[0].itmcde} Received Qty of ${remarks} No. : ${spl_wpl_docnum}`,
+                  });
+                }
               }
               if (wpResponse.data.wpto2_data[0].validated === 1) {
                 dispatch(handleToggleOutboundItemScan());
@@ -900,6 +987,11 @@ export const useDocumentHooks = () => {
             dispatch(getSTGValidate({ limit: 10, offset: 0 }));
             if (stgResponse.data.spl2_data[0]) {
               dispatch(handleSetItem(stgResponse.data.spl2_data[0]));
+              updateAction({
+                method: METHODS.UPDATE,
+                remarks: `Update ${stgResponse.data.spl2_data[0].itmcde} Received Qty of Single Pick List No. : ${stgResponse.data.spl2_data[0].docnum}`,
+                activity: `Update ${stgResponse.data.spl2_data[0].itmcde} Received Qty of Single Pick List No. : ${stgResponse.data.spl2_data[0].docnum}`,
+              });
             }
             if (stgResponse.data.spl2_data.length === 0) {
               dispatch(setStatusText(`Item Successfully Scanned.`));
@@ -1000,6 +1092,14 @@ export const useDocumentHooks = () => {
               dispatch(setStatusText(`Item Successfully Scanned.`));
               if (slocResponse.data.sloc2_data[0]) {
                 dispatch(handleSetItem(slocResponse.data.sloc2_data[0]));
+
+                if (scanlevel != "1") {
+                  updateAction({
+                    method: METHODS.UPDATE,
+                    remarks: `Update ${slocResponse.data.sloc2_data[0].itmcde} Received Qty of Sloc to Sloc No. : ${slocResponse.data.sloc2_data[0].docnum}`,
+                    activity: `Update ${slocResponse.data.sloc2_data[0].itmcde} Received Qty of Sloc to Sloc No. : ${slocResponse.data.sloc2_data[0].docnum}`,
+                  });
+                }
               }
               if (slocResponse.data.sloc2_data.length === 0) {
                 dispatch(setStatusText(`Item Successfully Scanned.`));
@@ -1050,10 +1150,8 @@ export const useDocumentHooks = () => {
             fromspl: undefined,
             usrnam: userDetails?.usrcde,
           });
-          console.log("eyuy", stResponse);
 
           if (stResponse && stResponse.data.bnt2_data) {
-            console.log("wat is this", stResponse.data.bnt2_data);
             dispatch(showQuantityField(true));
 
             !isQuantityFieldShown &&
@@ -1071,6 +1169,14 @@ export const useDocumentHooks = () => {
               dispatch(setStatusText(`Item Successfully Scanned.`));
               if (stResponse.data.bnt2_data[0]) {
                 dispatch(handleSetItem(stResponse.data.bnt2_data[0]));
+
+                if (scanlevel != "1") {
+                  updateAction({
+                    method: METHODS.UPDATE,
+                    remarks: `Update ${stResponse.data.bnt2_data[0].itmcde} Received Qty of BIN To BIN No. : ${stResponse.data.bnt2_data[0].btbnum}`,
+                    activity: `Update ${stResponse.data.bnt2_data[0].itmcde} Received Qty of BIN To BIN No. : ${stResponse.data.bnt2_data[0].btbnum}`,
+                  });
+                }
               }
               if (stResponse.data.bnt2_data.length === 0) {
                 dispatch(setStatusText(`Item Successfully Scanned.`));
@@ -1109,6 +1215,43 @@ export const useDocumentHooks = () => {
             }
           }
           break;
+        case "dts":
+          const dtsResponse = await scanBarcode({
+            barcode,
+            category: "dts_item",
+            recid: selectedItem?.recid.toString(),
+            docnum: selectedDocument.docnum,
+            refnum: selectedDocument.refnum,
+            scanlevel: scanlevel,
+            pdtmanualqtyoutbound: receiveQty.toString(),
+            usrnam: userDetails?.usrcde,
+            barcodelvl2: barcodelvl2,
+          });
+          if (dtsResponse && dtsResponse.data.dts2_data) {
+            dispatch(showQuantityField(true));
+            !isQuantityFieldShown &&
+              dispatch(setStatusText(`Bin No. Successfully Scanned.`));
+            if (isQuantityFieldShown) {
+              dispatch(getDTSDetails({ docnum: selectedDocument.docnum }));
+              dispatch(getDTSValid({ limit: 10, offset: 0 }));
+              dispatch(setStatusText(`Item Successfully Scanned.`));
+              if (dtsResponse.data.dts2_data[0]) {
+                dispatch(handleSetItem(dtsResponse.data.dts2_data[0]));
+
+                if (scanlevel != "1") {
+                  updateAction({
+                    method: METHODS.UPDATE,
+                    remarks: `Update ${dtsResponse.data.dts2_data[0].itmcde} Received Qty of Delivery to Supplier No. : ${dtsResponse.data.dts2_data[0].docnum}`,
+                    activity: `Update ${dtsResponse.data.dts2_data[0].itmcde} Received Qty of Delivery to Supplier No. : ${dtsResponse.data.dts2_data[0].docnum}`,
+                  });
+                }
+              }
+              if (dtsResponse.data.dts2_data.length === 0) {
+                dispatch(handleToggleOutboundItemScan());
+              }
+            }
+          }
+          break;
         case "stock-replenish":
           const srResponse = await scanBarcode({
             barcode,
@@ -1122,10 +1265,8 @@ export const useDocumentHooks = () => {
             fromspl: undefined,
             usrnam: userDetails?.usrcde,
           });
-          console.log("eyuy", srResponse);
 
           if (srResponse && srResponse.data.whrepto2_data) {
-            console.log("wat is this", srResponse.data.whrepto2_data);
             dispatch(showQuantityField(true));
 
             !isQuantityFieldShown &&
@@ -1141,6 +1282,13 @@ export const useDocumentHooks = () => {
               dispatch(setStatusText(`Item Successfully Scanned.`));
               if (srResponse.data.whrepto2_data[0]) {
                 dispatch(handleSetItem(srResponse.data.whrepto2_data[0]));
+                if (scanlevel != "1") {
+                  updateAction({
+                    method: METHODS.UPDATE,
+                    remarks: `Update ${srResponse.data.whrepto2_data[0].itmcde} Received Qty of Stock Replenishment No. : ${srResponse.data.whrepto2_data[0].docnum}`,
+                    activity: `Update ${srResponse.data.whrepto2_data[0].itmcde} Received Qty of Stock Replenishment No. : ${srResponse.data.whrepto2_data[0].docnum}`,
+                  });
+                }
               }
               if (srResponse.data.whrepto2_data.length === 0) {
                 dispatch(setStatusText(`Item Successfully Scanned.`));
@@ -1179,7 +1327,6 @@ export const useDocumentHooks = () => {
             }
           }
           break;
-
         case "physical-inventory":
           const pirResponse = await scanBarcode({
             barcode,
@@ -1246,7 +1393,6 @@ export const useDocumentHooks = () => {
             }
           }
           break;
-
         default:
           alert("no api yet");
           break;
@@ -1274,6 +1420,7 @@ export const useDocumentHooks = () => {
       case "wavepick":
       case "cyclecount":
       case "physical-inventory":
+      case "dts":
         const response = await scanBarcode({ barcode, category });
         if (response) {
           handleSelectModal({ item: response.data, type: uses });

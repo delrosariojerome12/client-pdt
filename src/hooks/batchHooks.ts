@@ -53,6 +53,9 @@ import { formatDateYYYYMMDD } from "../helper/Date";
 import { setStatus, setStatusText } from "../reducers/statusReducer";
 import { useAPIHooks } from "./apiHooks";
 import { TypeSelect } from "./documentHooks";
+import { useUserActivityLog } from "./userActivityLogHooks";
+import { METHODS } from "../enums/activitylog";
+import { getDTSDetails, getDTSValid } from "../store/actions/ims/subcon";
 
 type Uses = "update" | "create";
 
@@ -66,6 +69,7 @@ export const useBatchHooks = () => {
   const { handlePost } = useDocumentHooks();
   const { connectToPHPNotDispatch, removeScannedQuantityService } =
     useAPIHooks();
+  const { updateAction } = useUserActivityLog();
 
   // on remove then load
   const checkDetailsToReload = (detailsToLoad: TypeSelect) => {
@@ -115,6 +119,10 @@ export const useBatchHooks = () => {
       case "stock-replenish":
         dispatch(getStockTOValid({ limit: 10, offset: 0 }));
         dispatch(getStockTODetails({ docnum: selectedDocument.docnum }));
+        break;
+      case "dts":
+        dispatch(getDTSValid({ limit: 10, offset: 0 }));
+        dispatch(getDTSDetails({ docnum: selectedDocument.docnum }));
         break;
       case "physical-inventory":
         dispatch(getphysicalRecord({ limit: 10, offset: 0 }));
@@ -465,6 +473,26 @@ export const useBatchHooks = () => {
         );
 
         break;
+      case "dts":
+        const dtsEndpoints: Endpoint[] = [
+          {
+            method: "PATCH",
+            url: `lst_tracc/deliverytosuppliertransferorderfile2b`,
+            payload: {
+              field: {
+                recid: item.recid,
+              },
+              data: {
+                scanqty: 0,
+              },
+            },
+          },
+        ];
+        await removeScannedQuantityService(dtsEndpoints, () => {
+          checkDetailsToReload(uses);
+          dispatch(setStatusText(`Scanned Quantity Removed Successfully.`));
+        });
+        break;
       case "physical-inventory":
         if (item.validated === 1) {
           Alert.alert(
@@ -585,6 +613,12 @@ export const useBatchHooks = () => {
                 },
               })
             );
+
+            updateAction({
+              method: METHODS.UPDATE,
+              remarks: `Update the Batch Information in LPN No. : ${selectedBatchItem.lpnnum} with Document No. : ${selectedDocument.docnum}`,
+              activity: `Update the Batch Information in LPN No. : ${selectedBatchItem.lpnnum} with Document No. : ${selectedDocument.docnum}`,
+            });
           },
         },
         { text: "No", style: "cancel" },

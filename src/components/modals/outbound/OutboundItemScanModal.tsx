@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import {
   Modal,
   View,
@@ -9,17 +9,17 @@ import {
   Alert,
 } from "react-native";
 import CustomInputs from "../../forms/inputs/CustomInputs";
-import {FontAwesome5, Ionicons} from "@expo/vector-icons";
-import {useAppSelector} from "../../../store/store";
+import { FontAwesome5, Ionicons } from "@expo/vector-icons";
+import { useAppSelector } from "../../../store/store";
 import CustomButton from "../../forms/buttons/CustomButton";
-import {useDocumentHooks} from "../../../hooks/documentHooks";
-import {format, generalStyles} from "../../../styles/styles";
+import { useDocumentHooks } from "../../../hooks/documentHooks";
+import { format, generalStyles } from "../../../styles/styles";
 import MessageToast from "../../message-toast/MessageToast";
-import {ScanValidate} from "../../../hooks/documentHooks";
+import { ScanValidate } from "../../../hooks/documentHooks";
 import CustomLoadingText from "../../load-spinner/CustomLoadingText";
-import {useModalHooks} from "../../../hooks/modalHooks";
-import {formatDateStringMMDDYYYY} from "../../../helper/Date";
-import {ScanOptions} from "../../list-holder/ItemsList";
+import { useModalHooks } from "../../../hooks/modalHooks";
+import { formatDateStringMMDDYYYY } from "../../../helper/Date";
+import { ScanOptions } from "../../list-holder/ItemsList";
 
 interface ScanModalProps {
   visible: boolean;
@@ -28,11 +28,11 @@ interface ScanModalProps {
 }
 
 const OutboundItemScanModal = React.memo((props: ScanModalProps) => {
-  const {selectedItem} = useAppSelector((state) => state.document);
-  const {toggleOutboundItemScan} = useModalHooks();
-  const {handleScanItem} = useDocumentHooks();
+  const { selectedItem } = useAppSelector((state) => state.document);
+  const { toggleOutboundItemScan } = useModalHooks();
+  const { handleScanItem } = useDocumentHooks();
   const item: any = selectedItem;
-  const {status, isQuantityFieldShown, statusText} = useAppSelector(
+  const { status, isQuantityFieldShown, statusText } = useAppSelector(
     (state) => state.status
   );
 
@@ -40,7 +40,7 @@ const OutboundItemScanModal = React.memo((props: ScanModalProps) => {
   const [itemBarcode, setItemBarcode] = useState<string>("");
   const [quantityField, setQuantityField] = useState<number>(1);
 
-  const {visible, scanType, options} = props;
+  const { visible, scanType, options } = props;
 
   const handleOnChange = (key: string, value: string | number) => {
     setScanfield(String(value));
@@ -50,21 +50,24 @@ const OutboundItemScanModal = React.memo((props: ScanModalProps) => {
     setQuantityField(parseInt(value as any));
   };
 
-  const handleSubmit = () => {
-    if (isQuantityFieldShown && !itemBarcode) {
-      return Alert.alert("Empty Field", "Invalid Item Barcode", [
+  const handleSubmit = (scanlevel: string) => {
+    if (quantityField) {
+      return Alert.alert("Empty Field", "Invalid Qty.", [
         {
           text: "OK",
         },
       ]);
     }
     setQuantityField(1);
-    setItemBarcode("");
+    if (item.itmqty - item.scanqty == quantityField) {
+      setItemBarcode("");
+    }
     handleScanItem(
       {
         barcode: scanfield,
         receiveQty: quantityField,
         barcodelvl2: itemBarcode,
+        scanlevel: scanlevel,
       },
       scanType
     );
@@ -93,13 +96,13 @@ const OutboundItemScanModal = React.memo((props: ScanModalProps) => {
               <CustomLoadingText text="Processing..." visible={true} />
             )}
 
-            <ScrollView contentContainerStyle={{gap: 12}}>
+            <ScrollView contentContainerStyle={{ gap: 12 }}>
               <View style={styles.headerContainer}>
                 <TouchableOpacity onPress={toggleOutboundItemScan}>
                   <FontAwesome5 name="arrow-left" size={24} color="black" />
                 </TouchableOpacity>
 
-                <View style={{flexDirection: "row", gap: 10}}>
+                <View style={{ flexDirection: "row", gap: 10 }}>
                   <Ionicons name="scan" size={24} color="black" />
                   <Text style={styles.headerText}>Scan Barcode</Text>
                 </View>
@@ -118,7 +121,7 @@ const OutboundItemScanModal = React.memo((props: ScanModalProps) => {
                 inputKey="scan"
                 isFocus={true}
                 onSubmit={() => {
-                  handleSubmit();
+                  handleSubmit("1");
                 }}
               />
 
@@ -134,51 +137,51 @@ const OutboundItemScanModal = React.memo((props: ScanModalProps) => {
                   Item Details
                 </Text>
                 <View style={format.twoRowText}>
-                  <Text style={{fontWeight: "bold"}}>Line No: </Text>
+                  <Text style={{ fontWeight: "bold" }}>Line No: </Text>
                   <Text>{item.linenum}</Text>
                 </View>
                 <View style={format.twoRowText}>
-                  <Text style={{fontWeight: "bold"}}>Item Code: </Text>
+                  <Text style={{ fontWeight: "bold" }}>Item Code: </Text>
                   <Text>{item.itmcde}</Text>
                 </View>
                 <View style={format.twoRowText}>
-                  <Text style={{fontWeight: "bold"}}>Description: </Text>
+                  <Text style={{ fontWeight: "bold" }}>Description: </Text>
                   <Text>{item.itmdsc}</Text>
                 </View>
                 <View style={format.twoRowText}>
-                  <Text style={{fontWeight: "bold"}}>Batch No.:</Text>
+                  <Text style={{ fontWeight: "bold" }}>Batch No.:</Text>
                   <Text>{`${item.batchnum || "No BatchNo."}`}</Text>
                 </View>
 
                 <View style={format.twoRowText}>
-                  <Text style={{fontWeight: "bold"}}>Mfg. Date:</Text>
+                  <Text style={{ fontWeight: "bold" }}>Mfg. Date:</Text>
                   <Text>{`${
                     formatDateStringMMDDYYYY(item.mfgdte as string) || "No Date"
                   } `}</Text>
                 </View>
                 <View style={format.twoRowText}>
-                  <Text style={{fontWeight: "bold"}}>Exp. Date:</Text>
+                  <Text style={{ fontWeight: "bold" }}>Exp. Date:</Text>
                   <Text>{`${
                     formatDateStringMMDDYYYY(item.expdte as string) || "No Date"
                   }`}</Text>
                 </View>
                 <View style={format.twoRowText}>
-                  <Text style={{fontWeight: "bold"}}>Bin No.:</Text>
+                  <Text style={{ fontWeight: "bold" }}>Bin No.:</Text>
                   <Text>{`${item.binnum || item.binfrom} `}</Text>
                 </View>
 
                 <View style={format.twoRowText}>
-                  <Text style={{fontWeight: "bold"}}>Qty: </Text>
+                  <Text style={{ fontWeight: "bold" }}>Qty: </Text>
                   <Text> {`${item.itmqty || ""} `}</Text>
                 </View>
 
                 <View style={format.twoRowText}>
-                  <Text style={{fontWeight: "bold"}}>UOM: </Text>
+                  <Text style={{ fontWeight: "bold" }}>UOM: </Text>
                   <Text> {`${item.untmea || ""}`}</Text>
                 </View>
 
                 <View style={format.twoRowText}>
-                  <Text style={{fontWeight: "bold"}}>Scanned Quantity: </Text>
+                  <Text style={{ fontWeight: "bold" }}>Scanned Quantity: </Text>
                   <Text> {`${item.scanqty}`}</Text>
                 </View>
               </View>
@@ -198,7 +201,7 @@ const OutboundItemScanModal = React.memo((props: ScanModalProps) => {
                 </View>
               )}
 
-              {isQuantityFieldShown && (
+              {isQuantityFieldShown ? (
                 <>
                   <CustomInputs
                     onInputChange={(key: string, value: string | number) => {
@@ -209,7 +212,7 @@ const OutboundItemScanModal = React.memo((props: ScanModalProps) => {
                     placeHolder="Waiting To Scan Item Barcode"
                     inputKey="itemBarcode"
                     onSubmit={() => {
-                      handleSubmit();
+                      handleSubmit("2");
                     }}
                   />
 
@@ -225,27 +228,46 @@ const OutboundItemScanModal = React.memo((props: ScanModalProps) => {
                       useFlex={true}
                     />
                   </View>
-                </>
-              )}
 
-              <View style={styles.buttonContainer}>
-                <CustomButton
-                  onPress={() => {
-                    handleSubmit();
-                  }}
-                  title="NEXT"
-                  type="regular"
-                  isWidthNotFull={true}
-                  useFlex={true}
-                />
-                <CustomButton
-                  onPress={toggleOutboundItemScan}
-                  title="CLOSE"
-                  type="delete"
-                  isWidthNotFull={true}
-                  useFlex={true}
-                />
-              </View>
+                  <View style={styles.buttonContainer}>
+                    <CustomButton
+                      onPress={() => {
+                        handleSubmit("2");
+                      }}
+                      title="NEXT"
+                      type="regular"
+                      isWidthNotFull={true}
+                      useFlex={true}
+                    />
+                    <CustomButton
+                      onPress={toggleOutboundItemScan}
+                      title="CLOSE"
+                      type="delete"
+                      isWidthNotFull={true}
+                      useFlex={true}
+                    />
+                  </View>
+                </>
+              ) : (
+                <View style={styles.buttonContainer}>
+                  <CustomButton
+                    onPress={() => {
+                      handleSubmit("1");
+                    }}
+                    title="NEXT"
+                    type="regular"
+                    isWidthNotFull={true}
+                    useFlex={true}
+                  />
+                  <CustomButton
+                    onPress={toggleOutboundItemScan}
+                    title="CLOSE"
+                    type="delete"
+                    isWidthNotFull={true}
+                    useFlex={true}
+                  />
+                </View>
+              )}
             </ScrollView>
           </View>
         </View>
