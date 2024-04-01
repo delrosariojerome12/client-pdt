@@ -35,6 +35,7 @@ export const useUserActivityLog = () => {
     handlePost({
       url: "lst_tracc/useractivitylogfile",
       requestData: [payloadData],
+      disableToast: true,
     });
   };
 

@@ -89,7 +89,8 @@ export const useServiceHooks = () => {
 
       setData(response.data);
       setStatus("success");
-      ToastMessage(toastMessage?.success || "Post Success!", 500);
+      !disableToast &&
+        ToastMessage(toastMessage?.success || "Post Success!", 500);
       onSuccess && onSuccess(response.data);
 
       return response.data;
