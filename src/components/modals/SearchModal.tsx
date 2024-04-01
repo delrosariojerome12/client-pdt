@@ -7,6 +7,7 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  RefreshControl,
 } from "react-native";
 import { FontAwesome5, FontAwesome } from "@expo/vector-icons";
 import CustomInputs from "../forms/inputs/CustomInputs";
@@ -18,42 +19,30 @@ import {
   handleSetItemText,
 } from "../../reducers/searchReducer";
 import CustomTable from "../forms/table/CustomTable";
+import { useSearchHooks } from "../../hooks/searchHooks";
+import InputWithSearch from "../forms/inputs/InputWithSearch";
 
 interface SearchModalProps {
   visible: boolean;
 }
 
 const SearchModal = (props: SearchModalProps) => {
-  const { searchModalContent } = useAppSelector((state) => state.modal);
-  const { data: warehouseData } = useAppSelector(
-    (state) => state.search.warehouse
-  );
-  const { data: itemData } = useAppSelector((state) => state.search.item);
-  const { data: binData } = useAppSelector((state) => state.search.binnum);
+  const {
+    searchModalContent,
+    isPaginating,
+    refreshing,
+    onRefresh,
+    handleScroll,
+    warehouse,
+    binnum,
+    item,
+    filteredData,
+    searchText,
+    handleSearch,
+    handleChangeSearchText,
+  } = useSearchHooks();
   const dispatch = useAppDispatch();
   const { visible } = props;
-  const [searchText, setSearchText] = useState("");
-
-  const handleOnChange = (key: string, value: string | number) => {
-    setSearchText(String(value));
-  };
-
-  const handleSearchModal = async () => {
-    console.log("pumasok?", searchModalContent);
-    switch (searchModalContent) {
-      case "warehouse":
-        warehouseData.filter(
-          (e) =>
-            e.warcde?.indexOf(searchText) ||
-            e.warcdenum?.indexOf(searchText) ||
-            e.warloccde?.indexOf(searchText)
-        );
-        break;
-
-      default:
-        break;
-    }
-  };
 
   const handleCloseModal = () => {
     dispatch(handleToggleSearchModal());
@@ -62,11 +51,11 @@ const SearchModal = (props: SearchModalProps) => {
   const renderTable = () => {
     switch (searchModalContent) {
       case "warehouse":
-        if (warehouseData) {
+        if (warehouse?.data) {
           return (
             <CustomTable
               tableHeaders={["Warehouse", "Whs No.", "S.Loc.", "Action"]}
-              tableData={warehouseData}
+              tableData={searchText ? filteredData : warehouse?.data}
               visibleProperties={["warcde", "warcdenum", "warloccde"]}
               isSelectDisable={true}
               isPostDisable={true}
@@ -75,15 +64,21 @@ const SearchModal = (props: SearchModalProps) => {
                 dispatch(handleSetWarehouse(item));
                 handleCloseModal();
               }}
+              loadingStatus={
+                warehouse?.status === "loading" &&
+                !refreshing &&
+                !isPaginating &&
+                true
+              }
             />
           );
         }
       case "bin":
-        if (binData) {
+        if (binnum?.data) {
           return (
             <CustomTable
               tableHeaders={["Bin No.", "Action"]}
-              tableData={binData}
+              tableData={searchText ? filteredData : binnum?.data}
               visibleProperties={["binnum"]}
               isSelectDisable={true}
               isPostDisable={true}
@@ -92,15 +87,21 @@ const SearchModal = (props: SearchModalProps) => {
                 dispatch(handleSetBinText(item.binnum));
                 handleCloseModal();
               }}
+              loadingStatus={
+                binnum?.status === "loading" &&
+                !refreshing &&
+                !isPaginating &&
+                true
+              }
             />
           );
         }
       case "item":
-        if (itemData) {
+        if (item?.data) {
           return (
             <CustomTable
               tableHeaders={["Item Code", "Item Description", "Action"]}
-              tableData={itemData}
+              tableData={searchText ? filteredData : item?.data}
               visibleProperties={["itmcde", "itmdsc"]}
               isSelectDisable={true}
               isPostDisable={true}
@@ -109,6 +110,12 @@ const SearchModal = (props: SearchModalProps) => {
                 dispatch(handleSetItemText(item.itmcde));
                 handleCloseModal();
               }}
+              loadingStatus={
+                item?.status === "loading" &&
+                !refreshing &&
+                !isPaginating &&
+                true
+              }
             />
           );
         }
@@ -117,7 +124,7 @@ const SearchModal = (props: SearchModalProps) => {
     }
   };
 
-  console.log("search");
+  console.log(`${searchModalContent} search`);
 
   return (
     <Modal visible={visible} onRequestClose={handleCloseModal} transparent>
@@ -132,7 +139,13 @@ const SearchModal = (props: SearchModalProps) => {
                 `Search: ${searchModalContent.toUpperCase()}`}
             </Text>
           </View>
-          <View style={styles.searchContainer}>
+          <InputWithSearch
+            label="Search"
+            onShow={handleSearch}
+            text={searchText}
+            onTextChange={handleChangeSearchText}
+          />
+          {/* <View style={styles.searchContainer}>
             <CustomInputs
               placeHolder="Search"
               inputKey="search"
@@ -147,12 +160,22 @@ const SearchModal = (props: SearchModalProps) => {
                 padding: 20,
                 borderRadius: 10,
               }}
-              onPress={() => handleSearchModal}
+              onPress={() => console.log("asdas")}
             >
               <FontAwesome name="search" size={20} color="black" />
             </TouchableOpacity>
-          </View>
-          {renderTable()}
+          </View> */}
+          <ScrollView
+            style={styles.innerContainer}
+            contentContainerStyle={{ flexGrow: 1 }}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+            onScroll={handleScroll}
+            scrollEventThrottle={0}
+          >
+            {renderTable()}
+          </ScrollView>
         </View>
       </View>
     </Modal>
@@ -213,6 +236,10 @@ const styles = StyleSheet.create({
   },
   label: {
     fontWeight: "bold",
+  },
+  innerContainer: {
+    flex: 1,
+    gap: 15,
   },
 });
 

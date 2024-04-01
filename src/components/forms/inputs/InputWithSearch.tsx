@@ -13,11 +13,12 @@ interface InputProps {
   onShow: () => void;
   text: string;
   onTextChange?: (value: string) => void;
+  allowEmptyText?: boolean;
   disable?: boolean;
 }
 
 const InputWithSearch = (props: InputProps) => {
-  const { label, onShow, text, onTextChange, disable } = props;
+  const { label, onShow, text, onTextChange, disable, allowEmptyText } = props;
 
   return (
     <View style={style.inputWithSearchContainer}>
@@ -34,16 +35,18 @@ const InputWithSearch = (props: InputProps) => {
           value={text}
           onChangeText={(newText) => onTextChange && onTextChange(newText)}
           onSubmitEditing={() => {
-            if (text.trim() !== "") {
-              onShow && onShow();
+            if (!allowEmptyText && text.trim() !== "") {
+              return onShow && onShow();
             }
+            return onShow && onShow();
           }}
         />
         <TouchableOpacity
           onPress={() => {
-            if (text.trim() !== "") {
-              onShow && onShow();
+            if (!allowEmptyText && text.trim() !== "") {
+              return onShow && onShow();
             }
+            return onShow && onShow();
           }}
         >
           <FontAwesome name="search" size={20} color="#808080" />
