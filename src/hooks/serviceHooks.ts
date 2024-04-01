@@ -78,9 +78,6 @@ export const useServiceHooks = () => {
   }: SendProps) => {
     const completeUrl = `${baseURl}/api/${url}`;
 
-    console.log(completeUrl);
-    console.log(requestData);
-
     setStatus("loading");
     if (!disableToast) {
       ToastMessage(toastMessage?.loading || "Loading...", 500);
@@ -89,18 +86,23 @@ export const useServiceHooks = () => {
     try {
       const response = await axios.post(completeUrl, requestData);
 
-      setData(response.data);
-      setStatus("success");
-      !disableToast &&
-        ToastMessage(toastMessage?.success || "Post Success!", 500);
-      onSuccess && onSuccess(response.data);
+      if (response.status >= 200 && response.status < 300) {
+        // Request was successful
+        setData(response.data);
+        setStatus("success");
+        !disableToast &&
+          ToastMessage(toastMessage?.success || "Post Success!", 500);
+        onSuccess && onSuccess(response.data);
 
-      return response.data;
+        return response.data;
+      }
+      return null;
     } catch (error) {
-      console.log(error);
       onError && onError(error);
+      console.log("mali", error);
       setStatus("failed");
       !disableToast && ToastMessage(toastMessage?.error || "Post Failed!", 500);
+      return null;
     }
   };
 

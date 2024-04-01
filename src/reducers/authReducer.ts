@@ -22,6 +22,7 @@ interface AuthUser {
     traccDirectory: string;
     traccDomain: string;
   };
+  // company: {};
 }
 
 const initialState: AuthUser = {

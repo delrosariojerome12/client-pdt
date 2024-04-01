@@ -3,7 +3,7 @@
     "name": "client-pdt",
     "slug": "client-pdt",
     "scheme": "client-pdt",
-    "version": "1.0.0",
+    "version": "04.01.24",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",

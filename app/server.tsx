@@ -1,23 +1,28 @@
-import React, {useState} from "react";
-import {View, Text, TextInput, Button, StyleSheet} from "react-native";
+import React, { useState } from "react";
+import { View, Text, TextInput, Button, StyleSheet } from "react-native";
 import CustomInputs from "../src/components/forms/inputs/CustomInputs";
 import CustomButton from "../src/components/forms/buttons/CustomButton";
 import DropDown from "../src/components/forms/dropdowns/DropDown";
-import {useServerHooks} from "../src/hooks/serverHook";
+import { useServerHooks } from "../src/hooks/serverHook";
+import CustomLoadingText from "../src/components/load-spinner/CustomLoadingText";
 
 const Server = () => {
-  const {updateServer, serverConfig, handleInputChange} = useServerHooks();
+  const { updateServer, serverConfig, handleInputChange, status, statusText } =
+    useServerHooks();
 
   return (
     <View style={styles.container}>
+      {status === "loading" && (
+        <CustomLoadingText text="Updating..." visible={status === "loading"} />
+      )}
       <DropDown
         inputKey="protocol"
         onInputChange={handleInputChange}
         title="Protocol:"
         selectedValue={serverConfig.protocol}
         choices={[
-          {label: "HTTP", value: "http"},
-          {label: "HTTPS", value: "https"},
+          { label: "HTTP", value: "http" },
+          { label: "HTTPS", value: "https" },
         ]}
       />
 

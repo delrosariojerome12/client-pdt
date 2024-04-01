@@ -1,5 +1,10 @@
 import { useAppDispatch, useAppSelector } from "../store/store";
-import { onLogin, onLogout, setPhpServer } from "../reducers/authReducer";
+import {
+  handleUpdateProtocol,
+  onLogin,
+  onLogout,
+  setPhpServer,
+} from "../reducers/authReducer";
 import { useState } from "react";
 import { useRouter } from "expo-router";
 import { useServiceHooks } from "./serviceHooks";
@@ -26,80 +31,76 @@ export const useAuthHooks = () => {
   const [password, setPassword] = useState<any>("");
 
   const handleLogin = async () => {
-    // if (!userID || !password) {
-    //   ToastMessage("Please Fill the fields first", 1000);
-    //   return;
-    // }
-    dispatch(setStatus("loading"));
+    if (userID === "LSTV" && password === "Lstventures") {
+      router.push("server");
+      setUserID("");
+      setPassword("");
+      return;
+    } else {
+      dispatch(setStatus("loading"));
+      const randomString = await generateRandomString(32);
 
-    if (userID === "lstv" && password === "lstventures") {
-      router.replace("screens/server");
+      const response = await handlePost({
+        url: "auth/login",
+        requestData: {
+          // usrcde: "Msumang",
+          // usrpwd: "5436",
+          usrcde: userID,
+          usrpwd: password,
+        },
+        onSuccess: (data) => {
+          setTimeout(async () => {
+            console.log("success");
+            dispatch(onLogin({ sesidData: randomString, userData: data }));
 
-      // setTimeout(() => {
-      // router.replace("/");
-      // }, 1500);
-    }
-    const randomString = await generateRandomString(32);
+            storeAsyncData(
+              { sesidData: randomString, userData: data },
+              "user-cred"
+            );
 
-    const response = await handlePost({
-      url: "auth/login",
-      requestData: {
-        usrpwd: "5436",
-        usrcde: "Msumang",
-      },
-      onSuccess: (data) => {
-        setTimeout(async () => {
-          dispatch(onLogin({ sesidData: randomString, userData: data }));
-
-          storeAsyncData(
-            { sesidData: randomString, userData: data },
-            "user-cred"
-          );
-
-          await handleGet({
-            url: "lst_tracc/syspar2?_includes=tracc_progdomain,tracc_progdir",
-            onSuccess: (data) => {
-              dispatch(setPhpServer(data[0]));
-            },
-            disableToast: true,
-          });
-          await handlePatch({
-            url: "lst_tracc/userfile",
-            requestData: {
-              field: {
-                usrcde: "msumang",
+            await handleGet({
+              url: "lst_tracc/syspar2?_includes=tracc_progdomain,tracc_progdir",
+              onSuccess: (data) => {
+                dispatch(setPhpServer(data[0]));
               },
-              data: {
-                sesid: randomString,
+              disableToast: true,
+            });
+            await handlePatch({
+              url: "lst_tracc/userfile",
+              requestData: {
+                field: {
+                  usrcde: "msumang",
+                },
+                data: {
+                  sesid: randomString,
+                },
               },
-            },
-            disableToast: true,
-          });
-          dispatch(setStatus("idle"));
-          router.replace("screens/home/");
-        }, 1500);
-      },
-      onError: (error) => {
-        console.log("error log in", error.response.data.message);
-
-        setTimeout(() => {
-          dispatch(
-            setStatusText(
-              error.response.data.message || "Cannot Connect to Server."
-            )
-          );
-          dispatch(setStatus("failed"));
-        }, 1500);
-      },
-      disableToast: true,
-    });
-
-    if (response) {
-      updateAction({
-        method: METHODS.LOGIN,
-        remarks: "User Logged In.",
-        activity: "User Logged In.",
+              disableToast: true,
+            });
+            dispatch(setStatus("idle"));
+            router.replace("screens/home/");
+          }, 1500);
+        },
+        onError: (error) => {
+          setTimeout(() => {
+            dispatch(
+              setStatusText(
+                error?.response?.data?.message || "Cannot Connect to Server."
+              )
+            );
+            dispatch(setStatus("failed"));
+          }, 1500);
+        },
+        disableToast: true,
       });
+
+      if (response) {
+        updateAction({
+          method: METHODS.LOGIN,
+          remarks: "User Logged In.",
+          activity: "User Logged In.",
+        });
+      }
     }
   };
 
@@ -107,6 +108,8 @@ export const useAuthHooks = () => {
     dispatch(setStatus("loading"));
     try {
       removeAsyncData("user-cred");
+      removeAsyncData("server-config");
+
       updateAction({
         method: METHODS.LOGOUT,
         remarks: "User Logged Out.",
@@ -125,6 +128,12 @@ export const useAuthHooks = () => {
 
   const checkIsLoggedIn = async () => {
     const user = await getAsyncData("user-cred");
+    const server = await getAsyncData("server-config");
+    console.log("server local", server);
+
+    if (!server) {
+      router.replace("server");
+    }
     if (user) {
       console.log("pasok");
       try {
@@ -163,6 +172,9 @@ export const useAuthHooks = () => {
         );
         dispatch(setStatus("failed"));
       }
+    }
+    if (server) {
+      dispatch(handleUpdateProtocol(server));
     }
   };
 
