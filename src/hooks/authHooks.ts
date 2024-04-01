@@ -108,7 +108,7 @@ export const useAuthHooks = () => {
     dispatch(setStatus("loading"));
     try {
       removeAsyncData("user-cred");
-      removeAsyncData("server-config");
+      // removeAsyncData("server-config");
 
       updateAction({
         method: METHODS.LOGOUT,
