@@ -21,6 +21,7 @@ interface SendProps {
   requestData: any;
   toastMessage?: ToastMessage;
   onSuccess?: (data: any) => void; // Callback function for success
+  onError?: (error: any) => void;
   disableToast?: boolean;
 }
 
@@ -72,6 +73,7 @@ export const useServiceHooks = () => {
     requestData,
     disableToast,
     onSuccess,
+    onError,
     toastMessage,
   }: SendProps) => {
     const completeUrl = `${baseURl}/api/${url}`;
@@ -89,14 +91,16 @@ export const useServiceHooks = () => {
 
       setData(response.data);
       setStatus("success");
-      ToastMessage(toastMessage?.success || "Post Success!", 500);
+      !disableToast &&
+        ToastMessage(toastMessage?.success || "Post Success!", 500);
       onSuccess && onSuccess(response.data);
 
       return response.data;
     } catch (error) {
       console.log(error);
+      onError && onError(error);
       setStatus("failed");
-      ToastMessage(toastMessage?.error || "Post Failed!", 500);
+      !disableToast && ToastMessage(toastMessage?.error || "Post Failed!", 500);
     }
   };
 

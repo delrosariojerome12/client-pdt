@@ -10,6 +10,7 @@ import React, { useState, useEffect } from "react";
 import CustomButton from "../src/components/forms/buttons/CustomButton";
 import { Link } from "expo-router";
 import { useAuthHooks } from "../src/hooks/authHooks";
+import CustomLoadingText from "../src/components/load-spinner/CustomLoadingText";
 
 const Index = () => {
   const {
@@ -20,12 +21,13 @@ const Index = () => {
     password,
     setPassword,
     status,
+    statusText,
   } = useAuthHooks();
 
-  const handleLinkPress = () => {
-    const url = "https://your-license-agreement-url.com"; // Replace with your actual URL
-    Linking.openURL(url);
-  };
+  // const handleLinkPress = () => {
+  //   const url = "https://your-license-agreement-url.com"; // Replace with your actual URL
+  //   Linking.openURL(url);
+  // };
 
   useEffect(() => {
     const checkUserData = async () => {
@@ -37,9 +39,14 @@ const Index = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>User Login</Text>
-      {/* {status === "not-found" && (
-          <Text style={styles.error}>{errorMessage}</Text>
-        )} */}
+      {status === "failed" && <Text style={styles.error}>{statusText}</Text>}
+
+      {status === "loading" && (
+        <CustomLoadingText
+          text="Logging In..."
+          visible={status === "loading"}
+        />
+      )}
 
       <TextInput
         style={styles.input}
@@ -59,17 +66,18 @@ const Index = () => {
       <View style={styles.customButton}>
         <CustomButton
           onPress={handleLogin}
-          title={status === "loading" ? "Logging in..." : "Login"}
+          // title={status === "loading" ? "Logging in..." : "Login"}
+          title="Login"
           type="regular"
-          isDisable={
-            status === "loading" || status === "success" ? true : false
-          }
+          // isDisable={
+          //   status === "loading" || status === "success" ? true : false
+          // }
         />
       </View>
 
-      <Link href={"server"} style={styles.serverLink} asChild>
+      {/* <Link href={"server"} style={styles.serverLink} asChild>
         <Text>Setup Server</Text>
-      </Link>
+      </Link> */}
 
       <View style={styles.licenseTextContainer}>
         <Text style={styles.licenseText}>

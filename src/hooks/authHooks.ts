@@ -1,11 +1,9 @@
 import { useAppDispatch, useAppSelector } from "../store/store";
 import { onLogin, onLogout, setPhpServer } from "../reducers/authReducer";
 import { useState } from "react";
-import { ToastMessage } from "../helper/Toast";
 import { useRouter } from "expo-router";
 import { useServiceHooks } from "./serviceHooks";
 import { generateRandomString } from "../helper/RandomString";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   storeAsyncData,
   getAsyncData,
@@ -13,12 +11,15 @@ import {
 } from "../../src/helper/AsyncStorage";
 import { useUserActivityLog } from "./userActivityLogHooks";
 import { METHODS } from "../enums/activitylog";
+import { setStatus, setStatusText } from "../reducers/statusReducer";
 
 export const useAuthHooks = () => {
+  const { status, statusText } = useAppSelector((state) => state.status);
+
   const dispatch = useAppDispatch();
   const router = useRouter();
 
-  const { handlePost, handleGet, handlePatch, status } = useServiceHooks();
+  const { handlePost, handleGet, handlePatch } = useServiceHooks();
   const { updateAction } = useUserActivityLog();
 
   const [userID, setUserID] = useState<any>("");
@@ -29,6 +30,15 @@ export const useAuthHooks = () => {
     //   ToastMessage("Please Fill the fields first", 1000);
     //   return;
     // }
+    dispatch(setStatus("loading"));
+
+    if (userID === "lstv" && password === "lstventures") {
+      router.replace("screens/server");
+
+      // setTimeout(() => {
+      // router.replace("/");
+      // }, 1500);
+    }
     const randomString = await generateRandomString(32);
 
     const response = await handlePost({
@@ -36,11 +46,6 @@ export const useAuthHooks = () => {
       requestData: {
         usrpwd: "5436",
         usrcde: "Msumang",
-      },
-      toastMessage: {
-        error: "Login Failed",
-        loading: "Logging in...",
-        success: "Login Success!",
       },
       onSuccess: (data) => {
         setTimeout(async () => {
@@ -70,10 +75,23 @@ export const useAuthHooks = () => {
             },
             disableToast: true,
           });
-
+          dispatch(setStatus("idle"));
           router.replace("screens/home/");
         }, 1500);
       },
+      onError: (error) => {
+        console.log("error log in", error.response.data.message);
+
+        setTimeout(() => {
+          dispatch(
+            setStatusText(
+              error.response.data.message || "Cannot Connect to Server."
+            )
+          );
+          dispatch(setStatus("failed"));
+        }, 1500);
+      },
+      disableToast: true,
     });
 
     if (response) {
@@ -86,9 +104,8 @@ export const useAuthHooks = () => {
   };
 
   const handleLogout = () => {
-    ToastMessage("Logging out...", 1000);
+    dispatch(setStatus("loading"));
     try {
-      dispatch(onLogout());
       removeAsyncData("user-cred");
       updateAction({
         method: METHODS.LOGOUT,
@@ -97,38 +114,55 @@ export const useAuthHooks = () => {
       });
       setTimeout(() => {
         router.replace("/");
+        dispatch(onLogout());
+        dispatch(setStatus("idle"));
       }, 1500);
     } catch (error) {
+      dispatch(setStatus("failed"));
       console.log(error);
     }
   };
 
   const checkIsLoggedIn = async () => {
     const user = await getAsyncData("user-cred");
-
     if (user) {
       console.log("pasok");
-      dispatch(onLogin({ sesidData: user.sesidData, userData: user.userData }));
-      await handlePatch({
-        url: "lst_tracc/userfile",
-        requestData: {
-          field: {
-            usrcde: user.usrcde,
+      try {
+        dispatch(setStatus("loading"));
+        dispatch(
+          onLogin({ sesidData: user.sesidData, userData: user.userData })
+        );
+        await handlePatch({
+          url: "lst_tracc/userfile",
+          requestData: {
+            field: {
+              usrcde: user.usrcde,
+            },
+            data: {
+              sesid: user.sesidData,
+            },
           },
-          data: {
-            sesid: user.sesidData,
+          disableToast: true,
+        });
+        await handleGet({
+          url: "lst_tracc/syspar2?_includes=tracc_progdomain,tracc_progdir",
+          onSuccess: (data) => {
+            dispatch(setPhpServer(data[0]));
           },
-        },
-        disableToast: true,
-      });
-      await handleGet({
-        url: "lst_tracc/syspar2?_includes=tracc_progdomain,tracc_progdir",
-        onSuccess: (data) => {
-          dispatch(setPhpServer(data[0]));
-        },
-        disableToast: true,
-      });
-      router.push("screens/home/");
+          disableToast: true,
+        });
+        dispatch(setStatus("idle"));
+
+        router.push("screens/home/");
+      } catch (error: any) {
+        console.log(error);
+        dispatch(
+          setStatusText(
+            error.response.data.message || "Cannot Connect to Server."
+          )
+        );
+        dispatch(setStatus("failed"));
+      }
     }
   };
 
@@ -140,6 +174,7 @@ export const useAuthHooks = () => {
     password,
     userID,
     status,
+    statusText,
     checkIsLoggedIn,
   };
 };
