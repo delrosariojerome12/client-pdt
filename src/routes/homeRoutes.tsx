@@ -450,19 +450,19 @@ export const homeRoutes = [
 export const drawerScreens = [
   {
     name: "home/index",
-    title: "Home",
+    title: "",
     isVisible: false,
     icon: "home",
   },
   // start warehouse
   {
     name: "warehouse/index",
-    title: "Warehouse Management System",
+    title: "",
     isVisible: false,
   },
   {
     name: "warehouse/inbound/index",
-    title: "Inbound",
+    title: "",
     isVisible: false,
   },
   {
@@ -472,7 +472,7 @@ export const drawerScreens = [
   },
   {
     name: "warehouse/inbound/pur",
-    title: "Putaway to - PUR Transfer",
+    title: "Putaway TO - PUR Transfer",
     isVisible: false,
   },
 
@@ -483,7 +483,7 @@ export const drawerScreens = [
   },
   {
     name: "warehouse/inbound/whs",
-    title: "Putaway to - WHS Transfer",
+    title: "Putaway TO - WHS Transfer",
     isVisible: false,
   },
   {
@@ -494,7 +494,7 @@ export const drawerScreens = [
 
   {
     name: "warehouse/outbound/index",
-    title: "Outbound",
+    title: "",
     isVisible: false,
   },
   {
@@ -517,12 +517,12 @@ export const drawerScreens = [
   // start transport
   {
     name: "transport/index",
-    title: "Transport Management System",
+    title: "",
     isVisible: false,
   },
   {
     name: "transport/transaction/index",
-    title: "Transaction",
+    title: "",
     isVisible: false,
   },
   {
@@ -535,12 +535,12 @@ export const drawerScreens = [
   // start ims
   {
     name: "inventoryManagement/index",
-    title: "Inventory Management System",
+    title: "",
     isVisible: false,
   },
   {
     name: "inventoryManagement/transaction/index",
-    title: "Transaction",
+    title: "",
     isVisible: false,
   },
   {
@@ -560,7 +560,7 @@ export const drawerScreens = [
   },
   {
     name: "inventoryManagement/subcon/index",
-    title: "SUBCON",
+    title: "",
     isVisible: false,
   },
   {
@@ -570,7 +570,7 @@ export const drawerScreens = [
   },
   {
     name: "inventoryManagement/physicalCount/index",
-    title: "Physical Count",
+    title: "",
     isVisible: false,
   },
   {
@@ -580,7 +580,7 @@ export const drawerScreens = [
   },
   {
     name: "inventoryManagement/replenishment/index",
-    title: "Replenishment",
+    title: "",
     isVisible: false,
   },
   {
@@ -593,17 +593,17 @@ export const drawerScreens = [
   //start inventory
   {
     name: "inventory/index",
-    title: "Inventory",
+    title: "",
     isVisible: false,
   },
   {
     name: "inventory/inquiry/index",
-    title: "Inquiry",
+    title: "",
     isVisible: false,
   },
   {
     name: "inventory/inquiry/batchNOandLOC",
-    title: "Batch NO. and Bin Location Inquiry",
+    title: "BIN Inquiry",
     isVisible: false,
   },
 

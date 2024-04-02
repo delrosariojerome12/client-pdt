@@ -1,5 +1,6 @@
-import {createSlice} from "@reduxjs/toolkit";
-import {getBatch} from "../store/actions/generalActions";
+import { createSlice } from "@reduxjs/toolkit";
+import { getBatch } from "../store/actions/generalActions";
+import { getCompany } from "../store/actions/generalActions";
 
 interface Batch {
   recid: number;
@@ -10,6 +11,12 @@ interface Batch {
   expdte: string; // Assuming date strings in "YYYY-MM-DD" format
   itmcde: string;
   itmdsc: string;
+}
+
+interface Company {
+  recid: number;
+  comcde: string;
+  comdsc: string;
 }
 
 type Status = "idle" | "loading" | "success" | "failed";
@@ -26,10 +33,11 @@ interface GeneralProps {
     batchedSaved: boolean;
   };
   batchPostMode: "postUpdateBatch" | "updateBatch";
+  company: { data: Company[] | [] };
 }
 
 const initialState: GeneralProps = {
-  batch: {data: [], status: "idle"},
+  batch: { data: [], status: "idle" },
   batchDetails: {
     batchNo: "",
     expDate: new Date(),
@@ -37,6 +45,7 @@ const initialState: GeneralProps = {
     batchedSaved: false,
   },
   batchPostMode: "updateBatch",
+  company: { data: [] },
 };
 
 const generalReducer = createSlice({
@@ -57,7 +66,7 @@ const generalReducer = createSlice({
     },
     setBatchPostMode: (
       state,
-      action: {payload: "postUpdateBatch" | "updateBatch"}
+      action: { payload: "postUpdateBatch" | "updateBatch" }
     ) => {
       state.batchPostMode = action.payload;
     },
@@ -74,7 +83,7 @@ const generalReducer = createSlice({
         state.batch.status = "loading";
       })
       .addCase(getBatch.fulfilled, (state, action) => {
-        const {data, paginating} = action.payload;
+        const { data, paginating } = action.payload;
         if (paginating) {
           console.log("paginating");
           state.batch.data = [...state.batch.data, ...data];
@@ -87,6 +96,9 @@ const generalReducer = createSlice({
       .addCase(getBatch.rejected, (state, action) => {
         state.batch.status = "failed";
       });
+    builder.addCase(getCompany.fulfilled, (state, action) => {
+      state.company.data = action.payload;
+    });
   },
 });
 

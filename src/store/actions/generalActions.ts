@@ -106,6 +106,11 @@ interface BinNumPayload {
   paginating?: boolean;
 }
 
+interface CompanyPayload {
+  limit: number;
+  offset: number;
+}
+
 export const getDocument = createAsyncThunk(
   "general/getDocument",
   async (
@@ -686,6 +691,23 @@ export const getBinNum = createAsyncThunk(
         data: response.data,
         paginating: paginating,
       };
+    } catch (error: any) {
+      console.log("error", error);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const getCompany = createAsyncThunk(
+  "general/getCompany",
+  async ({ limit, offset }: CompanyPayload, { rejectWithValue, getState }) => {
+    try {
+      const state = getState() as RootState;
+      const { ipAddress, port, protocol } = state.auth.server;
+
+      const url = `${protocol}://${ipAddress}:${port}/api/lst_tracc/companyfile?_limit=${limit}&_offset=${offset}`;
+      const response = await axios.get(url);
+      return response.data;
     } catch (error: any) {
       console.log("error", error);
       return rejectWithValue(error.message);

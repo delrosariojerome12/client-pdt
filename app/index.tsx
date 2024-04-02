@@ -13,6 +13,7 @@ import { useAuthHooks } from "../src/hooks/authHooks";
 import CustomLoadingText from "../src/components/load-spinner/CustomLoadingText";
 import Constants from "expo-constants";
 import { FontAwesome5 } from "@expo/vector-icons";
+import { useAppSelector } from "../src/store/store";
 
 const Index = () => {
   const {
@@ -29,6 +30,7 @@ const Index = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const secondInputRef = useRef<any>(null);
+  const { company } = useAppSelector((state) => state.general);
 
   const focusSecondInput = () => {
     if (secondInputRef.current) {
@@ -57,7 +59,11 @@ const Index = () => {
       )}
       <View style={styles.imgContainer}>
         <Image
-          source={require("../assets/lst_logo.png")}
+          source={
+            company?.data[0]?.comcde !== "RGDI"
+              ? require("../assets/lifestrong.png")
+              : require("../assets/rgdi.png")
+          }
           style={styles.image}
           resizeMode="contain"
         />
@@ -136,14 +142,8 @@ const styles = StyleSheet.create({
     paddingRight: 30,
   },
   imgContainer: {
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 10,
     width: "100%",
-    borderWidth: 1,
-    borderRadius: 10,
-    borderColor: "#ccc",
-    padding: 10,
+    height: "20%",
   },
   image: {
     width: "100%",
@@ -151,8 +151,6 @@ const styles = StyleSheet.create({
   inputPassContainer: {
     flexDirection: "row",
     justifyContent: "center",
-    // borderWidth: 1,
-    // borderColor: "#ccc",
     borderRadius: 5,
     marginBottom: 10,
   },

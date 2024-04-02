@@ -17,6 +17,7 @@ import {
 import { useUserActivityLog } from "./userActivityLogHooks";
 import { METHODS } from "../enums/activitylog";
 import { setStatus, setStatusText } from "../reducers/statusReducer";
+import { getCompany } from "../store/actions/generalActions";
 
 export const useAuthHooks = () => {
   const { status, statusText } = useAppSelector((state) => state.status);
@@ -204,6 +205,7 @@ export const useAuthHooks = () => {
     }
     if (server) {
       dispatch(handleUpdateProtocol(server));
+      dispatch(getCompany({ limit: 1, offset: 0 }));
     }
   };
 

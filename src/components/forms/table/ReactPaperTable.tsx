@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import * as React from "react";
 import {
   ScrollView,
   View,
@@ -36,9 +36,10 @@ const ReactPaperTable = (props: TableProps) => {
     onSelectRow,
   } = props;
 
-  const [page, setPage] = useState<number>(0);
-  const [numberOfItemsPerPage, onItemsPerPageChange] = useState<number>(
-    10 // Default value
+  const numberOfItemsPerPageList = [10, 25, 50, 100];
+  const [page, setPage] = React.useState<number>(0);
+  const [numberOfItemsPerPage, onItemsPerPageChange] = React.useState(
+    numberOfItemsPerPageList[0]
   );
 
   const from = page * numberOfItemsPerPage;
@@ -115,62 +116,54 @@ const ReactPaperTable = (props: TableProps) => {
             horizontal={tableData.length === 0 ? false : true}
             contentContainerStyle={{ flexDirection: "column" }}
           >
-            <DataTable style={styles.table}>
-              <ScrollView
-                showsHorizontalScrollIndicator
-                horizontal={tableData.length === 0 ? false : true}
-                contentContainerStyle={{ flexDirection: "column" }}
-              >
-                <DataTable.Header style={{}}>
-                  {tableHeaders.map((header, index) =>
-                    tableheader(header, index)
-                  )}
-                  {!disableActions && (
-                    <DataTable.Title
-                      style={{ width: 100, backgroundColor: "#ccc" }}
-                      textStyle={{
-                        fontWeight: "bold",
-                        fontSize: 14,
-                        textAlign: "center",
-                      }}
-                    >
-                      Actions
-                    </DataTable.Title>
-                  )}
-                </DataTable.Header>
+            <DataTable.Header>
+              {tableHeaders.map((header, index) => tableheader(header, index))}
+              {!disableActions && (
+                <DataTable.Title
+                  style={{ width: 100, backgroundColor: "#ccc" }}
+                  textStyle={{
+                    fontWeight: "bold",
+                    fontSize: 14,
+                    textAlign: "center",
+                  }}
+                >
+                  Actions
+                </DataTable.Title>
+              )}
+            </DataTable.Header>
 
-                {tableData.length === 0 ? (
-                  <View style={styles.placeholderContainer}>
-                    <FontAwesome name="file-o" size={50} color="#000" />
-                    <Text style={styles.placeholderText}>No records found</Text>
-                  </View>
-                ) : (
-                  <>
-                    {tableData
-                      .slice(
-                        page * numberOfItemsPerPage,
-                        page * numberOfItemsPerPage + numberOfItemsPerPage
-                      )
-                      .map((row, index) => tableRow(row, index))}
+            {tableData.length === 0 ? (
+              <View style={styles.placeholderContainer}>
+                <FontAwesome name="file-o" size={50} color="#000" />
+                <Text style={styles.placeholderText}>No records found</Text>
+              </View>
+            ) : (
+              <>
+                {tableData
+                  .slice(
+                    page * numberOfItemsPerPage,
+                    page * numberOfItemsPerPage + numberOfItemsPerPage
+                  )
+                  .map((row, index) => tableRow(row, index))}
 
-                    <DataTable.Pagination
-                      page={page}
-                      numberOfPages={Math.ceil(
-                        tableData.length / numberOfItemsPerPage
-                      )}
-                      onPageChange={(page) => setPage(page)}
-                      label={`${from + 1}-${to} of ${tableData.length}`}
-                      showFastPaginationControls
-                      numberOfItemsPerPage={numberOfItemsPerPage}
-                      numberOfItemsPerPageList={[5, 10, 15]}
-                      onItemsPerPageChange={onItemsPerPageChange}
-                      selectPageDropdownLabel={"Rows per page"}
-                      style={{ alignSelf: "center" }}
-                    />
-                  </>
-                )}
-              </ScrollView>
-            </DataTable>
+                <DataTable.Pagination
+                  page={page}
+                  numberOfPages={Math.ceil(
+                    tableData.length / numberOfItemsPerPage
+                  )}
+                  onPageChange={(page) => setPage(page)}
+                  label={`${from + 1}-${to} of ${tableData.length}`}
+                  showFastPaginationControls
+                  numberOfItemsPerPage={numberOfItemsPerPage}
+                  numberOfItemsPerPageList={[10]}
+                  onItemsPerPageChange={onItemsPerPageChange}
+                  selectPageDropdownLabel={"Rows per page"}
+                  style={{
+                    alignSelf: "center",
+                  }}
+                />
+              </>
+            )}
           </ScrollView>
         </DataTable>
       </ScrollView>
@@ -180,13 +173,11 @@ const ReactPaperTable = (props: TableProps) => {
 
 const styles = StyleSheet.create({
   table: {
+    position: "relative",
     borderRadius: 10,
     backgroundColor: "#ccc",
     borderBlockColor: "#ccc",
-  },
-  cell: {
-    flexWrap: "wrap",
-    flex: 1,
+    // height: 650,
   },
   buttons: {
     backgroundColor: "#007AFF",
@@ -213,10 +204,6 @@ const styles = StyleSheet.create({
   placeholderText: {
     fontSize: 16,
     fontWeight: "bold",
-  },
-  pagination: {
-    alignSelf: "center", // Align pagination component to the center
-    backgroundColor: "red",
   },
 });
 
