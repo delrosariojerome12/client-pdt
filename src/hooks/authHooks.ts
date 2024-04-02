@@ -205,7 +205,17 @@ export const useAuthHooks = () => {
     }
     if (server) {
       dispatch(handleUpdateProtocol(server));
-      dispatch(getCompany({ limit: 1, offset: 0 }));
+      dispatch(
+        getCompany({
+          limit: 1,
+          offset: 0,
+          config: {
+            headers: {
+              Authorization: `Bearer ${user.userData.token}`,
+            },
+          },
+        })
+      );
     }
   };
 

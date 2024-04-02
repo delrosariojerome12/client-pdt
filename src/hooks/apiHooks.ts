@@ -8,7 +8,6 @@ import {
   handleToggleNotificationModal,
   handleSetNotificationText,
 } from "../reducers/modalReducer";
-import { getAsyncData } from "../helper/AsyncStorage";
 
 interface ConnectToPHPParams {
   recid: any;

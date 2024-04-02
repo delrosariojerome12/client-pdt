@@ -14,8 +14,8 @@ export const generalStyles = StyleSheet.create({
     padding: 25,
   },
   innerContainer: {
-    padding: 7,
-    paddingTop: 10,
+    // padding: 7,
+    // paddingTop: 10,
     flex: 1,
     gap: 15,
   },

@@ -126,10 +126,16 @@ export const getWTO = createAsyncThunk(
     try {
       const state = getState() as RootState;
       const { ipAddress, port, protocol } = state.auth.server;
+      const { userDetails } = state.auth.user;
+      const config = {
+        headers: {
+          Authorization: `Bearer ${userDetails?.token}`,
+        },
+      };
 
       const url = `${protocol}://${ipAddress}:${port}/api/lst_tracc/warehousetransferorderfile1?trntypcde=WHSTOIN&posted=0&canceldoc=0&trndte=nev2:null&_limit=${limit}&_sortby=trndte:DESC,docnum:DESC&_offset=${offset}`;
 
-      const response = await axios.get(url);
+      const response = await axios.get(url, config);
       return {
         data: response.data,
         paginating: paginating,

@@ -20,10 +20,16 @@ export const getCycleCount = createAsyncThunk(
     try {
       const state = getState() as RootState;
       const { ipAddress, port, protocol } = state.auth.server;
+      const { userDetails } = state.auth.user;
+      const config = {
+        headers: {
+          Authorization: `Bearer ${userDetails?.token}`,
+        },
+      };
 
       const url = `${protocol}://${ipAddress}:${port}/api/lst_tracc/cyclecountfile1?validate=or:%5BN,0%5D&trncde=CYC&_limit=${limit}&_offset=${offset}&_sortby=trndte:DESC,docnum:DESC`;
 
-      const response = await axios.get(url);
+      const response = await axios.get(url, config);
 
       return {
         data: response.data,

@@ -21,10 +21,16 @@ export const getphysicalRecord = createAsyncThunk(
     try {
       const state = getState() as RootState;
       const { ipAddress, port, protocol } = state.auth.server;
+      const { userDetails } = state.auth.user;
+      const config = {
+        headers: {
+          Authorization: `Bearer ${userDetails?.token}`,
+        },
+      };
 
       const url = `${protocol}://${ipAddress}:${port}/api/lst_tracc/physicalcountfile31?validate=or:%5BN,0%5D&trncde=PHC&_limit=${limit}&_offset=${offset}&_sortby=trndte:DESC,refnum:DESC`;
 
-      const response = await axios.get(url);
+      const response = await axios.get(url, config);
 
       return {
         data: response.data,

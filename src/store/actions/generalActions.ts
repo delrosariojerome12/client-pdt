@@ -109,6 +109,7 @@ interface BinNumPayload {
 interface CompanyPayload {
   limit: number;
   offset: number;
+  config: any;
 }
 
 export const getDocument = createAsyncThunk(
@@ -569,11 +570,18 @@ export const getBatch = createAsyncThunk(
       const state = getState() as RootState;
       const { ipAddress, port, protocol } = state.auth.server;
 
+      const { userDetails } = state.auth.user;
+      const config = {
+        headers: {
+          Authorization: `Bearer ${userDetails?.token}`,
+        },
+      };
+
       const url = `${protocol}://${ipAddress}:${port}/api/lst_tracc/batchfile?itmcde=${itmcde}&_limit=${limit}&_offset=${offset}`;
 
       console.log("daan", url);
 
-      const response = await axios.get(url);
+      const response = await axios.get(url, config);
 
       return {
         data: response.data,
@@ -595,16 +603,20 @@ export const updateBatch = createAsyncThunk(
     try {
       const state = getState() as RootState;
       const { ipAddress, port, protocol } = state.auth.server;
+      const { userDetails } = state.auth.user;
 
       const url1 = `${protocol}://${ipAddress}:${port}/api/lst_tracc/purchasetofile1`;
       const url2 = `${protocol}://${ipAddress}:${port}/api/lst_tracc/purchasetofile2`;
 
-      // const responseDocument = await axios.patch(url1, document);
-      // const responseItem = await axios.patch(url2, item);
+      const config = {
+        headers: {
+          Authorization: `Bearer ${userDetails?.token}`,
+        },
+      };
 
       const [responseDocument, responseItem] = await Promise.all([
-        axios.patch(url1, document),
-        axios.patch(url2, item),
+        axios.patch(url1, document, config),
+        axios.patch(url2, item, config),
       ]);
 
       onSuccess();
@@ -636,8 +648,15 @@ export const getWarehouse = createAsyncThunk(
     try {
       const state = getState() as RootState;
       const { ipAddress, port, protocol } = state.auth.server;
+      const { userDetails } = state.auth.user;
+      const config = {
+        headers: {
+          Authorization: `Bearer ${userDetails?.token}`,
+        },
+      };
+
       const url = `${protocol}://${ipAddress}:${port}/api/lst_tracc/warehousefile2?warcde=nev2:%20null&warcdenum=nev2:%20null&warloccde=nev2:%20null&_limit=${limit}&_offset=${offset}`;
-      const response = await axios.get(url);
+      const response = await axios.get(url, config);
 
       return {
         data: response.data,
@@ -660,8 +679,15 @@ export const getItem = createAsyncThunk(
       const state = getState() as RootState;
       const { ipAddress, port, protocol } = state.auth.server;
 
+      const { userDetails } = state.auth.user;
+      const config = {
+        headers: {
+          Authorization: `Bearer ${userDetails?.token}`,
+        },
+      };
+
       const url = `${protocol}://${ipAddress}:${port}/api/lst_tracc/itemfile?itmcde=nev2:%20null&_limit=${limit}&_offset=${offset}`;
-      const response = await axios.get(url);
+      const response = await axios.get(url, config);
 
       return {
         data: response.data,
@@ -683,9 +709,14 @@ export const getBinNum = createAsyncThunk(
     try {
       const state = getState() as RootState;
       const { ipAddress, port, protocol } = state.auth.server;
-
+      const { userDetails } = state.auth.user;
+      const config = {
+        headers: {
+          Authorization: `Bearer ${userDetails?.token}`,
+        },
+      };
       const url = `${protocol}://${ipAddress}:${port}/api/lst_tracc/binfile1?binnum=nev2:%20null&_limit=${limit}&_offset=${offset}`;
-      const response = await axios.get(url);
+      const response = await axios.get(url, config);
 
       return {
         data: response.data,
@@ -700,13 +731,18 @@ export const getBinNum = createAsyncThunk(
 
 export const getCompany = createAsyncThunk(
   "general/getCompany",
-  async ({ limit, offset }: CompanyPayload, { rejectWithValue, getState }) => {
+  async (
+    { limit, offset, config }: CompanyPayload,
+    { rejectWithValue, getState }
+  ) => {
     try {
       const state = getState() as RootState;
       const { ipAddress, port, protocol } = state.auth.server;
 
       const url = `${protocol}://${ipAddress}:${port}/api/lst_tracc/companyfile?_limit=${limit}&_offset=${offset}`;
-      const response = await axios.get(url);
+      const response = await axios.get(url, config);
+      console.log("company res", response);
+
       return response.data;
     } catch (error: any) {
       console.log("error", error);
