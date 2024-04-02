@@ -14,6 +14,7 @@ interface GetProps {
   toastMessage?: ToastMessage;
   onSuccess?: (data: any) => void;
   disableToast?: boolean;
+  config?: any;
 }
 
 interface SendProps {
@@ -23,6 +24,7 @@ interface SendProps {
   onSuccess?: (data: any) => void; // Callback function for success
   onError?: (error: any) => void;
   disableToast?: boolean;
+  config?: any;
 }
 
 export const useServiceHooks = () => {
@@ -41,6 +43,7 @@ export const useServiceHooks = () => {
     disableToast,
     onSuccess,
     toastMessage,
+    config,
   }: GetProps) => {
     const completeUrl = `${baseURl}/api/${url}`;
 
@@ -49,18 +52,22 @@ export const useServiceHooks = () => {
     !disableToast && ToastMessage(toastMessage?.loading || "Loading...", 1000);
 
     try {
-      const response = await axios.get(completeUrl);
+      const response = await axios.get(completeUrl, config ? config : {});
+      console.log("get res:", response);
+      if (response) {
+        setData(response.data);
+        setStatus("success");
+        !disableToast &&
+          ToastMessage(toastMessage?.success || "Fetch Success!", 1000);
 
-      setData(response.data);
-      setStatus("success");
-      !disableToast &&
-        ToastMessage(toastMessage?.success || "Fetch Success!", 1000);
-
-      // Invoke the onSuccess callback with response data
-      onSuccess && onSuccess(response.data);
-
-      return response.data;
+        // Invoke the onSuccess callback with response data
+        onSuccess && onSuccess(response.data);
+        return response.data;
+      }
+      return null;
     } catch (error) {
+      console.log("url", completeUrl);
+      console.log("mali", error);
       setStatus("failed");
       !disableToast &&
         ToastMessage(toastMessage?.error || "Fetch Failed!", 1000);
@@ -75,6 +82,7 @@ export const useServiceHooks = () => {
     onSuccess,
     onError,
     toastMessage,
+    config,
   }: SendProps) => {
     const completeUrl = `${baseURl}/api/${url}`;
 
@@ -84,10 +92,9 @@ export const useServiceHooks = () => {
     }
 
     try {
-      const response = await axios.post(completeUrl, requestData);
+      const response = await axios.post(completeUrl, requestData, config);
 
       if (response.status >= 200 && response.status < 300) {
-        // Request was successful
         setData(response.data);
         setStatus("success");
         !disableToast &&
@@ -98,8 +105,9 @@ export const useServiceHooks = () => {
       }
       return null;
     } catch (error) {
-      onError && onError(error);
+      console.log("url", completeUrl);
       console.log("mali", error);
+      onError && onError(error);
       setStatus("failed");
       !disableToast && ToastMessage(toastMessage?.error || "Post Failed!", 500);
       return null;
@@ -144,6 +152,7 @@ export const useServiceHooks = () => {
     disableToast,
     onSuccess,
     toastMessage,
+    config,
   }: SendProps) => {
     const completeUrl = `${baseURl}/api/${url}`;
     console.log("daan url", completeUrl);
@@ -153,22 +162,26 @@ export const useServiceHooks = () => {
     !disableToast && ToastMessage(toastMessage?.loading || "Loading...", 1000);
 
     try {
-      const response = await axios.patch(completeUrl, requestData);
+      const response = await axios.patch(completeUrl, requestData, config);
+      console.log("patch res:", response);
 
-      setData(response.data);
-      setStatus("success");
+      if (response) {
+        setData(response.data);
+        setStatus("success");
 
-      !disableToast &&
-        ToastMessage(toastMessage?.success || "Update Success!", 1000);
+        !disableToast &&
+          ToastMessage(toastMessage?.success || "Update Success!", 1000);
 
-      // Invoke the onSuccess callback with response data
-      onSuccess && onSuccess(response.data);
-      console.log("patch sukli", response.data);
+        // Invoke the onSuccess callback with response data
+        onSuccess && onSuccess(response.data);
+        console.log("patch sukli", response.data);
 
-      return response.data;
+        return response.data;
+      }
+      return null;
     } catch (error) {
-      console.log(error);
-
+      console.log("url", completeUrl);
+      console.log("mali", error);
       setStatus("failed");
 
       !disableToast &&

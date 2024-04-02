@@ -24,6 +24,7 @@ const Index = () => {
     setPassword,
     status,
     statusText,
+    server,
   } = useAuthHooks();
 
   const [showPassword, setShowPassword] = useState(false);
@@ -61,6 +62,7 @@ const Index = () => {
           resizeMode="contain"
         />
       </View>
+      {/* <Text>{`${server.protocol}://${server.ipAddress}:${server.port}`}</Text> */}
 
       <View style={{ alignItems: "flex-end", width: "100%" }}>
         <Text>v{Constants?.expoConfig?.version}</Text>

@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "client-pdt",
+    "name": "React-Native PDT",
     "slug": "client-pdt",
     "scheme": "client-pdt",
     "version": "04.01.24",
@@ -21,7 +21,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.lstv.reactnative.pdt"
+      "package": "com.lstvjerome.clientpdt",
+      "permissions": ["INTERNET"]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -32,7 +33,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "e4903a69-9bc7-49b5-ae1c-8e18ee3e2528"
+        "projectId": "74878359-7ef9-4cea-941b-b6d4a5373a17"
       }
     }
   }

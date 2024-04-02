@@ -15,15 +15,21 @@ interface ActionData {
   remarks: String;
 }
 
+interface User {
+  usrname: string;
+  usrcde: string;
+  token: string;
+}
+
 export const useUserActivityLog = () => {
   const { userDetails } = useAppSelector((state) => state.auth.user);
   const { handlePost } = useServiceHooks();
 
-  const postActivity = async (data: Data) => {
+  const postActivity = async (data: Data, user?: User) => {
     const payloadData = {
       ...data,
-      usrname: userDetails?.usrname,
-      usrcde: userDetails?.usrcde,
+      usrname: userDetails?.usrname || user?.usrname,
+      usrcde: userDetails?.usrcde || user?.usrcde,
       trndte: moment().format("YYYY-MM-DD HH:mm:ss"),
       usrdte: moment().format("YYYY-MM-DD"),
       usrtim: moment().format("LTS"),
@@ -32,16 +38,23 @@ export const useUserActivityLog = () => {
       module: "NG_WMS",
     };
 
+    console.log("dito ?", userDetails);
+
     handlePost({
       url: "lst_tracc/useractivitylogfile",
       requestData: [payloadData],
       disableToast: true,
+      config: {
+        headers: {
+          Authorization: `Bearer ${userDetails?.token || user?.token}`,
+        },
+      },
     });
   };
 
-  const updateAction = (data: ActionData) => {
+  const updateAction = (data: ActionData, user?: User) => {
     const finalCreateData = { ...data };
-    postActivity(finalCreateData);
+    postActivity(finalCreateData, user);
   };
 
   return {

@@ -20,6 +20,7 @@ import { setStatus, setStatusText } from "../reducers/statusReducer";
 
 export const useAuthHooks = () => {
   const { status, statusText } = useAppSelector((state) => state.status);
+  const { server } = useAppSelector((state) => state.auth);
 
   const dispatch = useAppDispatch();
   const router = useRouter();
@@ -40,7 +41,7 @@ export const useAuthHooks = () => {
       dispatch(setStatus("loading"));
       const randomString = await generateRandomString(32);
 
-      const response = await handlePost({
+      await handlePost({
         url: "auth/login",
         requestData: {
           // usrcde: "Msumang",
@@ -49,9 +50,11 @@ export const useAuthHooks = () => {
           usrpwd: password,
         },
         onSuccess: (data) => {
+          console.log("wat", data);
+          dispatch(onLogin({ sesidData: randomString, userData: data }));
+
           setTimeout(async () => {
             console.log("success");
-            dispatch(onLogin({ sesidData: randomString, userData: data }));
 
             storeAsyncData(
               { sesidData: randomString, userData: data },
@@ -64,7 +67,13 @@ export const useAuthHooks = () => {
                 dispatch(setPhpServer(data[0]));
               },
               disableToast: true,
+              config: {
+                headers: {
+                  Authorization: `Bearer ${data.token}`,
+                },
+              },
             });
+
             await handlePatch({
               url: "lst_tracc/userfile",
               requestData: {
@@ -76,7 +85,22 @@ export const useAuthHooks = () => {
                 },
               },
               disableToast: true,
+              config: {
+                headers: {
+                  Authorization: `Bearer ${data.token}`,
+                },
+              },
             });
+
+            updateAction(
+              {
+                method: METHODS.LOGIN,
+                remarks: "User Logged In.",
+                activity: "User Logged In.",
+              },
+              { token: data.token, usrcde: data.usrcde, usrname: data.usrname }
+            );
+
             dispatch(setStatus("idle"));
             router.replace("screens/home/");
           }, 1500);
@@ -93,14 +117,6 @@ export const useAuthHooks = () => {
         },
         disableToast: true,
       });
-
-      if (response) {
-        updateAction({
-          method: METHODS.LOGIN,
-          remarks: "User Logged In.",
-          activity: "User Logged In.",
-        });
-      }
     }
   };
 
@@ -129,36 +145,49 @@ export const useAuthHooks = () => {
   const checkIsLoggedIn = async () => {
     const user = await getAsyncData("user-cred");
     const server = await getAsyncData("server-config");
-    console.log("server local", server);
+    console.log("existing server", server);
+    console.log("existing user", user);
 
     if (!server) {
       router.replace("server");
     }
+
     if (user) {
-      console.log("pasok");
       try {
         dispatch(setStatus("loading"));
         dispatch(
           onLogin({ sesidData: user.sesidData, userData: user.userData })
         );
+
         await handlePatch({
           url: "lst_tracc/userfile",
           requestData: {
             field: {
-              usrcde: user.usrcde,
+              usrcde: user.userData.usrcde,
             },
             data: {
               sesid: user.sesidData,
             },
           },
           disableToast: true,
+          config: {
+            headers: {
+              Authorization: `Bearer ${user.userData.token}`,
+            },
+          },
         });
+
         await handleGet({
           url: "lst_tracc/syspar2?_includes=tracc_progdomain,tracc_progdir",
           onSuccess: (data) => {
             dispatch(setPhpServer(data[0]));
           },
           disableToast: true,
+          config: {
+            headers: {
+              Authorization: `Bearer ${user.userData.token}`,
+            },
+          },
         });
         dispatch(setStatus("idle"));
 
@@ -188,5 +217,6 @@ export const useAuthHooks = () => {
     status,
     statusText,
     checkIsLoggedIn,
+    server,
   };
 };
