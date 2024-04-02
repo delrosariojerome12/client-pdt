@@ -8,6 +8,7 @@ import {
   handleToggleNotificationModal,
   handleSetNotificationText,
 } from "../reducers/modalReducer";
+import { getAsyncData } from "../helper/AsyncStorage";
 
 interface ConnectToPHPParams {
   recid: any;
@@ -58,6 +59,12 @@ export const useAPIHooks = () => {
   const { handleGet, handlePost, handlePatch } = useServiceHooks();
 
   const baseUrl = `${protocol}://${ipAddress}:${port}`;
+
+  const config = {
+    headers: {
+      Authorization: `Bearer ${userDetails?.token}`,
+    },
+  };
 
   const connectToPHPNotDispatch = async (props: ConnectToPHPParams) => {
     const {
@@ -461,9 +468,11 @@ export const useAPIHooks = () => {
       response = await handleGet({
         url: url,
         disableToast: true,
+        config: config,
       });
+      console.log("lpn res", response);
 
-      if (response.length === 0) {
+      if (response && response.length === 0) {
         dispatch(setStatus("idle"));
         Alert.alert(
           "LPN Not Ready",
@@ -511,7 +520,6 @@ export const useAPIHooks = () => {
       });
 
       console.log("ito ang bin", binDetails);
-      console.log();
 
       if (binDetails) {
         if (binDetails.length === 0) {
@@ -537,10 +545,10 @@ export const useAPIHooks = () => {
             },
           };
           handlePatch({
-            // url: "lst_tracc/purchasetofile2",
             url: patchUrl,
             requestData: patchDocument,
             disableToast: true,
+            config: config,
           });
           return binDetails;
         }
@@ -570,16 +578,16 @@ export const useAPIHooks = () => {
         let response: AxiosResponse;
         switch (method) {
           case "GET":
-            response = await axios.get(completeUrl);
+            response = await axios.get(completeUrl, config);
             break;
           case "POST":
-            response = await axios.post(completeUrl, payload);
+            response = await axios.post(completeUrl, payload, config);
             break;
           case "PATCH":
-            response = await axios.patch(completeUrl, payload);
+            response = await axios.patch(completeUrl, payload, config);
             break;
           case "DELETE":
-            response = await axios.delete(completeUrl);
+            response = await axios.delete(completeUrl, config);
             break;
 
           default:
@@ -594,6 +602,8 @@ export const useAPIHooks = () => {
     await Promise.all(promises);
     dispatch(setStatus("success"));
     onSucces();
+    console.log("remove results", results);
+
     return results;
   };
 
@@ -601,11 +611,10 @@ export const useAPIHooks = () => {
     const response = await handleGet({
       url: `lst_tracc/cyclecountfile1?recid=${recid}&docnum=${docnum}&_limit=1`,
       disableToast: true,
+      config: config,
     });
-
     return response;
   };
-  //
 
   const getPIRSingle = async (
     docnum: string,
@@ -615,15 +624,18 @@ export const useAPIHooks = () => {
     const response = await handleGet({
       url: `lst_tracc/physicalcountfile31?recid=${recid}&docnum=${docnum}&refnum=${refnum}&_limit=1`,
       disableToast: true,
+      config: config,
     });
 
     return response;
   };
+
   const getBatchAndBinInquiry = async (filter: string) => {
     try {
       let response: any = await handleGet({
         url: `lst_tracc/binfile2?${filter}`,
         disableToast: true,
+        config: config,
       });
 
       if (response) {
@@ -657,9 +669,11 @@ export const useAPIHooks = () => {
         params += params ? "&" : "";
         params += `${item}=${filter[item]}`;
       });
+
       let response: any = await handleGet({
         url: `getStockOnHand?${params}`,
         disableToast: true,
+        config: config,
       });
 
       if (response) {
