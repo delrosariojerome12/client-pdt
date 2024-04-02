@@ -199,20 +199,18 @@ const BatchNOandLOC = () => {
           <CustomLoadingText text="Processing..." visible={true} />
         )}
 
-        <ScrollView style={{ position: "relative", margin: 0 }}>
-          <ReactPaperTable
-            tableHeaders={tableHeaders}
-            tableData={tableData}
-            visibleProperties={tableVisibleProps}
-            disableActions={true}
-            onSelectRow={(item) => {
-              setModalData(item);
-              dispatch(handleToggleSelectModal());
-              dispatch(resetStatus());
-              getStockData(item);
-            }}
-          />
-        </ScrollView>
+        <ReactPaperTable
+          tableHeaders={tableHeaders}
+          tableData={tableData}
+          visibleProperties={tableVisibleProps}
+          disableActions={true}
+          onSelectRow={(item) => {
+            setModalData(item);
+            dispatch(handleToggleSelectModal());
+            dispatch(resetStatus());
+            getStockData(item);
+          }}
+        />
 
         {isSelectModal && (
           <SelectModal

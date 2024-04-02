@@ -116,62 +116,54 @@ const ReactPaperTable = (props: TableProps) => {
             horizontal={tableData.length === 0 ? false : true}
             contentContainerStyle={{ flexDirection: "column" }}
           >
-            <DataTable style={styles.table}>
-              <ScrollView
-                showsHorizontalScrollIndicator
-                horizontal={tableData.length === 0 ? false : true}
-                contentContainerStyle={{ flexDirection: "column" }}
-              >
-                <DataTable.Header style={{}}>
-                  {tableHeaders.map((header, index) =>
-                    tableheader(header, index)
-                  )}
-                  {!disableActions && (
-                    <DataTable.Title
-                      style={{ width: 100, backgroundColor: "#ccc" }}
-                      textStyle={{
-                        fontWeight: "bold",
-                        fontSize: 14,
-                        textAlign: "center",
-                      }}
-                    >
-                      Actions
-                    </DataTable.Title>
-                  )}
-                </DataTable.Header>
+            <DataTable.Header>
+              {tableHeaders.map((header, index) => tableheader(header, index))}
+              {!disableActions && (
+                <DataTable.Title
+                  style={{ width: 100, backgroundColor: "#ccc" }}
+                  textStyle={{
+                    fontWeight: "bold",
+                    fontSize: 14,
+                    textAlign: "center",
+                  }}
+                >
+                  Actions
+                </DataTable.Title>
+              )}
+            </DataTable.Header>
 
-                {tableData.length === 0 ? (
-                  <View style={styles.placeholderContainer}>
-                    <FontAwesome name="file-o" size={50} color="#000" />
-                    <Text style={styles.placeholderText}>No records found</Text>
-                  </View>
-                ) : (
-                  <>
-                    {tableData
-                      .slice(
-                        page * numberOfItemsPerPage,
-                        page * numberOfItemsPerPage + numberOfItemsPerPage
-                      )
-                      .map((row, index) => tableRow(row, index))}
+            {tableData.length === 0 ? (
+              <View style={styles.placeholderContainer}>
+                <FontAwesome name="file-o" size={50} color="#000" />
+                <Text style={styles.placeholderText}>No records found</Text>
+              </View>
+            ) : (
+              <>
+                {tableData
+                  .slice(
+                    page * numberOfItemsPerPage,
+                    page * numberOfItemsPerPage + numberOfItemsPerPage
+                  )
+                  .map((row, index) => tableRow(row, index))}
 
-                    <DataTable.Pagination
-                      page={page}
-                      numberOfPages={Math.ceil(
-                        tableData.length / numberOfItemsPerPage
-                      )}
-                      onPageChange={(page) => setPage(page)}
-                      label={`${from + 1}-${to} of ${tableData.length}`}
-                      showFastPaginationControls
-                      numberOfItemsPerPage={numberOfItemsPerPage}
-                      numberOfItemsPerPageList={numberOfItemsPerPageList}
-                      onItemsPerPageChange={onItemsPerPageChange}
-                      selectPageDropdownLabel={"Rows per page"}
-                      style={{ alignSelf: "center" }}
-                    />
-                  </>
-                )}
-              </ScrollView>
-            </DataTable>
+                <DataTable.Pagination
+                  page={page}
+                  numberOfPages={Math.ceil(
+                    tableData.length / numberOfItemsPerPage
+                  )}
+                  onPageChange={(page) => setPage(page)}
+                  label={`${from + 1}-${to} of ${tableData.length}`}
+                  showFastPaginationControls
+                  numberOfItemsPerPage={numberOfItemsPerPage}
+                  numberOfItemsPerPageList={[10]}
+                  onItemsPerPageChange={onItemsPerPageChange}
+                  selectPageDropdownLabel={"Rows per page"}
+                  style={{
+                    alignSelf: "center",
+                  }}
+                />
+              </>
+            )}
           </ScrollView>
         </DataTable>
       </ScrollView>
@@ -185,6 +177,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: "#ccc",
     borderBlockColor: "#ccc",
+    // height: 650,
   },
   buttons: {
     backgroundColor: "#007AFF",
