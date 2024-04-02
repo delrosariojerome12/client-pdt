@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "expo-router";
 import { homeRoutes, drawerScreens } from "../routes/homeRoutes";
-import { View, Text, TouchableOpacity } from "react-native";
+import { Image, View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Drawer } from "expo-router/drawer";
 import { DrawerItem } from "@react-navigation/drawer";
 import { FontAwesome5, FontAwesome } from "@expo/vector-icons";
@@ -22,8 +22,19 @@ interface customDrawers {
   icon: string;
 }
 
+const styles = StyleSheet.create({
+  imgContainer: {
+    width: "85%",
+  },
+  image: {
+    width: "70%",
+    height: 50,
+  },
+});
+
 export const useDrawerHooks = () => {
   const { previousRoutes } = useAppSelector((state) => state.router);
+  const { company } = useAppSelector((state) => state.general);
 
   const dispatch = useAppDispatch();
 
@@ -76,17 +87,34 @@ export const useDrawerHooks = () => {
           options={{
             headerTitle: drawer.title,
             drawerItemStyle: { display: drawer.isVisible ? "flex" : "none" },
-            headerRight: () =>
-              drawer.title.toUpperCase() !== "HOME" && (
-                <View
-                  style={{ flexDirection: "row", gap: 10, marginRight: 10 }}
-                >
+            headerRight: () => (
+              <View
+                style={{
+                  width: !drawer.title ? "105%" : "auto",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  flexDirection: "row",
+                  marginRight: 10,
+                }}
+              >
+                {!drawer.title && (
+                  <View style={styles.imgContainer}>
+                    <Image
+                      source={
+                        company?.data[0]?.comcde !== "RGDI"
+                          ? require("../../assets/lifestrong.png")
+                          : require("../../assets/rgdi.png")
+                      }
+                      style={styles.image}
+                      resizeMode="contain"
+                    />
+                  </View>
+                )}
+
+                {drawer.name !== "home/index" && (
                   <TouchableOpacity
-                    style={{
-                      backgroundColor: "#eee",
-                      padding: 10,
-                      borderRadius: 50 / 3,
-                    }}
+                    style={{ padding: 10 }}
                     onPress={() => {
                       dispatch(resetStatus());
                       dispatch(resetSearch());
@@ -114,8 +142,9 @@ export const useDrawerHooks = () => {
                   >
                     <FontAwesome5 name="arrow-left" size={24} color="black" />
                   </TouchableOpacity>
-                </View>
-              ),
+                )}
+              </View>
+            ),
           }}
         />
       );

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import * as React from "react";
 import {
   ScrollView,
   View,
@@ -36,9 +36,10 @@ const ReactPaperTable = (props: TableProps) => {
     onSelectRow,
   } = props;
 
-  const [page, setPage] = useState<number>(0);
-  const [numberOfItemsPerPage, onItemsPerPageChange] = useState<number>(
-    10 // Default value
+  const numberOfItemsPerPageList = [10, 25, 50, 100];
+  const [page, setPage] = React.useState<number>(0);
+  const [numberOfItemsPerPage, onItemsPerPageChange] = React.useState(
+    numberOfItemsPerPageList[0]
   );
 
   const from = page * numberOfItemsPerPage;
@@ -162,7 +163,7 @@ const ReactPaperTable = (props: TableProps) => {
                       label={`${from + 1}-${to} of ${tableData.length}`}
                       showFastPaginationControls
                       numberOfItemsPerPage={numberOfItemsPerPage}
-                      numberOfItemsPerPageList={[5, 10, 15]}
+                      numberOfItemsPerPageList={numberOfItemsPerPageList}
                       onItemsPerPageChange={onItemsPerPageChange}
                       selectPageDropdownLabel={"Rows per page"}
                       style={{ alignSelf: "center" }}
@@ -180,13 +181,10 @@ const ReactPaperTable = (props: TableProps) => {
 
 const styles = StyleSheet.create({
   table: {
+    position: "relative",
     borderRadius: 10,
     backgroundColor: "#ccc",
     borderBlockColor: "#ccc",
-  },
-  cell: {
-    flexWrap: "wrap",
-    flex: 1,
   },
   buttons: {
     backgroundColor: "#007AFF",
@@ -213,10 +211,6 @@ const styles = StyleSheet.create({
   placeholderText: {
     fontSize: 16,
     fontWeight: "bold",
-  },
-  pagination: {
-    alignSelf: "center", // Align pagination component to the center
-    backgroundColor: "red",
   },
 });
 
