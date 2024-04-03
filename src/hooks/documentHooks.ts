@@ -1689,7 +1689,7 @@ export const useDocumentHooks = () => {
     if (!barcode || receiveQty === 0) {
       Alert.alert(
         "Empty Field",
-        customMessage || "Please make sure barcode and quantity is filled.",
+        customMessage || "Please make sure barcode or quantity is filled.",
         [
           {
             text: "OK",

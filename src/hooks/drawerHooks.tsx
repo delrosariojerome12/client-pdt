@@ -249,5 +249,6 @@ export const useDrawerHooks = () => {
     handleDropDown,
     renderDrawerScreens,
     renderCustomDrawers,
+    company,
   };
 };

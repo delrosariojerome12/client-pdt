@@ -1,11 +1,11 @@
-import {View, Text} from "react-native";
-import React, {useMemo} from "react";
-import {useRouteHooks} from "../../../../src/hooks/routeHooks";
+import { View, Text } from "react-native";
+import React, { useMemo } from "react";
+import { useRouteHooks } from "../../../../src/hooks/routeHooks";
 import HomeNavButtons from "../../../../src/components/forms/buttons/HomeNavButtons";
-import {generalStyles} from "../../../../src/styles/styles";
+import { generalStyles } from "../../../../src/styles/styles";
 
 const Inbound = () => {
-  const {getGrandchildRoutes, getBasePath} = useRouteHooks(
+  const { getGrandchildRoutes, getBasePath } = useRouteHooks(
     "WAREHOUSE MANAGEMENT SYSTEM",
     "INBOUND"
   );
@@ -17,8 +17,6 @@ const Inbound = () => {
   const basePath = useMemo(() => {
     return getBasePath();
   }, [getBasePath]);
-
-  console.log(routes.children[0]);
 
   return (
     <View style={generalStyles.wideContainer}>

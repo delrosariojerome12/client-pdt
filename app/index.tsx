@@ -5,6 +5,9 @@ import {
   StyleSheet,
   Image,
   TouchableOpacity,
+  KeyboardAvoidingView,
+  ScrollView,
+  SafeAreaView,
 } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
 import CustomButton from "../src/components/forms/buttons/CustomButton";
@@ -68,7 +71,6 @@ const Index = () => {
           resizeMode="contain"
         />
       </View>
-      {/* <Text>{`${server.protocol}://${server.ipAddress}:${server.port}`}</Text> */}
 
       <View style={{ alignItems: "flex-end", width: "100%" }}>
         <Text>v{Constants?.expoConfig?.version}</Text>
@@ -84,7 +86,6 @@ const Index = () => {
         onChangeText={(text) => setUserID(text)}
         onSubmitEditing={focusSecondInput}
       />
-
       <View style={styles.inputPassContainer}>
         <TextInput
           style={styles.inputPass}
@@ -144,9 +145,11 @@ const styles = StyleSheet.create({
   imgContainer: {
     width: "100%",
     height: "20%",
+    // marginBottom: 50,
   },
   image: {
     width: "100%",
+    height: "100%",
   },
   inputPassContainer: {
     flexDirection: "row",

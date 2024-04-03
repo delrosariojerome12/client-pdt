@@ -1,192 +1,236 @@
-import {View, Text} from "react-native";
-import React, {useEffect, useState} from "react";
+import {
+  View,
+  Text,
+  ScrollView,
+  RefreshControl,
+  ActivityIndicator,
+} from "react-native";
+import React from "react";
 import CustomButton from "../../../../src/components/forms/buttons/CustomButton";
 import CustomTable from "../../../../src/components/forms/table/CustomTable";
 import ScanModal from "../../../../src/components/modals/ScanModal";
-import {useDocumentHooks} from "../../../../src/hooks/documentHooks";
-import {useAppSelector} from "../../../../src/store/store";
-import {generalStyles} from "../../../../src/styles/styles";
+import { useDocumentHooks } from "../../../../src/hooks/documentHooks";
+import { generalStyles } from "../../../../src/styles/styles";
 import SelectModal from "../../../../src/components/modals/SelectModal";
 import ItemsList from "../../../../src/components/list-holder/ItemsList";
 import SwitchButton from "../../../../src/components/forms/buttons/SwitchButton";
+import { useOutboundHooks } from "../../../../src/hooks/outboundHooks";
+import LoadingSpinner from "../../../../src/components/load-spinner/LoadingSpinner";
+import CustomLoadingText from "../../../../src/components/load-spinner/CustomLoadingText";
+import MessageToast from "../../../../src/components/message-toast/MessageToast";
+import NotificationModal from "../../../../src/components/modals/NotificationModal";
+
+const tableHeaders = ["Date", "Document No.", ""];
+const tableVisibleProps = ["trndte", "docnum"];
 
 const ShipmentDocument = () => {
-  const {isScanModal, isSelectModal} = useAppSelector((state) => state.modal);
-  const {selectedDocument} = useAppSelector((state) => state.document);
+  const {
+    handleScroll,
+    isPaginating,
+    isScanModal,
+    isSelectModal,
+    onRefresh,
+    refreshing,
+    selectedDocument,
+    activeIndex,
+    handleIndexChange,
+    singlepick,
+    status,
+    singlepickDetails,
+    isScanItemModal,
+    isOutboundItemScan,
+  } = useOutboundHooks({
+    page: "singlepick",
+  });
 
-  const {handleScanModal, handleSelectModal, closeSelectModal, handlePost} =
+  const { handleScanModal, handleSelectModal, closeSelectModal, handlePost } =
     useDocumentHooks();
-  const [activeIndex, setActiveIndex] = useState(0); // State to track the active index
-
-  const tableHeaders = ["Document No.", "Date", "Status", ""];
-  const tableData = [
-    {
-      trndte: "01-26-2024",
-      docnum: "PTO-002021",
-      inrnum: "INT-003333",
-      items: [
-        {
-          itemCode: "ABC123",
-          itemName: "Item 1",
-          pieces: 5,
-          receiveQty: 5,
-          LPNNumber: "LPN123",
-          batchNumber: "BATCH001",
-          mfgDate: "2023-01-01",
-          expDate: "2024-12-31",
-        },
-        {
-          itemCode: "DEF456",
-          itemName: "Item 2",
-          pieces: 10,
-          receiveQty: 10,
-          LPNNumber: "LPN456",
-          batchNumber: "BATCH002",
-          mfgDate: "2023-02-01",
-          expDate: "2024-12-31",
-        },
-        {
-          itemCode: "GHI789",
-          itemName: "Item 3",
-          pieces: 15,
-          receiveQty: 15,
-          LPNNumber: "LPN789",
-          batchNumber: "BATCH003",
-          mfgDate: "2023-03-01",
-          expDate: "2024-12-31",
-        },
-      ],
-    },
-    {
-      trndte: "01-26-2024",
-      docnum: "PTO-002021",
-      inrnum: "INT-002222",
-      items: [
-        {
-          itemCode: "DEF456",
-          itemName: "Item 2",
-          pieces: 10,
-          receiveQty: 10,
-          LPNNumber: "LPN456",
-          batchNumber: "BATCH002",
-          mfgDate: "2023-02-01",
-          expDate: "2024-12-31",
-        },
-      ],
-    },
-    {
-      trndte: "01-26-2024",
-      docnum: "PTO-002021",
-      inrnum: "INT-001111",
-      items: [
-        {
-          itemCode: "GHI789",
-          itemName: "Item 3",
-          pieces: 15,
-          receiveQty: 15,
-          LPNNumber: "LPN789",
-          batchNumber: "BATCH003",
-          mfgDate: "2023-03-01",
-          expDate: "2024-12-31",
-        },
-      ],
-    },
-  ];
-  const tableVisibleProps = ["docnum", "trndte", ""];
-
-  const handleChange = (index: number) => {
-    setActiveIndex(index); // Update the active index
-  };
 
   const renderTables = () => {
     switch (activeIndex) {
       case 0:
-        // PENDING
+      case null:
         return (
           <CustomTable
             tableHeaders={tableHeaders}
-            tableData={tableData}
+            tableData={singlepick.pkValidate.data}
             visibleProperties={tableVisibleProps}
             isPostDisable={true}
             onSelect={handleSelectModal}
+            selectType="singlepick"
+            buttonUses=""
+            loadingStatus={
+              singlepick.pkValidate.status === "loading" &&
+              !isOutboundItemScan &&
+              !refreshing &&
+              !isPaginating &&
+              true
+            }
           />
         );
       case 1:
-        //CHECKED IN
         return (
           <CustomTable
             tableHeaders={tableHeaders}
-            tableData={tableData}
-            visibleProperties={tableVisibleProps}
-            isPostDisable={true}
-            onSelect={handleSelectModal}
-          />
-        );
-      case 2:
-        //LOADING START
-
-        return (
-          <CustomTable
-            tableHeaders={tableHeaders}
-            tableData={tableData}
-            visibleProperties={tableVisibleProps}
-            isPostDisable={true}
-            onSelect={handleSelectModal}
-          />
-        );
-      case 3:
-        //POSTING
-        return (
-          <CustomTable
-            tableHeaders={tableHeaders}
-            tableData={tableData}
+            tableData={singlepick.invPosting.data}
             visibleProperties={tableVisibleProps}
             isSelectDisable={true}
             onPost={handlePost}
+            buttonUses=""
+            postType="inv-singlepick"
+            loadingStatus={
+              singlepick.invPosting.status === "loading" &&
+              !isOutboundItemScan &&
+              !refreshing &&
+              !isPaginating &&
+              true
+            }
           />
         );
-
-      default:
-        break;
+      case 2:
+        return (
+          <CustomTable
+            tableHeaders={tableHeaders}
+            tableData={singlepick.stgValidate.data}
+            visibleProperties={tableVisibleProps}
+            isPostDisable={true}
+            onSelect={handleSelectModal}
+            selectType="stg-validate"
+            buttonUses=""
+            loadingStatus={
+              singlepick.stgValidate.status === "loading" &&
+              !isOutboundItemScan &&
+              !refreshing &&
+              !isPaginating &&
+              true
+            }
+          />
+        );
+      case 3:
+        return (
+          <CustomTable
+            tableHeaders={tableHeaders}
+            tableData={singlepick.splPosting.data}
+            visibleProperties={tableVisibleProps}
+            isSelectDisable={true}
+            onPost={handlePost}
+            buttonUses=""
+            postType="spl-singlepick"
+            loadingStatus={
+              singlepick.splPosting.status === "loading" &&
+              !isOutboundItemScan &&
+              !refreshing &&
+              !isPaginating &&
+              true
+            }
+          />
+        );
     }
   };
 
-  console.log("shipment document");
+  console.log("single pick");
 
-  return (
-    <View style={generalStyles.innerContainer}>
-      <CustomButton
-        title="SCAN SHIPMENT DOCUMENT"
-        onPress={handleScanModal}
-        type="regular"
-      />
-      <SwitchButton
-        options={["PENDING", "CHECKED-IN", "LOADING START", "POSTING"]}
-        activeIndex={activeIndex}
-        onChange={handleChange}
-      />
+  return <></>;
 
-      {renderTables()}
+  // return (
+  //   <>
+  //     {status === "success" && !isSelectModal && !isScanModal && (
+  //       <MessageToast
+  //         status="success"
+  //         text="Document Successfully Posted"
+  //         speed={2500}
+  //       />
+  //     )}
 
-      <ScanModal
-        visible={isScanModal}
-        onClose={handleScanModal}
-        placeholder="Waiting to Scan Single Pick Barcode..."
-      />
+  //     <View style={generalStyles.outerContainer}>
+  //       <CustomButton
+  //         title="SCAN SINGLE PICK"
+  //         onPress={handleScanModal}
+  //         type="regular"
+  //       />
+  //       {status === "loading" && !isSelectModal && !isScanModal && (
+  //         <CustomLoadingText text="Posting..." visible={true} />
+  //       )}
 
-      <SelectModal
-        visible={isSelectModal}
-        onClose={closeSelectModal}
-        selectedItem={selectedDocument}
-        title="Warehouse Transfer Order Details"
-        propertiesToShow={[
-          {name: "docnum", label: "TO Number"},
-          {name: "inrnum", label: "STR Number"},
-        ]}
-        customContent={<ItemsList uses="outbound" />}
-      />
-    </View>
-  );
+  //       <SwitchButton
+  //         options={[
+  //           "PK VALIDATE",
+  //           "INV POSTING",
+  //           "STG VALIDATE",
+  //           "SPL POSTING",
+  //         ]}
+  //         activeIndex={!activeIndex ? 0 : activeIndex}
+  //         onChange={handleIndexChange}
+  //       />
+
+  //       <ScrollView
+  //         style={generalStyles.innerContainer}
+  //         contentContainerStyle={{ flexGrow: 1 }}
+  //         refreshControl={
+  //           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+  //         }
+  //         onScroll={handleScroll}
+  //         scrollEventThrottle={0}
+  //       >
+  //         {renderTables()}
+
+  //         {isScanModal && (
+  //           <ScanModal
+  //             visible={isScanModal}
+  //             onClose={handleScanModal}
+  //             placeholder="Waiting to Scan Single Pick Barcode..."
+  //             scanParams={"spl"}
+  //             typeForFetching="singlepick"
+  //             usage="searching"
+  //           />
+  //         )}
+
+  //         {isSelectModal && (
+  //           <SelectModal
+  //             loadingStatus={
+  //               singlepickDetails.status === "loading" &&
+  //               !isOutboundItemScan &&
+  //               true
+  //             }
+  //             visible={isSelectModal}
+  //             onClose={closeSelectModal}
+  //             selectedItem={selectedDocument}
+  //             title="Single Pick List Details"
+  //             propertiesToShow={[
+  //               {
+  //                 name: "docnum",
+  //                 label:
+  //                   activeIndex === 0 || activeIndex === null
+  //                     ? "TO Number"
+  //                     : "SP TO NO. ",
+  //               },
+  //             ]}
+  //             customContent={
+  //               activeIndex === null || activeIndex === 0 ? (
+  //                 <ItemsList uses="outbound" subcategory={"singlepick"} />
+  //               ) : (
+  //                 <ItemsList uses="outbound" subcategory={"stg-validate"} />
+  //               )
+  //             }
+  //           />
+  //         )}
+  //       </ScrollView>
+  //       {isPaginating && (
+  //         <View
+  //           style={{
+  //             justifyContent: "center",
+  //             alignItems: "center",
+  //             paddingVertical: 10,
+  //             height: 100,
+  //           }}
+  //         >
+  //           <ActivityIndicator size="large" color="#0000ff" />
+  //           <Text>Loading more data...</Text>
+  //         </View>
+  //       )}
+  //     </View>
+  //   </>
+  // );
 };
 
 export default ShipmentDocument;

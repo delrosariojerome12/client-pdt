@@ -33,7 +33,7 @@ export const useAuthHooks = () => {
   const [password, setPassword] = useState<any>("");
 
   const handleLogin = async () => {
-    if (userID === "LSTV" && password === "Lstventures") {
+    if (userID === "LSTV" && password === "lstventures") {
       router.push("server");
       setUserID("");
       setPassword("");
