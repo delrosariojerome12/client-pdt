@@ -41,7 +41,6 @@ export const useAuthHooks = () => {
     } else {
       dispatch(setStatus("loading"));
       const randomString = await generateRandomString(32);
-
       await handlePost({
         url: "auth/login",
         requestData: {
@@ -152,70 +151,70 @@ export const useAuthHooks = () => {
     if (!server) {
       router.replace("server");
     }
-
-    if (user) {
-      try {
-        dispatch(setStatus("loading"));
-        dispatch(
-          onLogin({ sesidData: user.sesidData, userData: user.userData })
-        );
-
-        await handlePatch({
-          url: "lst_tracc/userfile",
-          requestData: {
-            field: {
-              usrcde: user.userData.usrcde,
-            },
-            data: {
-              sesid: user.sesidData,
-            },
-          },
-          disableToast: true,
-          config: {
-            headers: {
-              Authorization: `Bearer ${user.userData.token}`,
-            },
-          },
-        });
-
-        await handleGet({
-          url: "lst_tracc/syspar2?_includes=tracc_progdomain,tracc_progdir",
-          onSuccess: (data) => {
-            dispatch(setPhpServer(data[0]));
-          },
-          disableToast: true,
-          config: {
-            headers: {
-              Authorization: `Bearer ${user.userData.token}`,
-            },
-          },
-        });
-        dispatch(setStatus("idle"));
-
-        router.push("screens/home/");
-      } catch (error: any) {
-        console.log(error);
-        dispatch(
-          setStatusText(
-            error.response.data.message || "Cannot Connect to Server."
-          )
-        );
-        dispatch(setStatus("failed"));
-      }
-    }
     if (server) {
       dispatch(handleUpdateProtocol(server));
-      dispatch(
-        getCompany({
-          limit: 1,
-          offset: 0,
-          config: {
-            headers: {
-              Authorization: `Bearer ${user.userData.token}`,
+      if (user) {
+        try {
+          dispatch(setStatus("loading"));
+          dispatch(
+            onLogin({ sesidData: user.sesidData, userData: user.userData })
+          );
+
+          await handlePatch({
+            url: "lst_tracc/userfile",
+            customBaseURL: `${server.protocol}://${server.ipAddress}:${server.port}`,
+            requestData: {
+              field: {
+                usrcde: user.userData.usrcde,
+              },
+              data: {
+                sesid: user.sesidData,
+              },
             },
-          },
-        })
-      );
+            disableToast: true,
+            config: {
+              headers: {
+                Authorization: `Bearer ${user.userData.token}`,
+              },
+            },
+          });
+          await handleGet({
+            url: "lst_tracc/syspar2?_includes=tracc_progdomain,tracc_progdir",
+            customBaseURL: `${server.protocol}://${server.ipAddress}:${server.port}`,
+            onSuccess: (data) => {
+              dispatch(setPhpServer(data[0]));
+            },
+            disableToast: true,
+            config: {
+              headers: {
+                Authorization: `Bearer ${user.userData.token}`,
+              },
+            },
+          });
+          dispatch(
+            getCompany({
+              customBaseURL: `${server.protocol}://${server.ipAddress}:${server.port}`,
+              limit: 1,
+              offset: 0,
+              config: {
+                headers: {
+                  Authorization: `Bearer ${user.userData.token}`,
+                },
+              },
+            })
+          );
+          router.replace("screens/home/");
+          dispatch(setStatus("idle"));
+        } catch (error: any) {
+          console.log(error);
+          dispatch(
+            setStatusText(
+              error.response.data.message || "Cannot Connect to Server."
+            )
+          );
+          dispatch(setStatus("failed"));
+        }
+      }
     }
   };
 

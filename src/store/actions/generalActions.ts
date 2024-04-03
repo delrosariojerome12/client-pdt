@@ -110,6 +110,7 @@ interface CompanyPayload {
   limit: number;
   offset: number;
   config: any;
+  customBaseURL?: string;
 }
 
 export const getDocument = createAsyncThunk(
@@ -732,14 +733,15 @@ export const getBinNum = createAsyncThunk(
 export const getCompany = createAsyncThunk(
   "general/getCompany",
   async (
-    { limit, offset, config }: CompanyPayload,
+    { limit, offset, config, customBaseURL }: CompanyPayload,
     { rejectWithValue, getState }
   ) => {
     try {
       const state = getState() as RootState;
       const { ipAddress, port, protocol } = state.auth.server;
+      const baseURL = customBaseURL || `${protocol}://${ipAddress}:${port}`;
 
-      const url = `${protocol}://${ipAddress}:${port}/api/lst_tracc/companyfile?_limit=${limit}&_offset=${offset}`;
+      const url = `$${baseURL}/api/lst_tracc/companyfile?_limit=${limit}&_offset=${offset}`;
       const response = await axios.get(url, config);
       console.log("company res", response);
 

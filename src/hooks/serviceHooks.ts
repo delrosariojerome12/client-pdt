@@ -15,6 +15,7 @@ interface GetProps {
   onSuccess?: (data: any) => void;
   disableToast?: boolean;
   config?: any;
+  customBaseURL?: string;
 }
 
 interface SendProps {
@@ -25,6 +26,7 @@ interface SendProps {
   onError?: (error: any) => void;
   disableToast?: boolean;
   config?: any;
+  customBaseURL?: string;
 }
 
 export const useServiceHooks = () => {
@@ -44,8 +46,13 @@ export const useServiceHooks = () => {
     onSuccess,
     toastMessage,
     config,
+    customBaseURL,
   }: GetProps) => {
-    const completeUrl = `${baseURl}/api/${url}`;
+    const completeUrl = customBaseURL
+      ? `${customBaseURL}/api/${url}`
+      : `${baseURl}/api/${url}`;
+
+    console.log("daan url", completeUrl);
 
     setStatus("loading");
 
@@ -83,8 +90,12 @@ export const useServiceHooks = () => {
     onError,
     toastMessage,
     config,
+    customBaseURL,
   }: SendProps) => {
-    const completeUrl = `${baseURl}/api/${url}`;
+    const completeUrl = customBaseURL
+      ? `${customBaseURL}/api/${url}`
+      : `${baseURl}/api/${url}`;
+    console.log("daan url", completeUrl);
 
     setStatus("loading");
     if (!disableToast) {
@@ -153,8 +164,12 @@ export const useServiceHooks = () => {
     onSuccess,
     toastMessage,
     config,
+    customBaseURL,
+    onError,
   }: SendProps) => {
-    const completeUrl = `${baseURl}/api/${url}`;
+    const completeUrl = customBaseURL
+      ? `${customBaseURL}/api/${url}`
+      : `${baseURl}/api/${url}`;
     console.log("daan url", completeUrl);
 
     setStatus("loading");
@@ -183,6 +198,7 @@ export const useServiceHooks = () => {
       console.log("url", completeUrl);
       console.log("mali", error);
       setStatus("failed");
+      onError && onError(error);
 
       !disableToast &&
         ToastMessage(toastMessage?.error || "Update Failed!", 1000);
