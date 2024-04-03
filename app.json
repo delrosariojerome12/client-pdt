@@ -5,7 +5,7 @@
     "scheme": "client-pdt",
     "version": "04.01.24",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/wms-icon.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
@@ -18,7 +18,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/wms-icon.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.lstvjerome.clientpdt",
